@@ -1,1 +1,37 @@
-﻿
+﻿.codes-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.codes-content div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.codes-content div h3 {
+  font-weight: 600;
+}
+.codes-content div input {
+  color: #262626;
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  margin-left: 0.5rem;
+  border: 1px solid #dbd9d9;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+  width: calc(100% - 0.5rem);
+  /*&[type="number"] {
+      -webkit-appearance: none;
+      -moz-appearance: textfield;
+
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+      }
+  }*/
+}
+.codes-content div input:focus {
+  border-color: #009e4d;
+  outline: none;
+  box-shadow: 0 2px 6px #e5f5ed;
+}
