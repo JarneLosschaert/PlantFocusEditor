@@ -1,0 +1,27 @@
+@import "../../wwwroot/css/colors.scss";
+@import "../../wwwroot/css/config.scss";
+
+.templates-content {
+
+    ul {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+
+        li {
+            width: 8rem;
+            background: $btn-dark;
+            border-radius: $border-radius;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+
+            img {
+                width: 60%;
+                margin: 1rem 0;
+            }
+        }
+    }
+}
