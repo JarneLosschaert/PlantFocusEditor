@@ -4,7 +4,8 @@
 .side-bar {
     padding-top: 4rem;
     border-radius: $border-radius 0 0 $border-radius;
-    border-right: 3px solid $neutral-dark;
+    border-right: 1px solid $neutral-dark;
+    background: $white;
 
     ul {
         display: flex;
@@ -13,8 +14,6 @@
         gap: 1rem;
         width: 6rem;
         height: 100%;
-        //padding-inline-start: 0;
-        //margin-block-start: 0;
 
         li {
             display: flex;
@@ -29,7 +28,6 @@
             cursor: pointer;
             transition: $transition;
             border-radius: $border-radius;
-            //font-weight: 600;
 
             &:hover {
                 color: $text;
@@ -43,7 +41,7 @@
 
         .selected {
             color: $text;
-            background-color: $white;
+            background-color: $neutral;
         }
     }
 }

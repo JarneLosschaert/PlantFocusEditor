@@ -1,7 +1,8 @@
 ﻿.side-bar {
   padding-top: 4rem;
   border-radius: 10px 0 0 10px;
-  border-right: 3px solid #dbd9d9;
+  border-right: 1px solid #dbd9d9;
+  background: #fff;
 }
 .side-bar ul {
   display: flex;
@@ -34,5 +35,5 @@
 }
 .side-bar ul .selected {
   color: #262626;
-  background-color: #fff;
+  background-color: #f0f0f0;
 }

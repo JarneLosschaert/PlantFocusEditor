@@ -4,13 +4,15 @@
 .side-bar-content {
     width: 20rem;
     background-color: $white;
+    box-shadow: 5px 0 20px rgba(0, 0, 0, 0.15);
+    z-index: 100;
 
     .content-header {
         height: 4rem;
         display: flex;
         justify-content: center;
         align-items: center;
-        border-bottom: 3px solid $neutral-dark;
+        border-bottom: 1px solid $neutral-dark;
 
         h2 {
             font-size: 1.5rem;
@@ -20,7 +22,6 @@
 
     .content {
         height: calc(100% - 4rem);
-        box-shadow: $shadow-m;
         padding: 1rem;
     }
 }
