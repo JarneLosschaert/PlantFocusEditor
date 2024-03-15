@@ -1,0 +1,59 @@
+@import "../../wwwroot/css/colors.scss";
+@import "../../wwwroot/css/config.scss";
+
+.text-content {
+    display: flex;
+    flex-direction: column;
+
+    h3 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .texts {
+        display: flex;
+        flex-direction: column;
+        margin-left: 1rem;
+        gap: 1.5rem;
+
+        button {
+            display: flex;
+            align-items: center;
+            background: $btn;
+            box-shadow: $shadow-s;
+            border-radius: $border-radius-s;
+            gap: 0.5rem;
+            border: none;
+            transition: $transition;
+
+            ::deep svg {
+                height: 1.25rem;
+                width: 1.25rem;
+                transition: $transition;
+            }
+
+            &:hover {
+                background: $neutral;
+            }
+        }
+
+        .text-header {
+            font-size: 1.25rem;
+            font-weight: 600;
+            padding: 1.25rem 0.75rem;
+
+        }
+
+        .text-subheader {
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.75rem 0.75rem;
+        }
+
+        .text-paragraph {
+            font-size: 1rem;
+            font-weight: 400;
+            padding: 0.5rem 0.75rem;
+        }
+    }
+}
