@@ -1,4 +1,26 @@
-﻿
-@code {
+﻿<section class="styling-bar">
+    <div class="content-header">
+        <h2>@_SelectedTab</h2>
+    </div>
+    <div class="content">
+        @switch (_SelectedTab)
+        {
+            case StylingBarTabs.Label:
+                <LabelStyleContent />
+                break;
+            case StylingBarTabs.Text:
+                <TextStyleContent />
+                break;
+            case StylingBarTabs.Image:
+                <ImageStyleContent />
+                break;
+            case StylingBarTabs.Element:
+                <ElementStyleContent />
+                break;
+        }
+    </div>
+</section>
 
+@code {
+    public StylingBarTabs _SelectedTab { get; set; }
 }

@@ -1,26 +1,31 @@
-﻿<div class="side-bar-content">
-    @switch (LabelEditor._SelectedTab)
-    {
-        case SideBarTabs.Templates:
-            <TemplatesContent />
-            break;
-        case SideBarTabs.Text:
-            <TextContent />
-            break;
-        case SideBarTabs.Images:
-            <ImagesContent />
-            break;
-        case SideBarTabs.Elements:
-            <ElementsContent />
-            break;
-        case SideBarTabs.Codes:
-            <CodesContent />
-            break;
-        case SideBarTabs.Properties:
-            <PropertiesContent />
-            break;
-    }
-</div>
+﻿<section class="side-bar-content">
+    <div class="content-header">
+        <h2>@LabelEditor._SelectedTab</h2>
+    </div>
+    <div class="content">
+        @switch (LabelEditor._SelectedTab)
+        {
+            case SideBarTabs.Templates:
+                <TemplatesContent />
+                break;
+            case SideBarTabs.Text:
+                <TextContent />
+                break;
+            case SideBarTabs.Images:
+                <ImagesContent />
+                break;
+            case SideBarTabs.Elements:
+                <ElementsContent />
+                break;
+            case SideBarTabs.Codes:
+                <CodesContent />
+                break;
+            case SideBarTabs.Properties:
+                <PropertiesContent />
+                break;
+        }
+    </div>
+</section>
 
 
 @code {

@@ -54,5 +54,9 @@
   {
     "outputFile": "Components/SideBar/SideBar.razor.css",
     "inputFile": "Components/SideBar/SideBar.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/LabelStylingBar.razor.css",
+    "inputFile": "Components/StylingBar/LabelStylingBar.razor.scss"
   }
 ]
