@@ -1,4 +1,21 @@
-﻿<h3>EditorBar</h3>
+﻿<section class="editor-bar">
+    <div class="undo-redo">
+        <button>
+            @((MarkupString)CustomIcons.Undo())
+        </button>
+        <button>
+            @((MarkupString)CustomIcons.Redo())
+        </button>
+    </div>
+    <button>
+        Recto
+        @((MarkupString)CustomIcons.Rotate())
+    </button>
+
+    <button>
+        @((MarkupString)CustomIcons.Flip())
+    </button>
+</section>
 
 @code {
 

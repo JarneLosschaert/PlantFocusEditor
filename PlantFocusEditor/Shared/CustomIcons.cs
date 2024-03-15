@@ -2,6 +2,22 @@
 {
     public static class CustomIcons
     {
+        public static string Undo()
+        {
+            return "<svg id=\"Layer_1\" data-name=\"Layer 1\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" width=\"24\" height=\"24\" color=\"currentColor\"><defs><style>.cls-63ce7424ea57ea6c838005a1-1{fill:none;stroke:currentColor;stroke-miterlimit:10;}</style></defs><path class=\"cls-63ce7424ea57ea6c838005a1-1\" d=\"M2,17H12A10,10,0,0,0,22,7V1\"></path><polyline class=\"cls-63ce7424ea57ea6c838005a1-1\" points=\"8 23 2 17 8 11\"></polyline></svg>";
+        }
+        public static string Redo()
+        {
+            return "<svg id=\"Layer_1\" data-name=\"Layer 1\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" width=\"24\" height=\"24\" color=\"currentColor\"><defs><style>.cls-63ce7424ea57ea6c838005a1-1{fill:none;stroke:currentColor;stroke-miterlimit:10;}</style></defs><path class=\"cls-63ce7424ea57ea6c838005a1-1\" d=\"M22,7H12A10,10,0,0,0,2,17v6\"></path><polyline class=\"cls-63ce7424ea57ea6c838005a1-1\" points=\"16 1 22 7 16 13\"></polyline></svg>";
+        }
+        public static string Rotate()
+        {
+            return "<svg id=\"Layer_1\" data-name=\"Layer 1\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" width=\"24\" height=\"24\" color=\"currentColor\"><defs><style>.cls-63ce7424ea57ea6c838005ca-1{fill:none;stroke:currentColor;stroke-miterlimit:10;}</style></defs><line class=\"cls-63ce7424ea57ea6c838005ca-1\" x1=\"12\" y1=\"0.5\" x2=\"12\" y2=\"13.92\"></line><path class=\"cls-63ce7424ea57ea6c838005ca-1\" d=\"M14.88,8.31c4.42.45,7.66,1.94,7.66,3.69,0,2.12-4.71,3.83-10.54,3.83S1.46,14.12,1.46,12c0-1.75,3.24-3.24,7.66-3.69\"></path><line class=\"cls-63ce7424ea57ea6c838005ca-1\" x1=\"12\" y1=\"17.75\" x2=\"12\" y2=\"23.5\"></line><polyline class=\"cls-63ce7424ea57ea6c838005ca-1\" points=\"5.72 6.08 9.12 8.32 6.89 11.71\"></polyline></svg>";
+        }
+        public static string Flip()
+        {
+            return "<svg id=\"Layer_1\" data-name=\"Layer 1\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" width=\"24\" height=\"24\" color=\"currentColor\"><defs><style>.cls-63ce7424ea57ea6c83800590-1{fill:none;stroke:currentColor;stroke-miterlimit:10;}</style></defs><polyline class=\"cls-63ce7424ea57ea6c83800590-1\" points=\"20.63 0.5 20.63 6.25 14.88 6.25\"></polyline><polyline class=\"cls-63ce7424ea57ea6c83800590-1\" points=\"3.38 23.5 3.38 17.75 9.13 17.75\"></polyline><path class=\"cls-63ce7424ea57ea6c83800590-1\" d=\"M1.83,14.77A10.12,10.12,0,0,1,1.46,12,10.54,10.54,0,0,1,20.62,5.94\"></path><path class=\"cls-63ce7424ea57ea6c83800590-1\" d=\"M22.17,9.23A10.12,10.12,0,0,1,22.54,12,10.54,10.54,0,0,1,3.38,18.06\"></path></svg>";
+        }
         public static string Width()
         {
             return "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" id=\"Layer_1\" x=\"0px\" y=\"0px\" viewBox=\"0 0 122.88 41.04\" style=\"enable-background:new 0 0 122.88 41.04\" xml:space=\"preserve\"><g><path d=\"M115.39,6.09c0-2.07,1.68-3.75,3.75-3.75c2.07,0,3.75,1.68,3.75,3.75v28.86c0,2.07-1.68,3.75-3.75,3.75 c-2.07,0-3.75-1.68-3.75-3.75V6.09L115.39,6.09z M0,6.09c0-2.07,1.68-3.75,3.75-3.75c2.07,0,3.75,1.68,3.75,3.75v28.86 c0,2.07-1.68,3.75-3.75,3.75C1.68,38.69,0,37.02,0,34.95V6.09L0,6.09z M13.27,22.03c-0.18-0.41-0.29-0.85-0.31-1.29l0,0l0-0.09l0,0 l0-0.09v0v-0.09v0l0-0.09l0,0l0-0.09l0,0c0.03-0.44,0.13-0.88,0.31-1.29l0-0.01l0.01-0.01l0.03-0.07l0.01-0.01l0.03-0.07l0.01-0.02 l0.01-0.01c0.12-0.24,0.27-0.47,0.45-0.68L27.33,1.4c1.29-1.61,3.65-1.86,5.25-0.57c1.61,1.29,1.86,3.65,0.57,5.25l-8.67,10.73 l71-0.02L86.84,6.08c-1.29-1.61-1.04-3.96,0.57-5.25c1.61-1.29,3.96-1.04,5.25,0.57l13.52,16.72c0.18,0.21,0.33,0.44,0.45,0.68 l0.01,0.01l0.01,0.02l0.03,0.07l0.01,0.01l0.03,0.07l0.01,0.01l0,0.01c0.18,0.41,0.29,0.85,0.31,1.29l0,0l0,0.09l0,0l0,0.09v0v0.09 v0l0,0.09l0,0l0,0.09l0,0c-0.03,0.44-0.13,0.88-0.31,1.29l0,0.01l-0.01,0.01l-0.03,0.07l-0.01,0.01l-0.03,0.07l-0.01,0.02 l-0.01,0.01c-0.12,0.24-0.27,0.47-0.45,0.68L92.66,39.64c-1.29,1.61-3.65,1.86-5.25,0.57c-1.61-1.29-1.86-3.65-0.57-5.25l8.65-10.7 l-70.97,0.02l8.63,10.68c1.29,1.61,1.04,3.96-0.57,5.25c-1.61,1.29-3.96,1.04-5.25-0.57L13.82,22.92 c-0.18-0.21-0.33-0.44-0.45-0.68l-0.01-0.01l-0.01-0.02l-0.03-0.07l-0.01-0.01l-0.03-0.07l-0.01-0.01L13.27,22.03L13.27,22.03z\"/></g></svg>";
