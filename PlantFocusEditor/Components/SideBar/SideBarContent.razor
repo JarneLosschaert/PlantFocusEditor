@@ -1,5 +1,29 @@
-﻿<h3>SideBarContent</h3>
+﻿<div class="side-bar-content">
+    @switch (LabelEditor._SelectedTab)
+    {
+        case SideBarTabs.Templates:
+            <TemplatesContent />
+            break;
+        case SideBarTabs.Text:
+            <TextContent />
+            break;
+        case SideBarTabs.Images:
+            <ImagesContent />
+            break;
+        case SideBarTabs.Elements:
+            <ElementsContent />
+            break;
+        case SideBarTabs.Codes:
+            <CodesContent />
+            break;
+        case SideBarTabs.Properties:
+            <PropertiesContent />
+            break;
+    }
+</div>
+
 
 @code {
-
+    [CascadingParameter]
+    public LabelEditor LabelEditor { get; set; }
 }

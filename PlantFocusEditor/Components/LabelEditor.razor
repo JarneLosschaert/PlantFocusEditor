@@ -1,11 +1,17 @@
-﻿
-<div>
-    <SideBar />
-    <SideBarContent />
-    <Editor />
-    <StylingBar />
-</div>
+﻿<CascadingValue Value="this">
+    <div class="label-editor">
+        <SideBar SelectTab="SelectTab" />
+        <SideBarContent />
+        <Editor />
+        <StylingBar />
+    </div>
+</CascadingValue>
 
 @code {
+    public SideBarTabs _SelectedTab { get; set; } = SideBarTabs.Templates;
 
+    public void SelectTab(SideBarTabs tab)
+    {
+        _SelectedTab = tab;
+    }
 }

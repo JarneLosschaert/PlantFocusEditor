@@ -1,5 +1,46 @@
-﻿<h3>SideBar</h3>
+﻿<div class="side-bar">
+    <ul>
+        <li @onclick="() => SelectTabAsync(SideBarTabs.Templates)" class="@GetSelectedClass(SideBarTabs.Templates)">
+            @((MarkupString)CustomIcons.Templates())
+            Templates
+        </li>
+        <li @onclick="() => SelectTabAsync(SideBarTabs.Text)" class="@GetSelectedClass(SideBarTabs.Text)">
+            @((MarkupString)CustomIcons.Text())
+            Text
+        </li>
+        <li @onclick="() => SelectTabAsync(SideBarTabs.Images)" class="@GetSelectedClass(SideBarTabs.Images)">
+            @((MarkupString)CustomIcons.Images())
+            Images
+        </li>
+        <li @onclick="() => SelectTabAsync(SideBarTabs.Elements)" class="@GetSelectedClass(SideBarTabs.Elements)">
+            @((MarkupString)CustomIcons.Elements())
+            Elements
+        </li>
+        <li @onclick="() => SelectTabAsync(SideBarTabs.Codes)" class="@GetSelectedClass(SideBarTabs.Codes)">
+            @((MarkupString)CustomIcons.Codes())
+            Codes
+        </li>
+        <li @onclick="() => SelectTabAsync(SideBarTabs.Properties)" class="@GetSelectedClass(SideBarTabs.Properties)">
+            @((MarkupString)CustomIcons.Properties())
+            Properties
+        </li>
+    </ul>
+</div>
 
 @code {
+    [CascadingParameter]
+    public LabelEditor LabelEditor { get; set; }
 
+    [Parameter]
+    public EventCallback<SideBarTabs> SelectTab { get; set; }
+
+    public async Task SelectTabAsync(SideBarTabs tab)
+    {
+        await SelectTab.InvokeAsync(tab);
+    }
+
+    private string GetSelectedClass(SideBarTabs tab)
+    {
+        return LabelEditor._SelectedTab == tab ? "selected" : "";
+    }
 }

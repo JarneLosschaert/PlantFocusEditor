@@ -1,0 +1,58 @@
+﻿[
+  {
+    "outputFile": "Components/LabelEditor.razor.css",
+    "inputFile": "Components/LabelEditor.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/TextStylingBar.razor.css",
+    "inputFile": "Components/StylingBar/TextStylingBar.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/StylingBar.razor.css",
+    "inputFile": "Components/StylingBar/StylingBar.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/ImageStylingBar.razor.css",
+    "inputFile": "Components/StylingBar/ImageStylingBar.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/TextContent.razor.css",
+    "inputFile": "Components/SideBar/TextContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/TemplatesContent.razor.css",
+    "inputFile": "Components/SideBar/TemplatesContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/SideBarContent.razor.css",
+    "inputFile": "Components/SideBar/SideBarContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/PropertiesContent.razor.css",
+    "inputFile": "Components/SideBar/PropertiesContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/ImagesContent.razor.css",
+    "inputFile": "Components/SideBar/ImagesContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/ElementsContent.razor.css",
+    "inputFile": "Components/SideBar/ElementsContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/CodesContent.razor.css",
+    "inputFile": "Components/SideBar/CodesContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/Editor/EditorBar.razor.css",
+    "inputFile": "Components/Editor/EditorBar.razor.scss"
+  },
+  {
+    "outputFile": "Components/Editor/Editor.razor.css",
+    "inputFile": "Components/Editor/Editor.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/SideBar.razor.css",
+    "inputFile": "Components/SideBar/SideBar.razor.scss"
+  }
+]

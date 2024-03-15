@@ -1,6 +1,6 @@
 ﻿namespace PlantFocusEditor.Helpers
 {
-    public enum Tabs
+    public enum SideBarTabs
     {
         Templates,
         Text,
