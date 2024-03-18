@@ -33,7 +33,7 @@
     private ImageStyleContent _imageStyleContent;
     private IJSObjectReference? _controlBar;
     private ControlBar _controlBarRef;
-    public StylingBarTabs _SelectedTab { get; set; }
+    public StylingBarTabs _SelectedTab { get; set; } = StylingBarTabs.Text;
 
     public string _popupVisible { get; set; } = "";
 
@@ -66,18 +66,6 @@
             _popupVisible = popup;
         }
         StateHasChanged();
-    }
-
-    [JSInvokable]
-    public void displayTextStylingBar(bool visible)
-    {
-        textStyleContent.displayTextStylingBar(visible);
-    }
-
-    [JSInvokable]
-    public void updateTextStylingBarValues(string font, int size, string color, string boldItalicStyle, string underlineStyle, string alignment, double transparency, double shadow)
-    {
-        textStyleContent.updateTextStylingBarValues(font, size, color, boldItalicStyle, underlineStyle, alignment, transparency, shadow);
     }
 
     [JSInvokable]

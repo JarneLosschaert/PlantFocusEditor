@@ -58,5 +58,9 @@
   {
     "outputFile": "Components/StylingBar/LabelStylingBar.razor.css",
     "inputFile": "Components/StylingBar/LabelStylingBar.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/TextStyleContent.razor.css",
+    "inputFile": "Components/StylingBar/TextStyleContent.razor.scss"
   }
 ]

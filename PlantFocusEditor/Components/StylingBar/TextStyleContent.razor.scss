@@ -1,0 +1,240 @@
+@import "../../wwwroot/css/colors.scss";
+@import "../../wwwroot/css/config.scss";
+
+.text-style-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    & > div {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        & > div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+
+            & > div {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                transition: $transition;
+
+                h4 {
+                    width: 30%;
+                }
+
+                & > div {
+                    display: flex;
+                    justify-content: space-between;
+                    position: relative;
+                    width: 70%;
+                    border-radius: $border-radius-s;
+                }
+            }
+        }
+    }
+
+    select {
+        width: 100%;
+        padding: 0.5rem;
+        background: $white;
+        border: 1px solid $neutral-dark;
+        border-radius: $border-radius-s;
+        appearance: none;
+        cursor: pointer;
+
+        &:focus {
+            border-color: $primary;
+            outline: none;
+            box-shadow: 0 2px 6px $primary-lightest;
+        }
+
+        & ~ .icon {
+            position: absolute;
+            top: 50%;
+            right: 0.5rem;
+            transform: translateY(-50%);
+
+            ::deep svg {
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+        }
+    }
+
+    input[type="text"], input[type="number"] {
+        width: 100%;
+        background: $white;
+        border: 1px solid $neutral-dark;
+        border-radius: $border-radius-s;
+        padding: 0.25rem 0.5rem;
+
+        &[type="number"] {
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
+
+            &::-webkit-outer-spin-button,
+            &::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+            }
+        }
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+            box-shadow: 0 2px 6px $primary-lightest;
+        }
+    }
+
+    button {
+        color: $text-lighter;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        height: 100%;
+        padding: 0.5rem;
+        background: $btn-dark;
+        border: none;
+        border-radius: $border-radius-s;
+        cursor: pointer;
+
+        ::deep svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        &:hover {
+            color: $text;
+        }
+
+        &.selected {
+            background: $neutral;
+            color: $text;
+        }
+    }
+
+    .color-input {
+        gap: 5%;
+
+        input[type="text"] {
+            width: 80%
+        }
+
+        input[type="color"] {
+            width: 15%;
+            padding: 0;
+            border: 1px solid $neutral-dark;
+            border-radius: $border-radius-s;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: $neutral;
+            border-radius: $border-radius-s;
+        }
+    }
+
+    .align-input {
+        background: $btn-dark;
+        justify-content: space-evenly;
+
+        button {
+            background: none;
+            width: 33%;
+
+            &:not(:last-child) {
+                border-right: 1px solid $neutral-dark;
+            }
+
+            &.selected {
+                background: $neutral;
+            }
+        }
+    }
+
+    .elements-style-content {
+        .position {
+            button {
+                width: 100%;
+            }
+        }
+
+        .position-popup {
+            padding: 0.5rem 0;
+            display: flex;
+            justify-content: center;
+            background: $btn-dark;
+            border-radius: $border-radius-s;
+
+            ul {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+
+                li {
+                    color: $text-lighter;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    cursor: pointer;
+
+                    &:hover {
+                        color: $text;
+                    }
+                }
+            }
+        }
+
+        button {
+            color: $text;
+
+            &:hover {
+                background: $neutral;
+            }
+        }
+    }
+
+    input[type=range] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 1.5rem;
+        background: $neutral-dark;
+        border-radius: $border-radius-s;
+        outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 0.5rem;
+        height: 1.5rem;
+        border: none;
+        border-radius: $border-radius-m;
+        background: $neutral;
+        cursor: pointer;
+    }
+
+    input[type=range]::-moz-range-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 0.5rem;
+        height: 1.5rem;
+        border: none;
+        border-radius: $border-radius-m;
+        background: $neutral;
+        cursor: pointer;
+    }
+
+    input[type=range]:active,
+    input[type=range]:focus {
+        /* Add styles for when the range input is active or focused */
+    }
+}

@@ -1,257 +1,127 @@
-﻿@inject IJSRuntime JS;
-
-@if (_visible)
-{
-    <ul id="text-styling-bar">
-        <li class="text-general">
-            <ul>
-                <li class="font">
-                    <select id="text-fonts" @onchange="handleFontSelect">
-                        <option value="Arial">Arial</option>
-                        <option value="Times New Roman">Times New Roman</option>
-                        <option value="Courier New">Courier New</option>
-                        <option value="Verdana">Verdana</option>
-                        <option value="Georgia">Georgia</option>
+﻿<article class="text-style-content">
+    <div>
+        <h3>General</h3>
+        <div>
+            <div>
+                <h4>Font</h4>
+                <div>
+                    <select>
+                        <option>Times New Roman</option>
+                        <option>Arial</option>
+                        <option>Verdana</option>
+                        <option>Georgia</option>
+                        <option>Comic Sans MS</option>
                     </select>
                     <div class="icon">
                         @((MarkupString)CustomIcons.ChevronDown())
                     </div>
-                </li>
-                <li class="text-size">
-                    <button @onclick='() => incrDecrFontSize(-1)'>@((MarkupString)CustomIcons.Minus())</button>
-                    <input type="number"
-                           id="text-size"
-                           name="text-size"
-                           value="@_textSize"
-                           @onchange="handleFontSizeChange">
-                    <button @onclick='() => incrDecrFontSize(1)'>@((MarkupString)CustomIcons.Plus())</button>
-                </li>
-                <li class="text-color">
-                    <label for="text-color">
-                        <div>@((MarkupString)CustomIcons.TextColor())</div>
-                        <hr style="border: 5px solid @_fontColor" />
-                    </label>
+                </div>
 
-                    <input type="color" id="text-color" name="text-color" value="@_fontColor" @oninput="handleFontColorChange">
-                </li>
-            </ul>
-        </li>
+            </div>
+            <div>
+                <h4>Style</h4>
+                <div>
+                    <button class="selected">@((MarkupString)CustomIcons.Bold())</button>
+                    <button>@((MarkupString)CustomIcons.Italic())</button>
+                    <button>@((MarkupString)CustomIcons.Underline())</button>
+                </div>
+            </div>
+            <div>
+                <h4>Size</h4>
+                <div>
+                    <input type="number" />
+                </div>
+            </div>
+            <div>
+                <h4>Color</h4>
+                <div class="color-input">
+                    <input type="text" />
+                    <input type="color" />
+                </div>
+            </div>
+            <div>
+                <h4>Align</h4>
+                <div class="align-input">
+                    <button class="selected">@((MarkupString)CustomIcons.AlignLeft())</button>
+                    <button>@((MarkupString)CustomIcons.AlignCenter())</button>
+                    <button>@((MarkupString)CustomIcons.AlignRight())</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <h3>Appearance</h3>
+        <div>
+            <div>
+                <h4>Opacity</h4>
+                <div>
+                    <input type="range" />
+                </div>
+            </div>
+            <div>
+                <h4>Shadow</h4>
+                <div>
+                    <input type="range" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <h3>Elements</h3>
+        <div class="elements-style-content">
+            <div class="controls">
+                <button>
+                    @((MarkupString)CustomIcons.Lock())
+                    Lock
+                </button>
+                <button>
+                    @((MarkupString)CustomIcons.Clone())
+                    Clone
+                </button>
+                <button>
+                    @((MarkupString)CustomIcons.Trash())
+                    Delete
+                </button>
+            </div>
+            <div class="position">
+                <button @onclick="togglePositionPopup">
+                    @((MarkupString)CustomIcons.Layers())
+                    Position
+                </button>
+            </div>
+            @if(_isPositionPopupVisible)
+            {
+                <div class="position-popup">
+                    <ul>
+                        <li>
+                            @((MarkupString)CustomIcons.Front())
+                            Bring to front
+                        </li>
+                        <li>
+                            @((MarkupString)CustomIcons.Forward())
+                            Bring forward
+                        </li>
+                        <li>
+                            @((MarkupString)CustomIcons.Backward())
+                            Send backward
+                        </li>
+                        <li>
+                            @((MarkupString)CustomIcons.Back())
+                            Send to back
+                        </li>
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
 
-        <li class="text-styles">
-            <ul>
-                <li class="bold @(_bold ? "selected" : "")" id="text-bold">
-                    <button @onclick='() => toggleFontStyles("bold")'>@((MarkupString)CustomIcons.Bold())</button>
-                </li>
-                <li class="italic @(_italic ? "selected" : "")" id="text-italic">
-                    <button @onclick='() => toggleFontStyles("italic")'>@((MarkupString)CustomIcons.Italic())</button>
-                </li>
-                <li class="underline @(_underline ? "selected" : "")" id="text-underline">
-                    <button @onclick='() => toggleFontStyles("underline")'>@((MarkupString)CustomIcons.Underline())</button>
-                </li>
-            </ul>
-        </li>
-        <li class="text-alignment">
-            <ul>
-                <li class="alignment">
-                    @if (_alignment == "left")
-                    {
-                        <button @onclick='() => toggleAlignment("center")'>@((MarkupString)CustomIcons.AlignLeft())</button>
-                    }
-                    else if (_alignment == "center")
-                    {
-                        <button @onclick='() => toggleAlignment("right")'>@((MarkupString)CustomIcons.AlignCenter())</button>
-                    }
-                    else
-                    {
-                        <button @onclick='() => toggleAlignment("left")'>@((MarkupString)CustomIcons.AlignRight())</button>
-                    }
-                </li>
-            </ul>
-        </li>
-
-        <li class="text-specials">
-            <ul>
-                <li class="transparency @(StylingBar._popupVisible == "transparency" ? "visible" : "")">
-                    <button @onclick='() => StylingBar.togglePopup("transparency")'>@((MarkupString)CustomIcons.Transparency())</button>
-                    @if (StylingBar._popupVisible == "transparency")
-                    {
-                        <div class="popup">
-                            <p>Transparency: @_transparency%</p>
-                            <div>
-                                <input type="range"
-                                       id="transparency"
-                                       name="transparency"
-                                       min="0"
-                                       max="100"
-                                       value="@_transparency"
-                                       @oninput="(ChangeEventArgs e) => {_transparency = Convert.ToInt32(e.Value.ToString()); handleTransparencyChange();}">
-
-                            </div>
-                        </div>
-                    }
-                </li>
-                <li class="shadow @(StylingBar._popupVisible == "shadow" ? "visible" : "")">
-                    <button @onclick='() => StylingBar.togglePopup("shadow")'>Shadow</button>
-                    @if (StylingBar._popupVisible == "shadow")
-                    {
-                        <div class="popup">
-                            <p>Shadow: @_shadow%</p>
-                            <div>
-                                <input type="range"
-                                       id="shadow"
-                                       name="shadow"
-                                       min="0"
-                                       max="100"
-                                       value="@_shadow"
-                                       @oninput="(ChangeEventArgs e) => {_shadow = Convert.ToInt32(e.Value.ToString()); handleShadowChange();}">
-                            </div>
-                        </div>
-                    }
-                </li>
-            </ul>
-        </li>
-    </ul>
-}
+</article>
 
 @code {
-    private IJSObjectReference? module;
+    private bool _isPositionPopupVisible = false;
 
-    [CascadingParameter]
-    public StylingBar StylingBar { get; set; }
-
-    public bool _visible = false;
-
-    private string _font = "Arial";
-    private int _textSize = 40;
-    private string _fontColor = "#000000";
-    private bool _bold = false;
-    private bool _italic = false;
-    private bool _underline = false;
-    private string _alignment = "left";
-    private int _transparency = 100;
-    private int _shadow = 100;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private void togglePositionPopup()
     {
-        if (firstRender)
-        {
-            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textStylingBar.js");
-            await module.InvokeVoidAsync("setTextStylingBarReference", DotNetObjectReference.Create(this));
-        }
-    }
-
-    private async Task InvokeJSFunction(string functionName, string parameter)
-    {
-        if (module != null)
-        {
-            await module.InvokeAsync<string>(functionName, parameter);
-        }
-    }
-
-    private async Task toggleFontStyles(string style)
-    {
-        if (style == "bold")
-        {
-            _bold = !_bold;
-            await handleBoldItalic();
-        }
-        else if (style == "italic")
-        {
-            _italic = !_italic;
-            await handleBoldItalic();
-        }
-        else if (style == "underline")
-        {
-            _underline = !_underline;
-            string value = _underline ? "underline" : "none";
-            await InvokeJSFunction("handleUnderline", value);
-        }
-    }
-
-    private async Task handleBoldItalic()
-    {
-        if (_bold && _italic)
-        {
-            await InvokeJSFunction("handleBoldItalic", "bold italic");
-        }
-        else if (_bold)
-        {
-            await InvokeJSFunction("handleBoldItalic", "bold");
-        }
-        else if (_italic)
-        {
-            await InvokeJSFunction("handleBoldItalic", "italic");
-        }
-        else
-        {
-            await InvokeJSFunction("handleBoldItalic", "normal");
-        }
-    }
-
-    private async Task toggleAlignment(string alignment)
-    {
-        _alignment = alignment;
-        await InvokeJSFunction("handleAlignmentChange", _alignment);
-    }
-
-    private async Task handleFontSelect(ChangeEventArgs e)
-    {
-        _font = e.Value.ToString();
-        await InvokeJSFunction("handleFontSelect", _font);
-    }
-
-    private async Task handleFontSizeChange(ChangeEventArgs e)
-    {
-        _textSize = Convert.ToInt32(e.Value.ToString());
-        await InvokeJSFunction("handleFontSizeChange", _textSize.ToString());
-    }
-
-    private async Task incrDecrFontSize(int value)
-    {
-        Console.WriteLine(_visible);
-        _textSize += value;
-        await InvokeJSFunction("handleFontSizeChange", _textSize.ToString());
-    }
-
-    private async Task handleShadowChange()
-    {
-        double shadow = (double)_shadow / 100.0;
-        await InvokeJSFunction("handleShadowChange", shadow.ToString());
-    }
-
-    private async Task handleTransparencyChange()
-    {
-        double transparency = (double)_transparency / 100.0;
-        await InvokeJSFunction("handleTransparencyChange", transparency.ToString());
-    }
-
-    private async Task handleFontColorChange(ChangeEventArgs e)
-    {
-        _fontColor = e.Value.ToString();
-        await InvokeJSFunction("handleFontColorChange", _fontColor);
-    }
-
-    public void updateTextStylingBarValues(string font, int size, string color, string boldItalicStyle, string underlineStyle, string alignment, double transparency, double shadow)
-    {
-        _font = font;
-        _textSize = size;
-        _fontColor = color;
-        _bold = boldItalicStyle.Contains("bold");
-        _italic = boldItalicStyle.Contains("italic");
-        _underline = underlineStyle.Contains("underline");
-        _alignment = alignment;
-        _transparency = Convert.ToInt32(transparency * 100);
-        _shadow = Convert.ToInt32(shadow * 100);
-        StateHasChanged();
-    }
-
-    public void displayTextStylingBar(bool visisble)
-    {
-        if (_visible != visisble)
-        {
-            StylingBar.togglePopup("");
-        }
-        _visible = visisble;
-        StateHasChanged();
+        _isPositionPopupVisible = !_isPositionPopupVisible;
     }
 }
