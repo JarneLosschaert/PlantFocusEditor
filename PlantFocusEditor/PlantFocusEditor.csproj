@@ -90,10 +90,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\PlantfocusEditorPrototype2\Library\Library.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Animation.d.ts" />
     <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\BezierFunctions.d.ts" />
     <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Canvas.d.ts" />
@@ -161,6 +157,10 @@
     <Folder Include="wwwroot\node_modules\%40babel\" />
     <Folder Include="wwwroot\node_modules\%40types\" />
     <Folder Include="wwwroot\node_modules\.bin\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Library\Library.csproj" />
   </ItemGroup>
 
 </Project>
