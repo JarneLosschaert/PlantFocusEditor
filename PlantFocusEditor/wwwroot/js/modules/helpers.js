@@ -2,12 +2,12 @@ import { findWidthPassePartout, findHeightPassePartout } from "./passePartout.js
 
 function convertJsonToKonva(stage, layer, json) {
     const group = Konva.Node.create(json.Group);
+    let offsetX;
     group.children.forEach((child, i, arr) => {
         const node = Konva.Node.create(child);
-        arr[i] = node;
         if (node.getClassName() === "Path") {
             resizePath(stage, node);
-            group.x(stage.width() / 2 - findWidthPassePartout(node.data()) / 2);
+            offsetX = stage.width() / 2 - node.width() / 2;
             group.y(10);
         } else if (node.getClassName() === "Image") {
             const src = node.attrs.src;
@@ -17,18 +17,23 @@ function convertJsonToKonva(stage, layer, json) {
         } else if (node.getClassName() === "Shape") {
             node.sceneFunc(sceneFunc);
         }
+        arr[i] = node;
     });
-
+    group.x(offsetX);
+    group.children.forEach(child => child.x(child.x() + offsetX));
     layer.add(group);
-    stage.add(layer);
 }
 
 function resizePath(stage, path) {
-    const newWidth = stage.width() / 3;
-    const r = findWidthPassePartout(path.data()) / findHeightPassePartout(path.data());
-    const newHeight = newWidth / r;
-    path.width(newWidth);
-    path.height(newHeight);
+    let newHeight = stage.height() + 1;
+    let newWidth;
+    while (newHeight > stage.height()) {
+        const r = findWidthPassePartout(path.data()) / findHeightPassePartout(path.data());
+        newWidth = findWidthPassePartout(path.data()) - 2;
+        newHeight = newWidth / r;
+        path.width(newWidth);
+        path.height(newHeight);
+    }
 }
 
 function isValidJson(json) {
