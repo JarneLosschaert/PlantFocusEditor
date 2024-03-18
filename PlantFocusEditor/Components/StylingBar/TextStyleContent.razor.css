@@ -1,1 +1,195 @@
-﻿
+﻿.text-style-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.text-style-content > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.text-style-content > div h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.text-style-content > div > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.text-style-content > div > div > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+}
+.text-style-content > div > div > div h4 {
+  width: 30%;
+}
+.text-style-content > div > div > div > div {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  width: 70%;
+  border-radius: 6px;
+}
+.text-style-content select {
+  width: 100%;
+  padding: 0.5rem;
+  background: #fff;
+  border: 1px solid #dbd9d9;
+  border-radius: 6px;
+  appearance: none;
+  cursor: pointer;
+}
+.text-style-content select:focus {
+  border-color: #009e4d;
+  outline: none;
+  box-shadow: 0 2px 6px #e5f5ed;
+}
+.text-style-content select ~ .icon {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+}
+.text-style-content select ~ .icon ::deep svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.text-style-content input[type=text], .text-style-content input[type=number] {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #dbd9d9;
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+}
+.text-style-content input[type=text][type=number], .text-style-content input[type=number][type=number] {
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
+.text-style-content input[type=text][type=number]::-webkit-outer-spin-button, .text-style-content input[type=text][type=number]::-webkit-inner-spin-button, .text-style-content input[type=number][type=number]::-webkit-outer-spin-button, .text-style-content input[type=number][type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+.text-style-content input[type=text]:focus, .text-style-content input[type=number]:focus {
+  outline: none;
+  border-color: #009e4d;
+  box-shadow: 0 2px 6px #e5f5ed;
+}
+.text-style-content button {
+  color: #919191;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0.5rem;
+  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 67%, 0.16);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.text-style-content button ::deep svg {
+  width: 1rem;
+  height: 1rem;
+}
+.text-style-content button:hover {
+  color: #262626;
+}
+.text-style-content button.selected {
+  background: #f0f0f0;
+  color: #262626;
+}
+.text-style-content .color-input {
+  gap: 5%;
+}
+.text-style-content .color-input input[type=text] {
+  width: 80%;
+}
+.text-style-content .color-input input[type=color] {
+  width: 15%;
+  padding: 0;
+  border: 1px solid #dbd9d9;
+  border-radius: 6px;
+}
+.text-style-content .color-input input[type=color]::-webkit-color-swatch {
+  border: #f0f0f0;
+  border-radius: 6px;
+}
+.text-style-content .align-input {
+  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 67%, 0.16);
+  justify-content: space-evenly;
+}
+.text-style-content .align-input button {
+  background: none;
+  width: 33%;
+}
+.text-style-content .align-input button:not(:last-child) {
+  border-right: 1px solid #dbd9d9;
+}
+.text-style-content .align-input button.selected {
+  background: #f0f0f0;
+}
+.text-style-content .elements-style-content .position button {
+  width: 100%;
+}
+.text-style-content .elements-style-content .position-popup {
+  padding: 0.5rem 0;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 67%, 0.16);
+  border-radius: 6px;
+}
+.text-style-content .elements-style-content .position-popup ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.text-style-content .elements-style-content .position-popup ul li {
+  color: #919191;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+.text-style-content .elements-style-content .position-popup ul li:hover {
+  color: #262626;
+}
+.text-style-content .elements-style-content button {
+  color: #262626;
+}
+.text-style-content .elements-style-content button:hover {
+  background: #f0f0f0;
+}
+.text-style-content input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 1.5rem;
+  background: #dbd9d9;
+  border-radius: 6px;
+  outline: none;
+}
+.text-style-content input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0.5rem;
+  height: 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  cursor: pointer;
+}
+.text-style-content input[type=range]::-moz-range-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0.5rem;
+  height: 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  cursor: pointer;
+}
+.text-style-content input[type=range]:active,
+.text-style-content input[type=range]:focus {
+  /* Add styles for when the range input is active or focused */
+}
