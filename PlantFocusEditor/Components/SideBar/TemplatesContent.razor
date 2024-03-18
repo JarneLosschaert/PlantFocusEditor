@@ -1,26 +1,42 @@
-﻿<section class="templates-content">
+﻿@inject ApiConnectorService API
+@inject IJSRuntime JS
+
+<section class="templates-content">
     <ul>
-        <li>
-            <img src="../../sample-data/label.png" alt="template" />
-        </li>
-        <li>
-            <img src="../../sample-data/label.png" alt="template" />
-        </li>
-        <li>
-            <img src="../../sample-data/label.png" alt="template" />
-        </li>
-        <li>
-            <img src="../../sample-data/label.png" alt="template" />
-        </li>
-        <li>
-            <img src="../../sample-data/label.png" alt="template" />
-        </li>
-        <li>
-            <img src="../../sample-data/label.png" alt="template" />
-        </li>
+        @foreach (KeyValuePair<int, string> preview in _previews)
+        {
+            <li>
+                <img src="@preview.Value" id="@preview.Key"/>
+            </li>
+        }
     </ul>
 </section>
 
 @code {
+    private IJSObjectReference? _module;
+    private List<Template> _templates = [];
+    private Dictionary<int, string> _previews = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _templates = await API.GetTemplatesAsync(null, null) ?? [];
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/renderPreview.js");
+            foreach (Template template in _templates)
+            {
+                if (_module is not null)
+                {
+                    string source = await _module.InvokeAsync<string>("renderPreviewFromJson", template.JsonToRender);
+                    if (source != "")
+                    {
+                        _previews.Add(template.ID, source);
+                    }
+                }
+            }
+            StateHasChanged();
+        }
+    }
+
 
 }

@@ -11,12 +11,156 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="compilerconfig.json" />
+    <Content Include="wwwroot\node_modules\.package-lock.json" />
+    <Content Include="wwwroot\node_modules\konva\package.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.2" PrivateAssets="all" />
+    <None Include="compilerconfig.json" />
+    <None Include="wwwroot\node_modules\konva\konva.js" />
+    <None Include="wwwroot\node_modules\konva\konva.min.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Animation.js" />
+    <None Include="wwwroot\node_modules\konva\lib\BezierFunctions.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Canvas.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Container.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Context.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Core.js" />
+    <None Include="wwwroot\node_modules\konva\lib\DragAndDrop.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Factory.js" />
+    <None Include="wwwroot\node_modules\konva\lib\FastLayer.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Blur.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Brighten.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Contrast.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Emboss.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Enhance.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Grayscale.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\HSL.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\HSV.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Invert.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Kaleidoscope.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Mask.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Noise.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Pixelate.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Posterize.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\RGB.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\RGBA.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Sepia.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Solarize.js" />
+    <None Include="wwwroot\node_modules\konva\lib\filters\Threshold.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Global.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Group.js" />
+    <None Include="wwwroot\node_modules\konva\lib\index-node.js" />
+    <None Include="wwwroot\node_modules\konva\lib\index.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Layer.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Node.js" />
+    <None Include="wwwroot\node_modules\konva\lib\PointerEvents.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Shape.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Arc.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Arrow.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Circle.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Ellipse.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Image.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Label.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Line.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Path.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Rect.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\RegularPolygon.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Ring.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Sprite.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Star.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Text.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\TextPath.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Transformer.js" />
+    <None Include="wwwroot\node_modules\konva\lib\shapes\Wedge.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Stage.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Tween.js" />
+    <None Include="wwwroot\node_modules\konva\lib\types.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Util.js" />
+    <None Include="wwwroot\node_modules\konva\lib\Validators.js" />
+    <None Include="wwwroot\node_modules\konva\lib\_CoreInternals.js" />
+    <None Include="wwwroot\node_modules\konva\lib\_FullInternals.js" />
+    <None Include="wwwroot\node_modules\konva\LICENSE" />
+    <None Include="wwwroot\node_modules\konva\README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.0" PrivateAssets="all" />
+	  <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\PlantfocusEditorPrototype2\Library\Library.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Animation.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\BezierFunctions.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Canvas.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Container.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Context.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Core.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\DragAndDrop.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Factory.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\FastLayer.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Blur.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Brighten.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Contrast.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Emboss.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Enhance.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Grayscale.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\HSL.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\HSV.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Invert.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Kaleidoscope.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Mask.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Noise.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Pixelate.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Posterize.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\RGB.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\RGBA.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Sepia.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Solarize.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\filters\Threshold.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Global.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Group.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\index-node.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\index-types.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\index.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Layer.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Node.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\PointerEvents.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Shape.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Arc.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Arrow.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Circle.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Ellipse.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Image.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Label.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Line.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Path.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Rect.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\RegularPolygon.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Ring.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Sprite.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Star.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Text.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\TextPath.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Transformer.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\shapes\Wedge.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Stage.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Tween.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\types.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Util.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\Validators.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\_CoreInternals.d.ts" />
+    <TypeScriptCompile Include="wwwroot\node_modules\konva\lib\_FullInternals.d.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\node_modules\%40babel\" />
+    <Folder Include="wwwroot\node_modules\%40types\" />
+    <Folder Include="wwwroot\node_modules\.bin\" />
   </ItemGroup>
 
 </Project>
