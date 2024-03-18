@@ -5,15 +5,15 @@ import { sceneFunc } from "./shapeLayers.js";
 import { addHoverAnimation } from "./animations.js";
 import { createClipFunc } from "./passePartout.js";
 
-const $konvaContainer = document.getElementById("konva");
-const initialWidth = $konvaContainer.clientWidth;
-const initialHeight = $konvaContainer.clientHeight;
+const $konvaContainer = document.getElementById("konva-container");
+const initialWidth = $konvaContainer.offsetWidth;
+const initialHeight = $konvaContainer.offsetHeight;
 
 const images = {};
 const selectedImages = [];
 
 const stage = new Konva.Stage({
-    container: "konva",
+    container: "konva-container",
     width: initialWidth,
     height: initialHeight,
 });

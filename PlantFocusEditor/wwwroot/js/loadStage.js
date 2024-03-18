@@ -1,11 +1,13 @@
+import { convertJsonToKonva, isValidJson } from "./modules/helpers.js";
+import { stage, layer } from "./modules/state.js";
+
 function loadStageFromJson(json) {
-    const $container = document.getElementById("konva-container");
-    const stage = new Konva.Stage({
-        container: $container,
-        width: $container.parentElement.clientWidth,
-        height: $container.parentElement.clientHeight
-    });
-
-    const layer = Konva.Layer();
-
+    if (isValidJson(json)) {
+        const group = JSON.parse(json);
+        convertJsonToKonva(stage, layer, group);
+    } else {
+        console.log("json is invalid");
+    }
 }
+
+export { loadStageFromJson };

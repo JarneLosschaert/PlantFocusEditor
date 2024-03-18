@@ -1,26 +1,101 @@
-﻿<section class="styling-bar">
-    <div class="content-header">
-        <h2>@_SelectedTab</h2>
-    </div>
-    <div class="content">
-        @switch (_SelectedTab)
-        {
-            case StylingBarTabs.Label:
-                <LabelStyleContent />
-                break;
-            case StylingBarTabs.Text:
-                <TextStyleContent />
-                break;
-            case StylingBarTabs.Image:
-                <ImageStyleContent />
-                break;
-            case StylingBarTabs.Element:
-                <ElementStyleContent />
-                break;
-        }
-    </div>
-</section>
+﻿@inject IJSRuntime JS
+
+<CascadingValue Value="this">
+    <section class="styling-bar">
+        <div class="content-header">
+            <h2>@_SelectedTab</h2>
+        </div>
+        <div class="content">
+            <ControlBar @ref="_controlBarRef" />
+            @switch (_SelectedTab)
+            {
+                case StylingBarTabs.Label:
+                    <LabelStyleContent />
+                    break;
+                case StylingBarTabs.Text:
+                    <TextStyleContent @ref="textStyleContent" />
+                    break;
+                case StylingBarTabs.Image:
+                    <ImageStyleContent @ref="_imageStyleContent" />
+                    break;
+                case StylingBarTabs.Element:
+                    <ElementStyleContent />
+                    break;
+            }
+        </div>
+    </section>
+</CascadingValue>
 
 @code {
+    private IJSObjectReference? _textStylingBarModule;
+    private TextStyleContent textStyleContent;
+    private IJSObjectReference? _imageShapeStylingBar;
+    private ImageStyleContent _imageStyleContent;
+    private IJSObjectReference? _controlBar;
+    private ControlBar _controlBarRef;
     public StylingBarTabs _SelectedTab { get; set; }
+
+    public string _popupVisible { get; set; } = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var reference = DotNetObjectReference.Create(this);
+            _textStylingBarModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textStylingBar.js");
+            _textStylingBarModule.InvokeVoidAsync("setTextStylingBarReference", reference);
+            _imageShapeStylingBar = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
+            _imageShapeStylingBar.InvokeVoidAsync("setImageLayerReference", reference);
+            _imageShapeStylingBar.InvokeVoidAsync("setImageShapeStylingBarReference", reference);
+            _controlBar = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/controlBar.js");
+            await _controlBar.InvokeVoidAsync("setControlBarReference", reference);
+            await _controlBar.InvokeVoidAsync("setImageLayerReference", reference);
+
+        }
+    }
+
+    public void togglePopup(string popup)
+    {
+        Console.WriteLine(popup);
+        if (_popupVisible == popup)
+        {
+            _popupVisible = "";
+        }
+        else
+        {
+            _popupVisible = popup;
+        }
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void displayTextStylingBar(bool visible)
+    {
+        textStyleContent.displayTextStylingBar(visible);
+    }
+
+    [JSInvokable]
+    public void updateTextStylingBarValues(string font, int size, string color, string boldItalicStyle, string underlineStyle, string alignment, double transparency, double shadow)
+    {
+        textStyleContent.updateTextStylingBarValues(font, size, color, boldItalicStyle, underlineStyle, alignment, transparency, shadow);
+    }
+
+    [JSInvokable]
+    public void displayImageShapeStylingBar(bool onlyImage, bool onlyShapes)
+    {
+        _imageStyleContent.displayImageShapeStylingBar(onlyImage, onlyShapes);
+    }
+
+    [JSInvokable]
+    public void displayControlBar(bool visible, bool differentNodes)
+    {
+        _controlBarRef.displayControlBar(visible, differentNodes);
+    }
+
+    [JSInvokable]
+    public void updateControlBarValues(bool locked)
+    {
+        _controlBarRef.updateControlBarValues(locked);
+    }
 }
+

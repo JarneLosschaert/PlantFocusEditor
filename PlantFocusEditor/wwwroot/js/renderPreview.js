@@ -1,5 +1,6 @@
 import { findWidthPassePartout, findHeightPassePartout } from "./modules/passePartout.js";
-import { sceneFunc } from "./modules/shapeLayers.js"
+import { sceneFunc } from "./modules/shapeLayers.js";
+import { isValidJson } from "./modules/helpers.js";
 
 function renderPreviewFromJson(jsonToRender) {
     const container = document.createElement("div");
@@ -44,13 +45,6 @@ function renderPreviewFromJson(jsonToRender) {
     return dataUrl;
 }
 
-function isValidJson(json) {
-    try {
-        JSON.parse(json);
-    } catch (e) {
-        return false;
-    }
-    return true;
-}
+
 
 export { renderPreviewFromJson };

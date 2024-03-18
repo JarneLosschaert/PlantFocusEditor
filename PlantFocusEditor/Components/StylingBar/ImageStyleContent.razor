@@ -1,5 +1,261 @@
-﻿<h3>ImageStylingBar</h3>
+﻿@inject IJSRuntime JS;
+
+@if (_onlyImages || _onlyImages)
+{
+    <ul id="image-shape-styling-bar">
+        @if (_onlyImages || _onlyShapes)
+        {
+            <li class="image-shape-fill">
+                <ul>
+                    @if (_onlyImages)
+                    {
+                        <li class="input-file">
+                            <label for="file-upload-change">
+                                Change image
+                            </label>
+                            <InputFile id="file-upload-change" OnChange="ChangeImage" multiple></InputFile>
+                        </li>
+
+                    }
+                    @if (_onlyShapes)
+                    {
+                        <li class="color-picker">
+                            <label for="fill-color">
+                                <div>@((MarkupString)CustomIcons.FillColor())</div>
+                                <hr style="border: 5px solid @_fillColor" />
+                            </label>
+
+                            <input type="color" id="fill-color" name="fill-color" value="@_fillColor" @oninput="handleFillColorChange">
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
+        <li class="image-shape-border">
+            <ul>
+                <li class="color-picker">
+                    <label for="border-color">
+                        <div>@((MarkupString)CustomIcons.BorderColor())</div>
+                        <hr style="border: 5px solid @_borderColor" />
+                    </label>
+
+                    <input type="color" id="border-color" name="border-color" value="@_borderColor" @oninput="handleBorderColorChange">
+                </li>
+                <li class="border-width @(StylingBar._popupVisible == "border-width" ? "visible" : "")">
+                    <button @onclick='() => StylingBar.togglePopup("border-width")'>@((MarkupString)CustomIcons.BorderWidth())</button>
+                    @if (StylingBar._popupVisible == "border-width")
+                    {
+                        <div class="popup">
+                            <p>Border width: @_borderWidth px</p>
+                            <div>
+                                <input type="range"
+                                       id="border-width"
+                                       name="border-width"
+                                       min="0"
+                                       max="20"
+                                       value="@_borderWidth"
+                                       @oninput="(ChangeEventArgs e) => {_borderWidth = Convert.ToInt32(e.Value.ToString()); handleBorderWidthChange();}">
+                            </div>
+                        </div>
+                    }
+                </li>
+            </ul>
+        </li>
+        <li class="image-shape-specials">
+            <ul>
+                <li class="transparency @(StylingBar._popupVisible == "transparency" ? "visible" : "")">
+                    <button @onclick='() => StylingBar.togglePopup("transparency")'>@((MarkupString)CustomIcons.Transparency())</button>
+                    @if (StylingBar._popupVisible == "transparency")
+                    {
+                        <div class="popup">
+                            <p>Transparency: @_transparency%</p>
+                            <div>
+                                <input type="range"
+                                       id="transparency"
+                                       name="transparency"
+                                       min="0"
+                                       max="100"
+                                       value="@_transparency"
+                                       @oninput="(ChangeEventArgs e) => {_transparency = Convert.ToInt32(e.Value.ToString()); handleTransparencyChange();}">
+
+                            </div>
+                        </div>
+                    }
+                </li>
+                <li class="shadow @(StylingBar._popupVisible == "shadow" ? "visible" : "")">
+                    <button @onclick='() => StylingBar.togglePopup("shadow")'>Shadow</button>
+                    @if (StylingBar._popupVisible == "shadow")
+                    {
+                        <div class="popup">
+                            <p>Shadow: @_shadow%</p>
+                            <div>
+                                <input type="range"
+                                       id="shadow"
+                                       name="shadow"
+                                       min="0"
+                                       max="100"
+                                       value="@_shadow"
+                                       @oninput="(ChangeEventArgs e) => {_shadow = Convert.ToInt32(e.Value.ToString()); handleShadowChange();}">
+                            </div>
+                        </div>
+                    }
+                </li>
+            </ul>
+        </li>
+        <li class="image-shape-dimensions">
+            <ul>
+                <li class="width">
+                    <label for="width">W</label>
+                    <input type="number" id="width" name="width" value="@_width" @onchange="handleWidthChange">
+                </li>
+                <li class="height">
+                    <label for="height">H</label>
+                    <input type="number" id="height" name="height" value="@_height" @onchange="handleHeightChange">
+                </li>
+            </ul>
+        </li>
+    </ul>
+}
 
 @code {
+    private IJSObjectReference? module;
 
+    [CascadingParameter]
+    public StylingBar StylingBar { get; set; }
+
+    private bool _onlyShapes = false;
+    private bool _onlyImages = false;
+
+    private string _fillColor = "#000000";
+    private string _borderColor = "#000000";
+    private int _borderWidth = 0;
+    private int _transparency = 100;
+    private int _shadow = 0;
+    private int _width = 0;
+    private int _height = 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
+            await module.InvokeVoidAsync("setImageShapeStylingBarReference", DotNetObjectReference.Create(this));
+            await module.InvokeVoidAsync("addTransformEventListener");
+        }
+    }
+
+    private async Task InvokeJSFunction(string functionName, string parameter)
+    {
+        if (module != null)
+        {
+            await module.InvokeAsync<string>(functionName, parameter);
+        }
+    }
+
+    private async Task ChangeImage(InputFileChangeEventArgs args)
+    {
+        var file = args.File;
+        if (file != null)
+        {
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
+            var imageData = Convert.ToBase64String(buffer);
+            var src = $"data:{file.ContentType};base64,{imageData}";
+            await module.InvokeVoidAsync("changeImage", src);
+        }
+    }
+
+    private async Task handleTransparencyChange()
+    {
+        double transparency = (double)_transparency / 100.0;
+        await InvokeJSFunction("handleTransparencyChange", transparency.ToString());
+    }
+
+    private async Task handleShadowChange()
+    {
+        double shadow = (double)_shadow / 100.0;
+        await InvokeJSFunction("handleShadowChange", shadow.ToString());
+    }
+
+    private async Task handleFillColorChange(ChangeEventArgs e)
+    {
+        _fillColor = e.Value.ToString();
+        await InvokeJSFunction("handleFillColorChange", _fillColor);
+    }
+
+    private async Task handleBorderColorChange(ChangeEventArgs e)
+    {
+        _borderColor = e.Value.ToString();
+        await InvokeJSFunction("handleBorderColorChange", _borderColor);
+    }
+
+    private async Task handleBorderWidthChange()
+    {
+        await InvokeJSFunction("handleBorderWidthChange", _borderWidth.ToString());
+    }
+
+    private async Task handleWidthChange(ChangeEventArgs e)
+    {
+        if (module != null && e.Value != null)
+        {
+
+            if (e.Value.ToString() != "")
+            {
+                _width = Convert.ToInt32(e.Value.ToString());
+            }
+            else
+            {
+                _width = 0;
+            }
+            await module.InvokeVoidAsync("updateDimensionsOnInput", _width, true);
+        }
+    }
+
+    private async Task handleHeightChange(ChangeEventArgs e)
+    {
+        if (module != null && e.Value != null)
+        {
+            if (e.Value.ToString() != "")
+            {
+                _height = Convert.ToInt32(e.Value.ToString());
+            }
+            else
+            {
+                _height = 0;
+            }
+            await module.InvokeVoidAsync("updateDimensionsOnInput", _height, false);
+        }
+    }
+
+    [JSInvokable]
+    public void updateWidthHeight(int width, int height)
+    {
+        _width = width;
+        _height = height;
+    }
+
+    [JSInvokable]
+    public void updateImageShapeStylingBarValues(string fillColor, string borderColor, int borderWidth, float transparency, float shadow, int width, int height)
+    {
+        _fillColor = fillColor;
+        _borderColor = borderColor;
+        _borderWidth = borderWidth;
+        _transparency = Convert.ToInt32(transparency * 100);
+        _shadow = Convert.ToInt32(shadow * 100);
+        _width = width;
+        _height = height;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void displayImageShapeStylingBar(bool onlyImage, bool onlyShapes)
+    {
+        if (_onlyImages != onlyImage || _onlyShapes != onlyShapes)
+        {
+            StylingBar._popupVisible = "";
+        }
+        _onlyImages = onlyImage;
+        _onlyShapes = onlyShapes;
+        StateHasChanged();
+    }
 }

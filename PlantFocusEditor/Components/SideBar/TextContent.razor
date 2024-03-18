@@ -1,18 +1,36 @@
-﻿<article class="text-content">
+﻿@inject IJSRuntime JS
+
+<article class="text-content">
     <h3>Basic text</h3>
     <div class="texts">
-        <button class="text-header">
+        <button class="text-header" @onclick="AddTextField">
             Add a header
         </button>
-        <button class="text-subheader">
+        <button class="text-subheader" @onclick="AddTextField">
             Add a subheader
         </button>
-        <button class="text-paragraph">
+        <button class="text-paragraph" @onclick="AddTextField">
             Add a paragraph
         </button>
     </div>
 </article>
 
 @code {
+    private IJSObjectReference? module;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textLayers.js");
+        }
+    }
+
+    async Task AddTextField()
+    {
+        if (module != null)
+        {
+            await module.InvokeVoidAsync("createTextLayer");
+        }
+    }
 }
