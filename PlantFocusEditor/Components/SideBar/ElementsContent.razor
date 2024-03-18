@@ -1,5 +1,51 @@
-﻿<h3>ElementsContent</h3>
+﻿@inject IJSRuntime JSRuntime;
+<article class="elements-content">
+    <div>
+        <h3>Shapes</h3>
+        <ul class="shapes-list">
+            <li>
+                <img src="../../sample-data/shape.png" alt="shape" />
+            </li>
+            <li>
+                <img src="../../sample-data/shape.png" alt="shape" />
+            </li>
+            <li>
+                <img src="../../sample-data/shape.png" alt="shape" />
+            </li>
+            <li>
+                <img src="../../sample-data/shape.png" alt="shape" />
+            </li>
+            <li>
+                <img src="../../sample-data/shape.png" alt="shape" />
+            </li>
+            <li>
+                <img src="../../sample-data/shape.png" alt="shape" />
+            </li>
+        </ul>
+    </div>
+    <button @onclick="ScrollLeft">
+        Left
+    </button>
+    <button @onclick="ScrollRight">
+        Right
+    </button>
+</article>
 
 @code {
+    private void ScrollLeft()
+    {
+        Scroll(-100); // Adjust scroll amount as per your requirement
+    }
 
+    // Scroll right
+    private void ScrollRight()
+    {
+        Scroll(100); // Adjust scroll amount as per your requirement
+    }
+
+    // Scroll function using JavaScript Interop
+    private async Task Scroll(int scrollAmount)
+    {
+        await JSRuntime.InvokeVoidAsync("scrollFunction", scrollAmount, "shapes-list");
+    }
 }

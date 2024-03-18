@@ -1,1 +1,44 @@
-﻿
+﻿.elements-content div ul {
+  overflow-x: auto;
+  white-space: nowrap;
+  width: 100%;
+  scrollbar-width: none;
+}
+.elements-content div ul li {
+  display: inline-block;
+  width: 5rem;
+  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 67%, 0.16);
+  border-radius: 10px;
+  margin-right: 20px;
+  cursor: pointer;
+}
+.elements-content div ul li img {
+  width: calc(100% - 2rem);
+  margin: 1rem;
+}
+
+/*
+.templates-content {
+
+    ul {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+
+        li {
+            width: 8rem;
+            background: $btn-dark;
+            border-radius: $border-radius;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+
+            img {
+                width: 60%;
+                margin: 1rem 0;
+            }
+        }
+    }
+}*/
