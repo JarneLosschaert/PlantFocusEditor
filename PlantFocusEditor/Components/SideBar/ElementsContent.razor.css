@@ -7,7 +7,7 @@
 .elements-content div ul li {
   display: inline-block;
   width: 5rem;
-  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 67%, 0.16);
+  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 60%, 0.16);
   border-radius: 10px;
   margin-right: 20px;
   cursor: pointer;

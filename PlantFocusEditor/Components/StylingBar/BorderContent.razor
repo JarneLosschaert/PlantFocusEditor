@@ -1,0 +1,31 @@
+﻿<article class="border-content">
+    <h3>Border</h3>
+    <div>
+        <div>
+            <h4>Color</h4>
+            <ColorInput fontColor="@borderColor"
+                        handleColor="@ChangeColor" />
+        </div>
+        <div>
+            <h4>Width</h4>
+            <Slider value="@width"
+                    unit="px"
+                    max="10"
+                    handleValue="@changeWidth" />
+        </div>
+    </div>
+</article>
+
+@code {
+    private int width = 0;
+    private string borderColor = "#000000";
+
+    private void changeWidth(int value)
+    {
+        width = value;
+    }
+    private void ChangeColor(string color)
+    {
+        borderColor = color;
+    }
+}

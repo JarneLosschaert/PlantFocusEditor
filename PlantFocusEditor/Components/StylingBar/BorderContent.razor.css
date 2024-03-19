@@ -1,23 +1,23 @@
-﻿.elements-content {
+﻿.border-content {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
-.elements-content h3 {
+.border-content h3 {
   font-size: 1.1rem;
   font-weight: 600;
 }
-.elements-content > div {
+.border-content > div {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-.elements-content > div > div {
+.border-content > div > div {
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: all 0.2s ease-in-out;
 }
-.elements-content > div > div h4 {
+.border-content > div > div h4 {
   width: 30%;
 }

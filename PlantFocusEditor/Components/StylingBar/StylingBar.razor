@@ -1,26 +1,58 @@
 ﻿<section class="styling-bar">
     <div class="content-header">
-        <h2>@_SelectedTab</h2>
+        <h2>@GetSelectedItem()</h2>
     </div>
     <div class="content">
-        @switch (_SelectedTab)
+        @if (onlyText)
         {
-            case StylingBarTabs.Label:
-                <LabelStyleContent />
-                break;
-            case StylingBarTabs.Text:
-                <TextStyleContent />
-                break;
-            case StylingBarTabs.Image:
-                <ImageStyleContent />
-                break;
-            case StylingBarTabs.Element:
-                <ElementStyleContent />
-                break;
+            <TextStyleContent />
+        }
+        else if (onlyImage)
+        {
+            <ImageStyleContent />
+            <BorderContent />
+        }
+        else if (onlyElement)
+        {
+            <ElementStyleContent />
+            <BorderContent />
+        }
+        @if (selecting)
+        {
+            <AppearanceContent />
+            <ControlContent />
+        }
+        else
+        {
+            <LabelStyleContent />
         }
     </div>
 </section>
 
 @code {
-    public StylingBarTabs _SelectedTab { get; set; } = StylingBarTabs.Text;
+    private bool selecting = true;
+    private bool onlyText = true;
+    private bool onlyImage = false;
+    private bool onlyElement = false;
+
+    private string GetSelectedItem()
+    {
+        if (onlyText)
+        {
+            return "Text";
+        }
+        else if (onlyImage)
+        {
+            return "Image";
+        }
+        else if (onlyElement)
+        {
+            return "Element";
+        }
+        else if (selecting)
+        {
+            return "Styling";
+        }
+        return "Label";
+    }
 }

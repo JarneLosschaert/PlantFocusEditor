@@ -1,0 +1,33 @@
+﻿<article class="appearance-content">
+    <h3>Appearance</h3>
+    <div>
+        <div>
+            <h4>Opacity</h4>
+            <Slider value="@opacity"
+                    unit="%"
+                    handleValue="@changeOpacity" />
+        </div>
+        <div>
+            <h4>Shadow</h4>
+            <Slider value="@shadow"
+                    unit="%"
+                    handleValue="@changeShadow" />
+        </div>
+    </div>
+</article>
+
+@code {
+    private int opacity = 100;
+    private int shadow = 0;
+
+    private void changeOpacity(int value)
+    {
+        opacity = value;
+    }
+
+    private void changeShadow(int value)
+    {
+        shadow = value;
+    }
+}
+

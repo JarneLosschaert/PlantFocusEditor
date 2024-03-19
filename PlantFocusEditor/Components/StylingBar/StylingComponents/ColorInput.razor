@@ -1,0 +1,25 @@
+﻿<div class="color-input">
+    <input type="text" @bind="fontColor" @oninput="HandleColorInput" maxlength="7" />
+    <input type="color" @bind="fontColor" />
+</div>
+
+@code {
+    [Parameter]
+    public string fontColor { get; set; }
+
+    [Parameter]
+    public EventCallback<string> handleColor { get; set; }
+
+    private void HandleColorInput(ChangeEventArgs e)
+    {
+        string input = e.Value?.ToString()?.TrimStart('#').ToUpper();
+
+        if (!input.StartsWith("#"))
+        {
+            input = "#" + input;
+        }
+
+        fontColor = input;
+        handleColor.InvokeAsync(fontColor);
+    }
+}

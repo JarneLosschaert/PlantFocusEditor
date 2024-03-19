@@ -1,0 +1,100 @@
+@import "../../wwwroot/css/colors.scss";
+@import "../../wwwroot/css/config.scss";
+
+button {
+    color: $text-lighter;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 100%;
+    padding: 0.5rem;
+    background: $btn-dark;
+    border: 1px solid $neutral-dark;
+    border-radius: $border-radius-s;
+    box-shadow: $shadow-s;
+    cursor: pointer;
+
+    ::deep svg {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    &:hover {
+        color: $text;
+    }
+
+    &.selected {
+        background: $neutral;
+        color: $text;
+        border: 1px solid $primary;
+    }
+}
+
+.control-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+    h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    & > div {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .position {
+            position: relative;
+
+            button {
+                width: 100%;
+            }
+
+            .position-popup {
+                position: absolute;
+                top: -9rem;
+                width: 100%;
+                padding: 0.5rem 0;
+                display: flex;
+                justify-content: center;
+                background: $neutral;
+                border-radius: $border-radius-s;
+                box-shadow: $shadow-s;
+
+                ul {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+
+                    li {
+                        color: $text-lighter;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        cursor: pointer;
+
+                        &:hover {
+                            color: $text;
+                        }
+                    }
+                }
+            }
+        }
+
+        button {
+            color: $text;
+
+            &:hover {
+                background: $neutral;
+            }
+        }
+    }
+}

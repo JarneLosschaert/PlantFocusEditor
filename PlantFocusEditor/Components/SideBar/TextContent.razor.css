@@ -3,6 +3,7 @@
   flex-direction: column;
 }
 .text-content h3 {
+  font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 1rem;
 }
@@ -15,8 +16,9 @@
 .text-content .texts button {
   display: flex;
   align-items: center;
-  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 100%, 0.16);
+  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 60%, 0.16);
   box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 5px, rgba(0, 0, 0, 0.06) 0px 1px 3px;
+  border: 1px solid #dbd9d9;
   border-radius: 6px;
   gap: 0.5rem;
   border: none;

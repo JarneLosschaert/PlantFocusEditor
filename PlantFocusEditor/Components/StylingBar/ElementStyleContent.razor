@@ -1,5 +1,19 @@
-﻿<h3>ShapeStylingBar</h3>
+﻿<article class="elements-content">
+    <h3>Fill</h3>
+    <div>
+        <div>
+            <h4>Color</h4>
+            <ColorInput fontColor="@FillColor"
+                        handleColor="@ChangeColor" />
+        </div>
+    </div>
+</article>
 
 @code {
+    private string FillColor = "#000000";
 
+    private void ChangeColor(string color)
+    {
+        FillColor = color;
+    }
 }

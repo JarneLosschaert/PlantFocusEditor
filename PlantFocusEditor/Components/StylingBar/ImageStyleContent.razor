@@ -1,5 +1,39 @@
-﻿<h3>ImageStylingBar</h3>
+﻿<article class="image-style-content">
+    <h3>Image</h3>
+    <div>
+        <div>
+            <label for="change-image-image">
+                <img src="@currentImageSrc" id="current-image" alt="img">
+            </label>
+            <InputFile id="change-image-image" class="input-file" OnChange="ChangeImage"></InputFile>
+        </div>
+        <div>
+            <label for="change-image-button">
+                Change image
+            </label>
+            <InputFile id="change-image-button" class="input-file" OnChange="ChangeImage"></InputFile>
+        </div>
+    </div>
+</article>
 
 @code {
 
+    private string currentImageSrc = "../../sample-data/flower.jpg";
+
+    private async Task ChangeImage(InputFileChangeEventArgs e)
+    {
+        var selectedImage = e.File;
+        if (selectedImage != null)
+        {
+            using var memoryStream = new MemoryStream();
+            await selectedImage.OpenReadStream().CopyToAsync(memoryStream);
+            var imageBytes = memoryStream.ToArray();
+
+            currentImageSrc = $"data:{selectedImage.ContentType};base64,{Convert.ToBase64String(imageBytes)}";
+        }
+        else
+        {
+            currentImageSrc = "";
+        }
+    }
 }

@@ -6,7 +6,7 @@
 }
 .templates-content ul li {
   width: 8rem;
-  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 67%, 0.16);
+  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 60%, 0.16);
   border-radius: 10px;
   display: flex;
   align-items: center;
