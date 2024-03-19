@@ -95,11 +95,11 @@ function displayImageShapeStylingBar() {
     const selectedNodes = tr.nodes();
     const onlyImages = selectedNodes.length > 0 && selectedNodes.every(node => node.getClassName() === "Image");
     const onlyShapes = selectedNodes.length > 0 && selectedNodes.every(node => node.attrs.name === "shape");
-    imageShapeStylingBarReference.invokeMethodAsync('displayImageShapeStylingBar', onlyImages, onlyShapes);
-    updateStylingBarValues();
+    //imageShapeStylingBarReference.invokeMethodAsync('displayImageShapeStylingBar', onlyImages, onlyShapes);
+    //updateStylingBarValues();
 }
 
-function updateStylingBarValues() {
+/*function updateStylingBarValues() {
     const selectedNodes = tr.nodes();
     if (selectedNodes.length > 0) {
         const firstNode = selectedNodes[0];
@@ -112,6 +112,6 @@ function updateStylingBarValues() {
             );
         }
     }
-}
+}*/
 
 export { addTransformEventListener, displayImageShapeStylingBar, setImageShapeStylingBarReference, handleBorderColorChange, handleBorderWidthChange, changeImage, updateDimensionsOnInput, handleShapeColorChange, setImageLayerReference };

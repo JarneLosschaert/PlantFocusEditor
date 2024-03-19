@@ -6,7 +6,7 @@
         <div>
             <h4>Font</h4>
             <div>
-                <select @bind="selectedFont">
+                <select @bind="selectedFont" @oninput="ChangeFont">
                     <option>Arial</option>
                     <option>Times New Roman</option>
                     <option>Verdana</option>
@@ -30,7 +30,7 @@
         <div>
             <h4>Size</h4>
             <div>
-                <input type="number" @bind="fontSize" />
+                <input type="number" @bind="fontSize" @oninput="ChangeFontSize" />
             </div>
         </div>
         <div>
@@ -137,5 +137,19 @@
     {
         align = "right";
         _module.InvokeVoidAsync("handleAlignmentChange", "right");
+    }
+
+    private void ChangeFontSize(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value.ToString(), out int newFontSize))
+        {
+            fontSize = newFontSize;
+            _module.InvokeVoidAsync("handleFontSizeChange", fontSize);
+        }
+    }
+
+    private void ChangeFont()
+    {
+        _module.InvokeVoidAsync("handleFontSelect", selectedFont);
     }
 }
