@@ -1,5 +1,6 @@
 import { tr, selectionRectangle, hoverTr, currentGroup } from "./constants.js";
 import { removeBarcode } from "./barcodeLayer.js";
+import { barcodeImg } from "./state.js";
 
 let controlBarReference = null;
 let imageLayerReference = null;
@@ -15,13 +16,14 @@ function setImageLayerReference(ref) {
 function deleteNodes() {
     const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
-        if (node.attrs.name === "barcode") {
+        if (node.attrs.name !== "barcode") {
+            node.destroy();
+        } else {
             removeBarcode();
         }
         if (node.attrs.name === "img") {
             imageLayerReference.invokeMethodAsync("RemoveImage", node.attrs.id);
         }
-        node.destroy();
     });
     tr.nodes([]);
 }

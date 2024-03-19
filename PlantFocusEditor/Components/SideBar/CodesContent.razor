@@ -1,14 +1,38 @@
-﻿<article class="codes-content">
+﻿@inject IJSRuntime JS
+
+<article class="codes-content">
     <div>
         <h3>Barcode</h3>
-        <input type="text" />
+        <input type="number" id="barcodeInput" @bind="_barcode" @oninput="onBarcodeInput" />
     </div>
     <div>
         <h3>QR code</h3>
-        <input type="text" />
+        <input type="text" @bind="_qrcode" />
     </div>
 </article>
 
 @code {
+    private IJSObjectReference? module;
+    private IJSObjectReference? stateModule;
 
+    private string _barcode = "";
+    private string _qrcode = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/barcodeLayer.js");
+            stateModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/state.js");
+            _barcode = await stateModule.InvokeAsync<string>("getBarcodeNumber");
+            StateHasChanged();
+        }
+    }
+
+    public void onBarcodeInput(ChangeEventArgs e)
+    {
+        string value = e.Value.ToString();
+        _barcode = new string(value.Where(char.IsDigit).ToArray());
+        module.InvokeVoidAsync("createBarcode", _barcode);
+    }
 }

@@ -2,6 +2,7 @@ import { tr, currentGroup } from "./constants.js";
 import { addHoverAnimation } from "./animations.js";
 import { barcodeImg } from "./state.js";
 
+
 function createBarcode(inputValue) {
     if (inputValue === "") {
         removeBarcode();
@@ -29,6 +30,7 @@ function generateBarcode(value) {
     barcodeImg.attrs.number = value
     addHoverAnimation(barcodeImg);
     tr.forceUpdate();
+    console.log(barcodeImg);
 }
 
 function removeBarcode() {
@@ -36,6 +38,7 @@ function removeBarcode() {
     barcodeImg.attrs.number = "";
     barcodeImg.attrs.src = "";
     tr.nodes([]);
+    document.getElementById("barcodeInput").value = "";
 }
 
 export { removeBarcode, createBarcode };
