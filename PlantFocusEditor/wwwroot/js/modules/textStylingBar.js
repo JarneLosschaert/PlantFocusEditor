@@ -87,8 +87,8 @@ function displayTextStylingBar() {
         selectedNodes.every((node) => {
             return node.getClassName() === "Text";
         });
-    textStylingBarReference.invokeMethodAsync('displayTextStylingBar', onlyText)
-    updateTextStylingBarValues();
+    //textStylingBarReference.invokeMethodAsync('displayTextStylingBar', onlyText)
+    //updateTextStylingBarValues();
 }
 
 function updateTextStylingBarValues() {

@@ -6,14 +6,13 @@
             <h2>@_SelectedTab</h2>
         </div>
         <div class="content">
-            <ControlBar @ref="_controlBarRef" />
             @switch (_SelectedTab)
             {
                 case StylingBarTabs.Label:
                     <LabelStyleContent />
                     break;
                 case StylingBarTabs.Text:
-                    <TextStyleContent @ref="textStyleContent" />
+                    <TextStyleContent />
                     break;
                 case StylingBarTabs.Image:
                     <ImageStyleContent @ref="_imageStyleContent" />
@@ -27,12 +26,8 @@
 </CascadingValue>
 
 @code {
-    private IJSObjectReference? _textStylingBarModule;
-    private TextStyleContent textStyleContent;
     private IJSObjectReference? _imageShapeStylingBar;
     private ImageStyleContent _imageStyleContent;
-    private IJSObjectReference? _controlBar;
-    private ControlBar _controlBarRef;
     public StylingBarTabs _SelectedTab { get; set; } = StylingBarTabs.Text;
 
     public string _popupVisible { get; set; } = "";
@@ -42,15 +37,9 @@
         if (firstRender)
         {
             var reference = DotNetObjectReference.Create(this);
-            _textStylingBarModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textStylingBar.js");
-            _textStylingBarModule.InvokeVoidAsync("setTextStylingBarReference", reference);
             _imageShapeStylingBar = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
             _imageShapeStylingBar.InvokeVoidAsync("setImageLayerReference", reference);
             _imageShapeStylingBar.InvokeVoidAsync("setImageShapeStylingBarReference", reference);
-            _controlBar = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/controlBar.js");
-            await _controlBar.InvokeVoidAsync("setControlBarReference", reference);
-            await _controlBar.InvokeVoidAsync("setImageLayerReference", reference);
-
         }
     }
 
@@ -72,18 +61,6 @@
     public void displayImageShapeStylingBar(bool onlyImage, bool onlyShapes)
     {
         _imageStyleContent.displayImageShapeStylingBar(onlyImage, onlyShapes);
-    }
-
-    [JSInvokable]
-    public void displayControlBar(bool visible, bool differentNodes)
-    {
-        _controlBarRef.displayControlBar(visible, differentNodes);
-    }
-
-    [JSInvokable]
-    public void updateControlBarValues(bool locked)
-    {
-        _controlBarRef.updateControlBarValues(locked);
     }
 }
 

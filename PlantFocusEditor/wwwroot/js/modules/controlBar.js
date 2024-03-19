@@ -1,6 +1,5 @@
-import { tr, selectionRectangle, hoverTr } from "./constants.js";
+import { tr, selectionRectangle, hoverTr, currentGroup } from "./constants.js";
 import { removeBarcode } from "./barcodeLayer.js";
-import { currentGroup } from "./state.js";
 
 let controlBarReference = null;
 let imageLayerReference = null;

@@ -1,4 +1,4 @@
-import { changeTr, changeHoverTr, changeSelectionRectangle, front, setFront, back } from "./constants.js";
+import { changeTr, changeHoverTr, changeSelectionRectangle, front, setFront, back, currentGroup, setCurrentGroup } from "./constants.js";
 import { handleTextEventListeners } from "./textLayers.js";
 import { handleSelections } from "./selectionHandling.js";
 import { sceneFunc } from "./shapeLayers.js";
@@ -19,7 +19,6 @@ const stage = new Konva.Stage({
 });
 
 const layer = new Konva.Layer();
-let currentGroup = front;
 let barcodeImg = new Konva.Image({
     x: 0,
     y: 0,
@@ -55,7 +54,6 @@ function initKonva() {
     loadState(getStateLS());
 }
 
-
 function handleEventListeners() {
     document.addEventListener("click", saveState);
     //window.addEventListener("beforeunload", saveState);
@@ -68,11 +66,11 @@ function switchSides() {
     if (currentGroup === front) {
         front.remove();
         layer.add(back);
-        currentGroup = back;
+        setCurrentGroup(false);
     } else {
         back.remove();
         layer.add(front);
-        currentGroup = front;
+        setCurrentGroup(true);
     }
     handleSelections();
 }
@@ -138,7 +136,7 @@ function saveState() {
         historyBackside[historyBacksideIndex] = back.toJSON();
         historyBackside.length = historyBacksideIndex + 1;
     }
-    saveStateLS();
+    //saveStateLS();
 }
 
 function undo() {
@@ -200,4 +198,4 @@ function getSelectedImages() {
     return selectedImages;
 }
 
-export { stage, layer, handleState, saveState, barcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages, currentGroup };
+export { stage, layer, handleState, saveState, barcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages };

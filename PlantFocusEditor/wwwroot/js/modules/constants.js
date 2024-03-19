@@ -16,6 +16,7 @@ let selectionRectangle = new Konva.Rect({
 
 let front = new Konva.Group();
 let back = new Konva.Group();
+let currentGroup = front;
 
 function changeTr(newTr) {
     tr = newTr;
@@ -37,4 +38,12 @@ function setBack(newGroup) {
     back = newGroup;
 }
 
-export { tr, changeTr, hoverTr, front, setFront, back, setBack, changeHoverTr, selectionRectangle, changeSelectionRectangle };
+function setCurrentGroup(isFront) {
+    if (isFront) {
+        currentGroup = front;
+    } else {
+        currentGroup = back;
+    }
+}
+
+export { tr, changeTr, hoverTr, front, setFront, back, setBack, changeHoverTr, selectionRectangle, changeSelectionRectangle, currentGroup, setCurrentGroup };

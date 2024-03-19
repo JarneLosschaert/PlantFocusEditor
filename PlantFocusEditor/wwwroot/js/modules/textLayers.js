@@ -1,9 +1,10 @@
-import { tr } from "./constants.js";
-import { stage, currentGroup } from "./state.js";
+import { tr, currentGroup } from "./constants.js";
+import { stage } from "./state.js";
 import { selectAnimation, addHoverAnimation } from "./animations.js";
 import { findWidthPassePartout, findHeightPassePartout } from "./passePartout.js";
 
 export function createTextLayer() {
+    console.log(currentGroup);
     const path = currentGroup.children.find(node => node.getClassName() === "Path");
     const pathData = path.data();
     const text = new Konva.Text({
