@@ -3,13 +3,13 @@ import { stage } from "./state.js";
 import { selectAnimation, addHoverAnimation } from "./animations.js";
 import { findWidthPassePartout, findHeightPassePartout } from "./passePartout.js";
 
-export function createTextLayer() {
+export function createTextLayer(size = 16) {
     const path = currentGroup.children.find(node => node.getClassName() === "Path");
     const pathData = path.data();
     const text = new Konva.Text({
         name: "text",
         text: "New text",
-        fontSize: 30,
+        fontSize: size,
         draggable: true,
         width: 250,
         height: "auto",

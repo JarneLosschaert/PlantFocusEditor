@@ -3,13 +3,13 @@
 <article class="text-content">
     <h3>Basic text</h3>
     <div class="texts">
-        <button class="text-header" @onclick="AddTextField">
+        <button class="text-header" @onclick="@(() => AddTextField(32))">
             Add a header
         </button>
-        <button class="text-subheader" @onclick="AddTextField">
+        <button class="text-subheader" @onclick="@(() => AddTextField(24))">
             Add a subheader
         </button>
-        <button class="text-paragraph" @onclick="AddTextField">
+        <button class="text-paragraph" @onclick="@(() => AddTextField(16))">
             Add a paragraph
         </button>
     </div>
@@ -26,11 +26,11 @@
         }
     }
 
-    async Task AddTextField()
+    async Task AddTextField(int size = 16)
     {
         if (module != null)
         {
-            await module.InvokeVoidAsync("createTextLayer");
+            await module.InvokeVoidAsync("createTextLayer", size);
         }
     }
 }
