@@ -91,9 +91,9 @@ function lockNode() {
 function displayControlBar() {
     const selectedNodes = tr.nodes();
     if (selectedNodes.length > 0) {
-        controlBarReference.invokeMethodAsync('displayControlBar', true, areDifferentNodes());
+        //controlBarReference.invokeMethodAsync('displayControlBar', true, areDifferentNodes());
     } else {
-        controlBarReference.invokeMethodAsync('displayControlBar', false, areDifferentNodes());
+        //controlBarReference.invokeMethodAsync('displayControlBar', false, areDifferentNodes());
     }
     updateControlBarValues();
 }
@@ -115,7 +115,7 @@ function updateControlBarValues() {
     const selectedNodes = tr.nodes();
     if (selectedNodes.length > 0) {
         const firstNode = selectedNodes[0];
-        controlBarReference.invokeMethodAsync('updateControlBarValues', firstNode.draggable())
+        //controlBarReference.invokeMethodAsync('updateControlBarValues', firstNode.draggable())
     }
 }
 
