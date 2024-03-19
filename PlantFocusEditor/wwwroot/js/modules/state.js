@@ -3,7 +3,7 @@ import { handleTextEventListeners } from "./textLayers.js";
 import { handleSelections } from "./selectionHandling.js";
 import { sceneFunc } from "./shapeLayers.js";
 import { addHoverAnimation } from "./animations.js";
-import { createClipFunc } from "./passePartout.js";
+import { createClipFunc, findWidthPassePartout } from "./passePartout.js";
 
 const $konvaContainer = document.getElementById("konva-container");
 const initialWidth = $konvaContainer.offsetWidth;
@@ -130,7 +130,6 @@ function loadStateFromTemplate(json) {
     json = JSON.parse(json);
     console.log(json);
     const node = Konva.Node.create(json.Group);
-    node.x(10);
     setFront(node);
     setCurrentGroup(node);
     layer.children.forEach(child => {
@@ -140,9 +139,11 @@ function loadStateFromTemplate(json) {
     });
     layer.add(node);
     let pathData;
+    let offsetX;
     node.children.forEach(childNode => {
         if (childNode.getClassName() === "Path") {
             pathData = childNode.attrs.data;
+            offsetX = stage.width() / 2 - findWidthPassePartout(pathData) / 2;
         } else if (childNode.attrs.name === "barcode") {
             const img = new Image();
             img.src = childNode.attrs.src;
@@ -166,6 +167,7 @@ function loadStateFromTemplate(json) {
             addHoverAnimation(childNode);
         }
     });
+    node.x(offsetX);
     const clipFuncWithParam = createClipFunc(pathData);
     node.clipFunc(clipFuncWithParam);
     console.log(layer);
