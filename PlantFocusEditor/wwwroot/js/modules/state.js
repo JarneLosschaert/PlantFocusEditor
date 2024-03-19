@@ -85,6 +85,7 @@ function loadState(json) {
             layer.add(node);
             if (node.getClassName() === "Group") {
                 setFront(node);
+                setCurrentGroup(node);
                 let pathData;
                 node.children.forEach(childNode => {
                     if (childNode.getClassName() === "Path") {
@@ -123,6 +124,51 @@ function loadState(json) {
             }
         });
     }
+}
+
+function loadStateFromTemplate(json) {
+    json = JSON.parse(json);
+    console.log(json);
+    const node = Konva.Node.create(json.Group);
+    node.x(10);
+    setFront(node);
+    setCurrentGroup(node);
+    layer.children.forEach(child => {
+        if (child.getClassName() === "Group") {
+            child.remove();
+        }
+    });
+    layer.add(node);
+    let pathData;
+    node.children.forEach(childNode => {
+        if (childNode.getClassName() === "Path") {
+            pathData = childNode.attrs.data;
+        } else if (childNode.attrs.name === "barcode") {
+            const img = new Image();
+            img.src = childNode.attrs.src;
+            childNode.image(img);
+            barcodeImg = childNode;
+            addHoverAnimation(childNode);
+        } else if (childNode.getClassName() === "Image") {
+            const id = childNode.attrs.id;
+            const src = childNode.attrs.src;
+            const img = new Image();
+            img.src = src;
+            childNode.image(img);
+            images[id] = src;
+            selectedImages.push(id);
+            addHoverAnimation(childNode);
+        } else if (childNode.getClassName() === "Text") {
+            handleTextEventListeners(childNode);
+            addHoverAnimation(childNode);
+        } else if (childNode.getClassName() === "Shape") {
+            childNode.sceneFunc(sceneFunc);
+            addHoverAnimation(childNode);
+        }
+    });
+    const clipFuncWithParam = createClipFunc(pathData);
+    node.clipFunc(clipFuncWithParam);
+    console.log(layer);
 }
 
 function saveState() {
@@ -198,4 +244,8 @@ function getSelectedImages() {
     return selectedImages;
 }
 
-export { stage, layer, handleState, saveState, barcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages };
+function setBarcodeImg(img) {
+    barcodeImg = img;
+}
+
+export { stage, layer, handleState, saveState, barcodeImg, setBarcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages, loadStateFromTemplate };
