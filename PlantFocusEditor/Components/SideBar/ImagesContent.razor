@@ -1,5 +1,47 @@
-﻿<h3>ImagesContent</h3>
+﻿@inject IJSRuntime JSRuntime;
+
+<article class="images-content">
+    <div class="input-file-container">
+        <InputFile id="change-image-image" class="input-file" OnChange="OnInputFileChange"></InputFile>
+    </div>
+    <di class="images-container">
+        @if (images.Count > 0)
+        {
+            <ul>
+                @foreach (var image in images)
+                {
+                    <li>
+                        <img src="@image" alt="img" />
+                    </li>
+                }
+            </ul>
+        }
+    </di>
+</article>
+
+
 
 @code {
+    List<string> images = new List<string>(
+    new string[] {
+        "https://www.w3schools.com/w3images/lights.jpg",
+        "https://www.w3schools.com/w3images/nature.jpg" ,
+        "https://www.w3schools.com/w3images/mountains.jpg",
+        "https://www.w3schools.com/w3images/forest.jpg",
+    });
 
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+
+        foreach (var file in e.GetMultipleFiles())
+        {
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
+            var imageData = Convert.ToBase64String(buffer);
+            var src = $"data:{file.ContentType};base64,{imageData}";
+            var key = Guid.NewGuid().ToString();
+            images.Insert(0, src);
+            // use dictionary to store the image data later
+        }
+    }
 }
