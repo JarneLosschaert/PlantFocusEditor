@@ -62,5 +62,41 @@
   {
     "outputFile": "Components/StylingBar/TextStyleContent.razor.css",
     "inputFile": "Components/StylingBar/TextStyleContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/StylingComponents/ElementsSection.razor.css",
+    "inputFile": "Components/StylingBar/StylingComponents/ElementsSection.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/StylingComponents/AppearanceSection.razor.css",
+    "inputFile": "Components/StylingBar/StylingComponents/AppearanceSection.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/StylingComponents/ColorInput.razor.css",
+    "inputFile": "Components/StylingBar/StylingComponents/ColorInput.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/StylingComponents/Slider.razor.css",
+    "inputFile": "Components/StylingBar/StylingComponents/Slider.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/ControlContent.razor.css",
+    "inputFile": "Components/StylingBar/ControlContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/AppearanceContent.razor.css",
+    "inputFile": "Components/StylingBar/AppearanceContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/BorderContent.razor.css",
+    "inputFile": "Components/StylingBar/BorderContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/ElementStyleContent.razor.css",
+    "inputFile": "Components/StylingBar/ElementStyleContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/ImageStyleContent.razor.css",
+    "inputFile": "Components/StylingBar/ImageStyleContent.razor.scss"
   }
 ]

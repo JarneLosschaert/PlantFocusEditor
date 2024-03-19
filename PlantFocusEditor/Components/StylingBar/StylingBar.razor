@@ -1,66 +1,58 @@
-﻿@inject IJSRuntime JS
-
-<CascadingValue Value="this">
-    <section class="styling-bar">
-        <div class="content-header">
-            <h2>@_SelectedTab</h2>
-        </div>
-        <div class="content">
-            @switch (_SelectedTab)
-            {
-                case StylingBarTabs.Label:
-                    <LabelStyleContent />
-                    break;
-                case StylingBarTabs.Text:
-                    <TextStyleContent />
-                    break;
-                case StylingBarTabs.Image:
-                    <ImageStyleContent @ref="_imageStyleContent" />
-                    break;
-                case StylingBarTabs.Element:
-                    <ElementStyleContent />
-                    break;
-            }
-        </div>
-    </section>
-</CascadingValue>
-
-@code {
-    private IJSObjectReference? _imageShapeStylingBar;
-    private ImageStyleContent _imageStyleContent;
-    public StylingBarTabs _SelectedTab { get; set; } = StylingBarTabs.Text;
-
-    public string _popupVisible { get; set; } = "";
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+﻿<section class="styling-bar">
+    <div class="content-header">
+        <h2>@GetSelectedItem()</h2>
+    </div>
+    <div class="content">
+        @if (onlyText)
         {
-            var reference = DotNetObjectReference.Create(this);
-            _imageShapeStylingBar = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
-            _imageShapeStylingBar.InvokeVoidAsync("setImageLayerReference", reference);
-            _imageShapeStylingBar.InvokeVoidAsync("setImageShapeStylingBarReference", reference);
+            <TextStyleContent />
         }
-    }
-
-    public void togglePopup(string popup)
-    {
-        Console.WriteLine(popup);
-        if (_popupVisible == popup)
+        else if (onlyImage)
         {
-            _popupVisible = "";
+            <ImageStyleContent />
+            <BorderContent />
+        }
+        else if (onlyElement)
+        {
+            <ElementStyleContent />
+            <BorderContent />
+        }
+        @if (selecting)
+        {
+            <AppearanceContent />
+            <ControlContent />
         }
         else
         {
-            _popupVisible = popup;
+            <LabelStyleContent />
         }
-        StateHasChanged();
-    }
+    </div>
+</section>
 
-    [JSInvokable]
-    public void displayImageShapeStylingBar(bool onlyImage, bool onlyShapes)
+@code {
+    private bool selecting = true;
+    private bool onlyText = true;
+    private bool onlyImage = false;
+    private bool onlyElement = false;
+
+    private string GetSelectedItem()
     {
-        //_imageStyleContent.displayImageShapeStylingBar(onlyImage, onlyShapes);
+        if (onlyText)
+        {
+            return "Text";
+        }
+        else if (onlyImage)
+        {
+            return "Image";
+        }
+        else if (onlyElement)
+        {
+            return "Element";
+        }
+        else if (selecting)
+        {
+            return "Styling";
+        }
+        return "Label";
     }
 }
-

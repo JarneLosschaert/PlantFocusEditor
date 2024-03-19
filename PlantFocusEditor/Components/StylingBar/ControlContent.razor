@@ -1,0 +1,84 @@
+﻿<article class="control-content">
+    <h3>Elements</h3>
+    <div>
+        <div class="controls">
+            @if (isLocked)
+            {
+                <button @onclick="Lock">
+                    @((MarkupString)CustomIcons.Locked())
+                    Unlock
+                </button>
+            }
+            else
+            {
+                <button @onclick="Lock">
+                    @((MarkupString)CustomIcons.UnLocked())
+                    Lock
+                </button>
+            }
+            <button @onclick="Clone">
+                @((MarkupString)CustomIcons.Clone())
+                Clone
+            </button>
+            <button @onclick="Delete">
+                @((MarkupString)CustomIcons.Trash())
+                Delete
+            </button>
+        </div>
+        <div class="position">
+            <button class="@(isPositionPopupVisible ? "selected" : "")" @onclick="TogglePositionPopup">
+                @((MarkupString)CustomIcons.Layers())
+                Position
+            </button>
+            @if (isPositionPopupVisible)
+            {
+                <div class="position-popup">
+                    <ul>
+                        <li>
+                            @((MarkupString)CustomIcons.Front())
+                            Bring to front
+                        </li>
+                        <li>
+                            @((MarkupString)CustomIcons.Forward())
+                            Bring forward
+                        </li>
+                        <li>
+                            @((MarkupString)CustomIcons.Backward())
+                            Send backward
+                        </li>
+                        <li>
+                            @((MarkupString)CustomIcons.Back())
+                            Send to back
+                        </li>
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+</article>
+
+@code {
+    private bool isPositionPopupVisible = false;
+
+    private bool isLocked = false;
+
+    private void Lock()
+    {
+        isLocked = !isLocked;
+    }
+
+    private void Clone()
+    {
+
+    }
+
+    private void Delete()
+    {
+        
+    }
+
+    private void TogglePositionPopup()
+    {
+        isPositionPopupVisible = !isPositionPopupVisible;
+    }
+}

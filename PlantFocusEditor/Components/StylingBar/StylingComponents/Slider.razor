@@ -1,0 +1,27 @@
+﻿<div class="slider">
+    <input type="range"
+           value="@value"
+           max="@max"
+           @oninput="ChangeValue" />
+    <p>@value@unit</p>
+</div>
+
+@code {
+    [Parameter]
+    public int value { get; set; }
+
+    [Parameter]
+    public string unit { get; set; }
+
+    [Parameter]
+    public int max { get; set; } = 100;
+
+    [Parameter]
+    public EventCallback<int> handleValue { get; set; }
+
+    private void ChangeValue(ChangeEventArgs e)
+    {
+        value = Convert.ToInt32(e.Value.ToString());
+        handleValue.InvokeAsync(value);
+    }
+}
