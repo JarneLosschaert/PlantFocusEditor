@@ -8,6 +8,7 @@
     <div>
         <h3>QR code</h3>
         <input type="text" @bind="_qrcode" />
+        <button @onclick="GenerateQrCode">Generate QR Code</button>
     </div>
 </article>
 
@@ -34,5 +35,16 @@
         string value = e.Value.ToString();
         _barcode = new string(value.Where(char.IsDigit).ToArray());
         module.InvokeVoidAsync("createBarcode", _barcode);
+    }
+
+    private void GenerateQrCode()
+    {
+        QRCodeGenerator generator = new QRCodeGenerator();
+        QRCodeData codeData = generator.CreateQrCode(_qrcode, QRCodeGenerator.ECCLevel.Q);
+        PngByteQRCode qrCode = new PngByteQRCode(codeData);
+        byte[] qrCodeByteArr = qrCode.GetGraphic(20);
+        string base64String = Convert.ToBase64String(qrCodeByteArr);
+        string source = $"data:image/png;base64,{base64String}";
+        module.InvokeVoidAsync("addQRCode", source);
     }
 }
