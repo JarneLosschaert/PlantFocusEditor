@@ -1,7 +1,6 @@
-import { tr } from "./constants.js";
+import { tr, currentGroup } from "./constants.js";
 import { addHoverAnimation } from "./animations.js";
 import { barcodeImg } from "./state.js";
-import { currentGroup } from "./state.js";
 
 function createBarcode(inputValue) {
     if (inputValue === "") {

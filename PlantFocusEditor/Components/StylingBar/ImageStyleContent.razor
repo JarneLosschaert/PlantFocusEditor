@@ -17,6 +17,81 @@
 </article>
 
 @code {
+    private IJSObjectReference? module;
+
+    [CascadingParameter]
+    public StylingBar StylingBar { get; set; }
+
+    private bool _onlyShapes = false;
+    private bool _onlyImages = false;
+
+    private string _fillColor = "#000000";
+    private string _borderColor = "#000000";
+    private int _borderWidth = 0;
+    private int _transparency = 100;
+    private int _shadow = 0;
+    private int _width = 0;
+    private int _height = 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
+            await module.InvokeVoidAsync("setImageShapeStylingBarReference", DotNetObjectReference.Create(this));
+            await module.InvokeVoidAsync("addTransformEventListener");
+        }
+    }
+
+    private async Task InvokeJSFunction(string functionName, string parameter)
+    {
+        if (module != null)
+        {
+            await module.InvokeAsync<string>(functionName, parameter);
+        }
+    }
+
+    private async Task ChangeImage(InputFileChangeEventArgs args)
+    {
+        var file = args.File;
+        if (file != null)
+        {
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
+            var imageData = Convert.ToBase64String(buffer);
+            var src = $"data:{file.ContentType};base64,{imageData}";
+            await module.InvokeVoidAsync("changeImage", src);
+        }
+    }
+
+    private async Task handleTransparencyChange()
+    {
+        double transparency = (double)_transparency / 100.0;
+        await InvokeJSFunction("handleTransparencyChange", transparency.ToString());
+    }
+
+    private async Task handleShadowChange()
+    {
+        double shadow = (double)_shadow / 100.0;
+        await InvokeJSFunction("handleShadowChange", shadow.ToString());
+    }
+
+    private async Task handleFillColorChange(ChangeEventArgs e)
+    {
+        _fillColor = e.Value.ToString();
+        await InvokeJSFunction("handleFillColorChange", _fillColor);
+    }
+
+    private async Task handleBorderColorChange(ChangeEventArgs e)
+    {
+        _borderColor = e.Value.ToString();
+        await InvokeJSFunction("handleBorderColorChange", _borderColor);
+    }
+
+    private async Task handleBorderWidthChange()
+    {
+        await InvokeJSFunction("handleBorderWidthChange", _borderWidth.ToString());
+    }
 
     private string currentImageSrc = "../../sample-data/flower.jpg";
 

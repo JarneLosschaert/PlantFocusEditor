@@ -6,7 +6,7 @@
         @foreach (KeyValuePair<int, string> preview in _previews)
         {
             <li>
-                <img src="@preview.Value" id="@preview.Key"/>
+                <img src="@preview.Value" id="@preview.Key" @onclick="@((e) => SelectTemplate(preview.Key))"/>
             </li>
         }
     </ul>
@@ -14,6 +14,7 @@
 
 @code {
     private IJSObjectReference? _module;
+    private IJSObjectReference? _moduleState;
     private List<Template> _templates = [];
     private Dictionary<int, string> _previews = new();
 
@@ -23,6 +24,7 @@
         {
             _templates = await API.GetTemplatesAsync(null, null) ?? [];
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/renderPreview.js");
+            _moduleState = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/state.js");
             foreach (Template template in _templates)
             {
                 if (_module is not null)
@@ -38,5 +40,12 @@
         }
     }
 
-
+    private async void SelectTemplate(int id)
+    {
+        Template template = _templates.Find(el => el.ID == id);
+        if (_moduleState is not null && template is not null)
+        {
+            await _moduleState.InvokeVoidAsync("loadStateFromTemplate", template.JsonToRender);
+        }
+    }
 }

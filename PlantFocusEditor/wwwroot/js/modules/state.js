@@ -1,25 +1,24 @@
-import { changeTr, changeHoverTr, changeSelectionRectangle, front, setFront, back } from "./constants.js";
+import { changeTr, changeHoverTr, changeSelectionRectangle, front, setFront, back, currentGroup, setCurrentGroup } from "./constants.js";
 import { handleTextEventListeners } from "./textLayers.js";
 import { handleSelections } from "./selectionHandling.js";
 import { sceneFunc } from "./shapeLayers.js";
 import { addHoverAnimation } from "./animations.js";
-import { createClipFunc } from "./passePartout.js";
+import { createClipFunc, findWidthPassePartout } from "./passePartout.js";
 
-const $konvaContainer = document.getElementById("konva");
-const initialWidth = $konvaContainer.clientWidth;
-const initialHeight = $konvaContainer.clientHeight;
+const $konvaContainer = document.getElementById("konva-container");
+const initialWidth = $konvaContainer.offsetWidth;
+const initialHeight = $konvaContainer.offsetHeight;
 
 const images = {};
 const selectedImages = [];
 
 const stage = new Konva.Stage({
-    container: "konva",
+    container: "konva-container",
     width: initialWidth,
     height: initialHeight,
 });
 
 const layer = new Konva.Layer();
-let currentGroup = front;
 let barcodeImg = new Konva.Image({
     x: 0,
     y: 0,
@@ -55,7 +54,6 @@ function initKonva() {
     loadState(getStateLS());
 }
 
-
 function handleEventListeners() {
     document.addEventListener("click", saveState);
     //window.addEventListener("beforeunload", saveState);
@@ -68,11 +66,11 @@ function switchSides() {
     if (currentGroup === front) {
         front.remove();
         layer.add(back);
-        currentGroup = back;
+        setCurrentGroup(false);
     } else {
         back.remove();
         layer.add(front);
-        currentGroup = front;
+        setCurrentGroup(true);
     }
     handleSelections();
 }
@@ -87,6 +85,7 @@ function loadState(json) {
             layer.add(node);
             if (node.getClassName() === "Group") {
                 setFront(node);
+                setCurrentGroup(node);
                 let pathData;
                 node.children.forEach(childNode => {
                     if (childNode.getClassName() === "Path") {
@@ -127,6 +126,53 @@ function loadState(json) {
     }
 }
 
+function loadStateFromTemplate(json) {
+    json = JSON.parse(json);
+    console.log(json);
+    const node = Konva.Node.create(json.Group);
+    setFront(node);
+    setCurrentGroup(node);
+    layer.children.forEach(child => {
+        if (child.getClassName() === "Group") {
+            child.remove();
+        }
+    });
+    layer.add(node);
+    let pathData;
+    let offsetX;
+    node.children.forEach(childNode => {
+        if (childNode.getClassName() === "Path") {
+            pathData = childNode.attrs.data;
+            offsetX = stage.width() / 2 - findWidthPassePartout(pathData) / 2;
+        } else if (childNode.attrs.name === "barcode") {
+            const img = new Image();
+            img.src = childNode.attrs.src;
+            childNode.image(img);
+            barcodeImg = childNode;
+            addHoverAnimation(childNode);
+        } else if (childNode.getClassName() === "Image") {
+            const id = childNode.attrs.id;
+            const src = childNode.attrs.src;
+            const img = new Image();
+            img.src = src;
+            childNode.image(img);
+            images[id] = src;
+            selectedImages.push(id);
+            addHoverAnimation(childNode);
+        } else if (childNode.getClassName() === "Text") {
+            handleTextEventListeners(childNode);
+            addHoverAnimation(childNode);
+        } else if (childNode.getClassName() === "Shape") {
+            childNode.sceneFunc(sceneFunc);
+            addHoverAnimation(childNode);
+        }
+    });
+    node.x(offsetX);
+    const clipFuncWithParam = createClipFunc(pathData);
+    node.clipFunc(clipFuncWithParam);
+    console.log(layer);
+}
+
 function saveState() {
     if (history[historyIndex] !== layer.toJSON()) {
         historyIndex++;
@@ -138,7 +184,7 @@ function saveState() {
         historyBackside[historyBacksideIndex] = back.toJSON();
         historyBackside.length = historyBacksideIndex + 1;
     }
-    saveStateLS();
+    //saveStateLS();
 }
 
 function undo() {
@@ -200,4 +246,8 @@ function getSelectedImages() {
     return selectedImages;
 }
 
-export { stage, layer, handleState, saveState, barcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages, currentGroup };
+function setBarcodeImg(img) {
+    barcodeImg = img;
+}
+
+export { stage, layer, handleState, saveState, barcodeImg, setBarcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages, loadStateFromTemplate };

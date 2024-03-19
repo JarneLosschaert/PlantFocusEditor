@@ -1,4 +1,4 @@
-import { currentGroup } from "./state.js";
+import { currentGroup } from "./constants.js";
 import { addHoverAnimation, addIncomingAnimation } from "./animations.js";
 
 const $addRectangle = document.getElementById("add-rectangle");

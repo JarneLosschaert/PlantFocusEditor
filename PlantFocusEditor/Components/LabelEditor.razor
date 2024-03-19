@@ -1,4 +1,6 @@
-﻿<CascadingValue Value="this">
+﻿@inject IJSRuntime JS
+
+<CascadingValue Value="this">
     <div class="label-editor">
         <SideBar SelectTab="SelectTab" />
         <SideBarContent />
@@ -9,9 +11,22 @@
 
 @code {
     public SideBarTabs _SelectedTab { get; set; } = SideBarTabs.Templates;
+    private IJSObjectReference? _module;
 
     public void SelectTab(SideBarTabs tab)
     {
         _SelectedTab = tab;
+    }
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/init.js");
+            if (_module is not null)
+            {
+                _module.InvokeVoidAsync("init");
+            }
+        }
     }
 }

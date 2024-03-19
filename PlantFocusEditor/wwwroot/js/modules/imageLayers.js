@@ -1,7 +1,6 @@
 import { stage } from "./state.js";
 import { addHoverAnimation } from "./animations.js";
-import { tr } from "./constants.js";
-import { currentGroup } from "./state.js";
+import { tr, currentGroup } from "./constants.js";
 
 function addImage(src, id) {
     const img = new Image();

@@ -1,6 +1,5 @@
-import { tr, selectionRectangle, hoverTr } from "./constants.js";
+import { tr, selectionRectangle, hoverTr, currentGroup } from "./constants.js";
 import { removeBarcode } from "./barcodeLayer.js";
-import { currentGroup } from "./state.js";
 
 let controlBarReference = null;
 let imageLayerReference = null;
@@ -92,9 +91,9 @@ function lockNode() {
 function displayControlBar() {
     const selectedNodes = tr.nodes();
     if (selectedNodes.length > 0) {
-        controlBarReference.invokeMethodAsync('displayControlBar', true, areDifferentNodes());
+        //controlBarReference.invokeMethodAsync('displayControlBar', true, areDifferentNodes());
     } else {
-        controlBarReference.invokeMethodAsync('displayControlBar', false, areDifferentNodes());
+        //controlBarReference.invokeMethodAsync('displayControlBar', false, areDifferentNodes());
     }
     updateControlBarValues();
 }
@@ -116,7 +115,7 @@ function updateControlBarValues() {
     const selectedNodes = tr.nodes();
     if (selectedNodes.length > 0) {
         const firstNode = selectedNodes[0];
-        controlBarReference.invokeMethodAsync('updateControlBarValues', firstNode.draggable())
+        //controlBarReference.invokeMethodAsync('updateControlBarValues', firstNode.draggable())
     }
 }
 
