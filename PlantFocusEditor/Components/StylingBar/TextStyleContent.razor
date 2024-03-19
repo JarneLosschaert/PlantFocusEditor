@@ -1,4 +1,6 @@
-﻿<article class="text-style-content">
+﻿@inject IJSRuntime JS
+
+<article class="text-style-content">
     <h3>General</h3>
     <div>
         <div>
@@ -48,6 +50,7 @@
 </article>
 
 @code {
+    private IJSObjectReference _module;
     private bool isPositionPopupVisible = false;
     private string selectedFont = "Arial";
     private bool isBold = false;
@@ -57,6 +60,31 @@
     private int fontSize = 30;
     private string fontColor = "#000000";
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textStylingBar.js");
+        }
+    }
+
+    private string GetFontStyle()
+    {
+        if (isBold && isItalic)
+        {
+            return "bold italic";
+        }
+        if (isBold)
+        {
+            return "bold";
+        }
+        if (isItalic)
+        {
+            return "italic";
+        }
+        return "normal";
+    }
+
     private void TogglePositionPopup()
     {
         isPositionPopupVisible = !isPositionPopupVisible;
@@ -65,35 +93,49 @@
     private void ToggleBold()
     {
         isBold = !isBold;
+        _module.InvokeVoidAsync("handleBoldItalic", GetFontStyle());
+
     }
 
     private void ToggleItalic()
     {
         isItalic = !isItalic;
+        _module.InvokeVoidAsync("handleBoldItalic", GetFontStyle());
     }
 
     private void ToggleUnderline()
     {
         isUnderline = !isUnderline;
+        if (isUnderline)
+        {
+            _module.InvokeVoidAsync("handleUnderline", "underline");
+        } else
+        {
+            _module.InvokeVoidAsync("handleUnderline", "normal");
+        }
     }
 
     private void ChangeColor(string color)
     {
         fontColor = color;
+        _module.InvokeVoidAsync("handleFontColorChange", color);
     }
 
     private void SetAlignLeft()
     {
         align = "left";
+        _module.InvokeVoidAsync("handleAlignmentChange", "left");
     }
 
     private void SetAlignCenter()
     {
         align = "center";
+        _module.InvokeVoidAsync("handleAlignmentChange", "center");
     }
 
     private void SetAlignRight()
     {
         align = "right";
+        _module.InvokeVoidAsync("handleAlignmentChange", "right");
     }
 }

@@ -71,7 +71,7 @@ function displayTextStylingBar() {
     //updateTextStylingBarValues();
 }
 
-function updateTextStylingBarValues() {
+/*function updateTextStylingBarValues() {
     const selectedNodes = tr.nodes();
     if (selectedNodes.length > 0) {
         const firstNode = selectedNodes[0];
@@ -84,6 +84,6 @@ function updateTextStylingBarValues() {
             )
         }
     }
-}
+}*/
 
 export { setTextStylingBarReference, displayTextStylingBar, handleFontSelect, handleFontSizeChange, handleFontColorChange, handleBoldItalic, handleUnderline, handleAlignmentChange };
