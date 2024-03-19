@@ -101,7 +101,8 @@ function handleSelection(e) {
         !e.target.hasName("text") &&
         !e.target.hasName("img") &&
         !e.target.hasName("barcode") &&
-        !e.target.hasName("shape")
+        !e.target.hasName("shape") &&
+        !e.target.hasName("qrcode")
     ) {
         checkStylingBars();
         return;

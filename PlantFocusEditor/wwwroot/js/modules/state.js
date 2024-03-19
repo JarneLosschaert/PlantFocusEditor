@@ -35,6 +35,22 @@ let barcodeImg = new Konva.Image({
     shadowOpacity: 0,
     locked: false
 });
+let qrcodeImg = new Konva.Image({
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+    name: "qrcode",
+    number: "",
+    draggable: true,
+    src: "",
+    stroke: "#000000",
+    strokeWidth: 0,
+    shadowBlur: 10,
+    shadowOffset: { x: 5, y: 5 },
+    shadowOpacity: 0,
+    locked: false
+})
 
 const history = [];
 const historyBackside = [];
@@ -150,6 +166,12 @@ function loadStateFromTemplate(json) {
             childNode.image(img);
             barcodeImg = childNode;
             addHoverAnimation(childNode);
+        } else if (childNode.attrs.name === "qrcode") {
+            const img = new Image();
+            img.src = childNode.attrs.src;
+            childNode.image(img);
+            qrcodeImg = childNode;
+            addHoverAnimation(childNode);
         } else if (childNode.getClassName() === "Image") {
             const id = childNode.attrs.id;
             const src = childNode.attrs.src;
@@ -250,4 +272,4 @@ function setBarcodeImg(img) {
     barcodeImg = img;
 }
 
-export { stage, layer, handleState, saveState, barcodeImg, setBarcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages, loadStateFromTemplate };
+export { stage, layer, handleState, saveState, barcodeImg, setBarcodeImg, qrcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages, loadStateFromTemplate };

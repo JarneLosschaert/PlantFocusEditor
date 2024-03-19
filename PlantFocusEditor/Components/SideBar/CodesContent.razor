@@ -1,14 +1,50 @@
-﻿<article class="codes-content">
+﻿@inject IJSRuntime JS
+
+<article class="codes-content">
     <div>
         <h3>Barcode</h3>
-        <input type="text" />
+        <input type="number" id="barcodeInput" @bind="_barcode" @oninput="onBarcodeInput" />
     </div>
     <div>
         <h3>QR code</h3>
-        <input type="text" />
+        <input type="text" id="qrcodeInput" @bind="_qrcode" />
+        <button @onclick="GenerateQrCode">Generate QR Code</button>
     </div>
 </article>
 
 @code {
+    private IJSObjectReference? module;
+    private IJSObjectReference? stateModule;
 
+    private string _barcode = "";
+    private string _qrcode = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/barcodeLayer.js");
+            stateModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/state.js");
+            _barcode = await stateModule.InvokeAsync<string>("getBarcodeNumber");
+            StateHasChanged();
+        }
+    }
+
+    public void onBarcodeInput(ChangeEventArgs e)
+    {
+        string value = e.Value.ToString();
+        _barcode = new string(value.Where(char.IsDigit).ToArray());
+        module.InvokeVoidAsync("createBarcode", _barcode);
+    }
+
+    private void GenerateQrCode()
+    {
+        QRCodeGenerator generator = new QRCodeGenerator();
+        QRCodeData codeData = generator.CreateQrCode(_qrcode, QRCodeGenerator.ECCLevel.Q);
+        PngByteQRCode qrCode = new PngByteQRCode(codeData);
+        byte[] qrCodeByteArr = qrCode.GetGraphic(20);
+        string base64String = Convert.ToBase64String(qrCodeByteArr);
+        string source = $"data:image/png;base64,{base64String}";
+        module.InvokeVoidAsync("addQRCode", source);
+    }
 }
