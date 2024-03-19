@@ -90,25 +90,6 @@ function handleBorderWidthChange(width) {
     });
 }
 
-function handleTransparencyChange(transparency) {
-    const selectedNodes = tr.nodes();
-    selectedNodes.forEach((node) => {
-        if (node.getClassName() === "Image" || node.attrs.name === "shape") {
-            const value = parseFloat(transparency);
-            node.opacity(value);
-        }
-    });
-}
-
-function handleShadowChange(shadow) {
-    const selectedNodes = tr.nodes();
-    selectedNodes.forEach((node) => {
-        if (node.getClassName() === "Image" || node.attrs.name === "shape") {
-            const value = parseFloat(shadow);
-            node.shadowOpacity(value);
-        }
-    });
-}
 
 function displayImageShapeStylingBar() {
     const selectedNodes = tr.nodes();
@@ -133,4 +114,4 @@ function updateStylingBarValues() {
     }
 }
 
-export { addTransformEventListener, displayImageShapeStylingBar, setImageShapeStylingBarReference, handleBorderColorChange, handleBorderWidthChange, handleTransparencyChange, handleShadowChange, changeImage, updateDimensionsOnInput, handleShapeColorChange, setImageLayerReference };
+export { addTransformEventListener, displayImageShapeStylingBar, setImageShapeStylingBarReference, handleBorderColorChange, handleBorderWidthChange, changeImage, updateDimensionsOnInput, handleShapeColorChange, setImageLayerReference };

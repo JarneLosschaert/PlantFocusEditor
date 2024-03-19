@@ -60,26 +60,6 @@ function handleAlignmentChange(alignment) {
     });
 }
 
-function handleTransparencyChange(transparency) {
-    const selectedNodes = tr.nodes();
-    selectedNodes.forEach((node) => {
-        if (node.getClassName() === "Text") {
-            const value = parseFloat(transparency);
-            node.opacity(value);
-        }
-    });
-}
-
-function handleShadowChange(shadow) {
-    const selectedNodes = tr.nodes();
-    selectedNodes.forEach((node) => {
-        if (node.getClassName() === "Text") {
-            const value = parseFloat(shadow);
-            node.shadowOpacity(value);
-        }
-    });
-}
-
 function displayTextStylingBar() {
     const selectedNodes = tr.nodes();
     const onlyText =
@@ -106,4 +86,4 @@ function updateTextStylingBarValues() {
     }
 }
 
-export { setTextStylingBarReference, displayTextStylingBar, handleFontSelect, handleFontSizeChange, handleFontColorChange, handleBoldItalic, handleUnderline, handleAlignmentChange, handleTransparencyChange, handleShadowChange };
+export { setTextStylingBarReference, displayTextStylingBar, handleFontSelect, handleFontSizeChange, handleFontColorChange, handleBoldItalic, handleUnderline, handleAlignmentChange };

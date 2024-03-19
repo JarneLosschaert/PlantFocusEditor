@@ -1,4 +1,6 @@
-﻿<section class="styling-bar">
+﻿@inject IJSRuntime JS
+
+<section class="styling-bar">
     <div class="content-header">
         <h2>@GetSelectedItem()</h2>
     </div>
@@ -34,6 +36,39 @@
     private bool onlyText = true;
     private bool onlyImage = false;
     private bool onlyElement = false;
+    private IJSObjectReference? _module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/stylingBar.js");
+        }
+    }
+
+    private async Task SetSelectedItem()
+    {
+        string nodeType = await _module.InvokeAsync<string>("getSelectedItemType");
+        switch (nodeType)
+        {
+            case "onlyText":
+                onlyText = true;
+                selecting = true;
+                break;
+            case "onlyImages":
+                onlyImage = true;
+                selecting = true;
+                break;
+            case "onlyShapes":
+                onlyElement = true;
+                selecting = true;
+                break;
+            case "":
+                selecting = false;
+                break;
+        }
+        StateHasChanged();
+    }
 
     private string GetSelectedItem()
     {
