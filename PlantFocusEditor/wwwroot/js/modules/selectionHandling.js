@@ -1,6 +1,5 @@
 import { tr, hoverTr, selectionRectangle, currentGroup } from "./constants.js";
 import { stage, layer } from "./state.js";
-import { displayImageShapeStylingBar } from "./imageShapeStylingBar.js";
 import { deleteNodes } from "./controlBar.js";
 
 let x1, y1, x2, y2;
@@ -81,7 +80,6 @@ function handleSelectionEnd(e) {
     tr.nodes(selected);
     toggleLock();
     hoverTr.nodes([]);
-    checkStylingBars();
 }
 
 function handleSelection(e) {
@@ -93,7 +91,6 @@ function handleSelection(e) {
     }
     if (e.target === stage || e.target.attrs.name == "passepartout") {
         tr.nodes([]);
-        checkStylingBars();
         return;
     }
     if (
@@ -103,7 +100,6 @@ function handleSelection(e) {
         !e.target.hasName("shape") &&
         !e.target.hasName("qrcode")
     ) {
-        checkStylingBars();
         return;
     }
     const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
@@ -122,7 +118,6 @@ function handleSelection(e) {
         toggleLock();
     }
     hoverTr.nodes([]);
-    checkStylingBars();
 }
 
 function toggleLock() {
@@ -130,10 +125,6 @@ function toggleLock() {
     const locked = nodes.every(node => node.attrs.locked);
     tr.resizeEnabled(!locked);
     tr.rotateEnabled(!locked);
-}
-
-function checkStylingBars() {
-    displayImageShapeStylingBar();
 }
 
 export { handleSelections, addSelectionRectangle };

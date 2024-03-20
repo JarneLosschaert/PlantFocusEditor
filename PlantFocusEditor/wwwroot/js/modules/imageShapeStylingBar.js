@@ -1,17 +1,6 @@
 import { tr } from "./constants.js";
 import { layer } from "./state.js";
 
-let imageShapeStylingBarReference = null;
-let imageLayerReference = null;
-
-function setImageShapeStylingBarReference(reference) {
-    imageShapeStylingBarReference = reference;
-}
-
-function setImageLayerReference(ref) {
-    imageLayerReference = ref;
-}
-
 /*function addTransformEventListener() {
     tr.on('transformend', () => {
         const nodes = tr.nodes();
@@ -56,7 +45,6 @@ function changeImage(src) {
         newImg.src = src;
         img.image(newImg);
         img.attrs.src = src;
-        //imageLayerReference.invokeMethodAsync("ChangeImage", img.attrs.id, src);
     });
     layer.batchDraw();
 }
@@ -70,27 +58,9 @@ function handleShapeColorChange(color) {
     });
 }
 
-function displayImageShapeStylingBar() {
-    const selectedNodes = tr.nodes();
-    const onlyImages = selectedNodes.length > 0 && selectedNodes.every(node => node.getClassName() === "Image");
-    const onlyShapes = selectedNodes.length > 0 && selectedNodes.every(node => node.attrs.name === "shape");
-    //imageShapeStylingBarReference.invokeMethodAsync('displayImageShapeStylingBar', onlyImages, onlyShapes);
-    //updateStylingBarValues();
+function getFillColor() {
+    const firstNode = tr.nodes()[0];
+    return firstNode.fill();
 }
 
-/*function updateStylingBarValues() {
-    const selectedNodes = tr.nodes();
-    if (selectedNodes.length > 0) {
-        const firstNode = selectedNodes[0];
-        if (firstNode.getClassName() === "Image" || firstNode.attrs.name === "shape") {
-            let fill = firstNode.fill();
-            if (fill === undefined) fill = "#000000";
-            imageShapeStylingBarReference.invokeMethodAsync('updateImageShapeStylingBarValues',
-                fill, firstNode.stroke(), firstNode.strokeWidth(),
-                firstNode.opacity(), firstNode.shadowOpacity(), Math.round(firstNode.width()), Math.round(firstNode.height())
-            );
-        }
-    }
-}*/
-
-export { displayImageShapeStylingBar, setImageShapeStylingBarReference, changeImage, updateDimensionsOnInput, handleShapeColorChange, setImageLayerReference };
+export { changeImage, updateDimensionsOnInput, handleShapeColorChange, getFillColor };

@@ -20,6 +20,7 @@
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
+            _fillColor = await _module.InvokeAsync<string>("getFillColor");
         }
     }
 
