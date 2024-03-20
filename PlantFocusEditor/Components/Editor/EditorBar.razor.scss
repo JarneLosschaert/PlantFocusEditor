@@ -33,14 +33,30 @@
         }
     }
 
-    & > button, .undo-redo {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: $btn;
-        box-shadow: $shadow-s;
-        border-radius: $border-radius-s;
+    div {
+        width: 7rem;
+
+        & > button, .undo-redo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: $btn;
+            box-shadow: $shadow-s;
+            border-radius: $border-radius-s;
+        }
+
+        &.switch-sides {
+            display: flex;
+            justify-content: center;
+        }
+
+        &.flip {
+            display: flex;
+            justify-content: end;
+        }
     }
+
+
 
     .undo-redo {
         display: flex;

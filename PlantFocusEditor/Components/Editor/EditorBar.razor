@@ -7,14 +7,19 @@
             @((MarkupString)CustomIcons.Redo())
         </button>
     </div>
-    <button>
-        Recto
-        @((MarkupString)CustomIcons.Rotate())
-    </button>
-
-    <button>
-        @((MarkupString)CustomIcons.Flip())
-    </button>
+    <div class="switch-sides">
+        <button>
+            Recto
+            @((MarkupString)CustomIcons.Rotate())
+        </button>
+    </div>
+    
+    <div class="flip">
+        <button>
+            @((MarkupString)CustomIcons.Flip())
+        </button>
+    </div>
+    
 </section>
 
 @code {

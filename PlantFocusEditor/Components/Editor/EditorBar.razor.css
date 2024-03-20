@@ -27,13 +27,24 @@
 .editor-bar button:hover {
   background: #f0f0f0;
 }
-.editor-bar > button, .editor-bar .undo-redo {
+.editor-bar div {
+  width: 7rem;
+}
+.editor-bar div > button, .editor-bar div .undo-redo {
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 100%, 0.16);
   box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 5px, rgba(0, 0, 0, 0.06) 0px 1px 3px;
   border-radius: 6px;
+}
+.editor-bar div.switch-sides {
+  display: flex;
+  justify-content: center;
+}
+.editor-bar div.flip {
+  display: flex;
+  justify-content: end;
 }
 .editor-bar .undo-redo {
   display: flex;
