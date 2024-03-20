@@ -63,4 +63,9 @@ function getFillColor() {
     return firstNode.fill();
 }
 
-export { changeImage, updateDimensionsOnInput, handleShapeColorChange, getFillColor };
+function getSource() {
+    const firstNode = tr.nodes()[0];
+    return firstNode.attrs.src;
+}
+
+export { changeImage, updateDimensionsOnInput, handleShapeColorChange, getFillColor, getSource };
