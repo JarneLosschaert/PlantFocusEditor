@@ -2,40 +2,42 @@
 
 <section class="styling-bar">
     <div class="content-header">
-        <h2>@GetSelectedItem()</h2>
+        <h2>@_selectedNode</h2>
     </div>
     <div class="content">
-        @if (onlyText)
+        @switch (_selectedNode)
         {
-            <TextStyleContent />
-        }
-        else if (onlyImage)
-        {
-            <ImageStyleContent />
-            <BorderContent />
-        }
-        else if (onlyElement)
-        {
-            <ElementStyleContent />
-            <BorderContent />
-        }
-        @if (selecting)
-        {
-            <AppearanceContent />
-            <ControlContent />
-        }
-        else
-        {
-            <LabelStyleContent />
+            case "Text":
+                <TextStyleContent />
+                <AppearanceContent />
+                <ControlContent />
+                break;
+            case "Image":
+                <ImageStyleContent />
+                <AppearanceContent />
+                <BorderContent />
+                <ControlContent />
+                break;
+            case "Shape":
+                <ElementStyleContent />
+                <AppearanceContent />
+                <BorderContent />
+                <ControlContent />
+                break;
+            case "Selecting":
+                <AppearanceContent />
+                <ControlContent />
+                break;
+            default:
+                <LabelStyleContent />
+                break;
         }
     </div>
 </section>
 
 @code {
     private bool selecting = true;
-    private bool onlyText = true;
-    private bool onlyImage = false;
-    private bool onlyElement = false;
+    private string _selectedNode = "";
     private IJSObjectReference? _module;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -46,48 +48,9 @@
         }
     }
 
-    private async Task SetSelectedItem()
+    public async Task SetSelectedItem()
     {
-        string nodeType = await _module.InvokeAsync<string>("getSelectedItemType");
-        switch (nodeType)
-        {
-            case "onlyText":
-                onlyText = true;
-                selecting = true;
-                break;
-            case "onlyImages":
-                onlyImage = true;
-                selecting = true;
-                break;
-            case "onlyShapes":
-                onlyElement = true;
-                selecting = true;
-                break;
-            case "":
-                selecting = false;
-                break;
-        }
+        _selectedNode = await _module.InvokeAsync<string>("getSelectedItemType");
         StateHasChanged();
-    }
-
-    private string GetSelectedItem()
-    {
-        if (onlyText)
-        {
-            return "Text";
-        }
-        else if (onlyImage)
-        {
-            return "Image";
-        }
-        else if (onlyElement)
-        {
-            return "Element";
-        }
-        else if (selecting)
-        {
-            return "Styling";
-        }
-        return "Label";
     }
 }

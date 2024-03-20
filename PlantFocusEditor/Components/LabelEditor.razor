@@ -4,14 +4,16 @@
     <div class="label-editor">
         <SideBar SelectTab="SelectTab" />
         <SideBarContent />
-        <Editor />
-        <StylingBar />
+        <Editor @ref="_editor" KonvaClicked="HandleKonvaContainerClicked" />
+        <StylingBar @ref="_stylingBar" />
     </div>
 </CascadingValue>
 
 @code {
     public SideBarTabs _SelectedTab { get; set; } = SideBarTabs.Templates;
     private IJSObjectReference? _module;
+    private StylingBar.StylingBar _stylingBar;
+    private Editor.Editor _editor;
 
     public void SelectTab(SideBarTabs tab)
     {
@@ -28,5 +30,10 @@
                 _module.InvokeVoidAsync("init");
             }
         }
+    }
+
+    private void HandleKonvaContainerClicked()
+    {
+        _stylingBar.SetSelectedItem();
     }
 }

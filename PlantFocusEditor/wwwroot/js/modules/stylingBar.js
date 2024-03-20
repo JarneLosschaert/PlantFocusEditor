@@ -18,15 +18,21 @@ function handleShadowChange(shadow) {
 
 function getSelectedItemType() {
     const selectedClasses = tr.nodes().map(el => el.getClassName());
-    if (selectedClasses.every(el => el === "Text")) {
-        return "onlyText";
+    console.log(selectedClasses);
+    const isSelected = selectedClasses.length > 0;
+    if (isSelected && selectedClasses.every(el => el === "Text")) {
+        return "Text";
     }
-    if (selectedClasses.every(el => el === "Image")) {
-        return "onlyImages";
+    if (isSelected && selectedClasses.every(el => el === "Image")) {
+        return "Image";
     }
-    if (selectedClasses.every(el => el === "Shape")) {
-        return "onlyShapes";
+    if (isSelected && selectedClasses.every(el => el === "Shape")) {
+        return "Shape";
     }
+    if (isSelected) {
+        return "Selecting";
+    }
+    return "";
 
 }
 export { handleShadowChange, handleTransparencyChange, getSelectedItemType };
