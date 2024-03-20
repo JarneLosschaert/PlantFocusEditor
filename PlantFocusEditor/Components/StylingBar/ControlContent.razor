@@ -61,8 +61,18 @@
     [Parameter]
     public IJSObjectReference? Module { get; set; }
     private bool isPositionPopupVisible = false;
-
     private bool isLocked = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Module != null)
+        {
+            isLocked = await Module.InvokeAsync<bool>("getIsLocked");
+        } else
+        {
+            Console.WriteLine("module is null");
+        }
+    }
 
     private void Lock()
     {

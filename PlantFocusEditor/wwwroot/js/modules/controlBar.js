@@ -106,28 +106,11 @@ function displayControlBar() {
     } else {
         //controlBarReference.invokeMethodAsync('displayControlBar', false, areDifferentNodes());
     }
-    updateControlBarValues();
 }
 
-function areDifferentNodes() {
+function getIsLocked() {
     const selectedNodes = tr.nodes();
-
-    const hasOnlyText = selectedNodes.every(node =>
-        node.attrs.name === "text"
-    );
-
-    const hasOnlyImagesShapes = selectedNodes.every(node =>
-        node.attrs.name === "img" || node.attrs.name === "shape"
-    );
-
-    return !(hasOnlyText || hasOnlyImagesShapes);
-}
-function updateControlBarValues() {
-    const selectedNodes = tr.nodes();
-    if (selectedNodes.length > 0) {
-        const firstNode = selectedNodes[0];
-        //controlBarReference.invokeMethodAsync('updateControlBarValues', firstNode.draggable())
-    }
+    return selectedNodes.every(node => node.attrs.locked);
 }
 
-export { displayControlBar, setControlBarReference, deleteNodes, changePosition, cloneNode, lockNode, setImageLayerReference };
+export { displayControlBar, setControlBarReference, deleteNodes, changePosition, cloneNode, lockNode, setImageLayerReference, getIsLocked };
