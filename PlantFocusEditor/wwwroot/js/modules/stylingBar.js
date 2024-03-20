@@ -16,6 +16,19 @@ function handleShadowChange(shadow) {
     });
 }
 
+function handleBorderColorChange(color) {
+    const selectedNodes = tr.nodes();
+    selectedNodes.forEach(node => node.stroke(color));
+}
+
+function handleBorderWidthChange(width) {
+    const selectedNodes = tr.nodes();
+    selectedNodes.forEach((node) => {
+        const value = parseFloat(width);
+        node.strokeWidth(value);
+    });
+}
+
 function getSelectedItemType() {
     const selectedClasses = tr.nodes().map(el => el.getClassName());
     const isSelected = selectedClasses.length > 0;
@@ -34,4 +47,4 @@ function getSelectedItemType() {
     return "";
 
 }
-export { handleShadowChange, handleTransparencyChange, getSelectedItemType };
+export { handleShadowChange, handleTransparencyChange, getSelectedItemType, handleBorderColorChange, handleBorderWidthChange };

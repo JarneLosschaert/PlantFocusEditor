@@ -1,6 +1,6 @@
 ﻿<div class="color-input">
     <input type="text" @bind="fontColor" @oninput="HandleColorInput" maxlength="7" />
-    <input type="color" @bind="fontColor" />
+    <input type="color" @bind="fontColor" @oninput="HandleColorInput" />
 </div>
 
 @code {

@@ -71,26 +71,6 @@ function handleShapeColorChange(color) {
     });
 }
 
-function handleBorderColorChange(color) {
-    const selectedNodes = tr.nodes();
-    selectedNodes.forEach((node) => {
-        if (node.getClassName() === "Image" || node.attrs.name === "shape") {
-            node.stroke(color);
-        }
-    });
-}
-
-function handleBorderWidthChange(width) {
-    const selectedNodes = tr.nodes();
-    selectedNodes.forEach((node) => {
-        if (node.getClassName() === "Image" || node.attrs.name === "shape") {
-            const value = parseFloat(width);
-            node.strokeWidth(value);
-        }
-    });
-}
-
-
 function displayImageShapeStylingBar() {
     const selectedNodes = tr.nodes();
     const onlyImages = selectedNodes.length > 0 && selectedNodes.every(node => node.getClassName() === "Image");
@@ -114,4 +94,4 @@ function displayImageShapeStylingBar() {
     }
 }*/
 
-export { addTransformEventListener, displayImageShapeStylingBar, setImageShapeStylingBarReference, handleBorderColorChange, handleBorderWidthChange, changeImage, updateDimensionsOnInput, handleShapeColorChange, setImageLayerReference };
+export { addTransformEventListener, displayImageShapeStylingBar, setImageShapeStylingBarReference, changeImage, updateDimensionsOnInput, handleShapeColorChange, setImageLayerReference };
