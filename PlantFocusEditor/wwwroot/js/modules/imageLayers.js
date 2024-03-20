@@ -1,14 +1,15 @@
 import { stage } from "./state.js";
 import { addHoverAnimation } from "./animations.js";
-import { tr, currentGroup } from "./constants.js";
+import { tr, currentGroup, front, back } from "./constants.js";
 
-function addImage(src) {
+function addImage(id, src) {
     const img = new Image();
     img.src = src;
     const kimg = new Konva.Image({
         name: "img",
         image: img,
         src: img.src,
+        id: id,
         width: 100,
         height: 100,
         draggable: true,
@@ -30,6 +31,21 @@ function removeImage(id) {
         node.destroy();
     });
     tr.nodes([]);
+}
+
+window.getAllImages = function() {
+    const images = {}
+    getImages(front, images);
+    getImages(back, images);
+    return images;
+}
+
+function getImages(group, images) {
+    group.children.forEach(child => {
+        if (child.getClassName() === "Image") {
+            images[child.attrs.id] = child.attrs.src;
+        }
+    });
 }
 
 export { addImage, removeImage };

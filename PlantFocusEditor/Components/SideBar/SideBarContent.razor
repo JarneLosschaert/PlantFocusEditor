@@ -1,4 +1,6 @@
-﻿<section class="side-bar-content">
+﻿@inject IJSRuntime JS
+
+<section class="side-bar-content">
     <div class="content-header">
         <h2>@LabelEditor._SelectedTab</h2>
     </div>
@@ -12,7 +14,7 @@
                 <TextContent />
                 break;
             case SideBarTabs.Images:
-                <ImagesContent />
+                <ImagesContent @ref="_imagesContent" OnRendered="OnImagesContentRendered" />
                 break;
             case SideBarTabs.Elements:
                 <ElementsContent />
@@ -31,4 +33,58 @@
 @code {
     [CascadingParameter]
     public LabelEditor LabelEditor { get; set; }
+    private ImagesContent? _imagesContent;
+    private IJSObjectReference? _module;
+    private List<string> _imagesToRemove = new();
+    private Dictionary<string, string> _imagesToAdd = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var reference = DotNetObjectReference.Create(this);
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/controlBar.js");
+            await _module.InvokeVoidAsync("setReference", reference);
+        }
+    }
+
+    [JSInvokable]
+    public void RemoveImage(string id)
+    {
+        if (_imagesContent != null)
+        {
+            _imagesContent.RemoveImage(id);
+        } else
+        {
+            _imagesToRemove.Add(id);
+        }
+    }
+
+    [JSInvokable]
+    public void AddImage(string id, string src)
+    {
+        Console.WriteLine(src);
+        if (_imagesContent != null)
+        {
+            _imagesContent.AddImage(id, src);
+        } else
+        {
+            _imagesToAdd.Add(id, src);
+        }
+    }
+
+    private void OnImagesContentRendered()
+    {
+        foreach (string id in _imagesToRemove)
+        {
+            _imagesContent.RemoveImage(id);
+        }
+        foreach (KeyValuePair<string, string> image in _imagesToAdd)
+        {
+            _imagesContent.AddImage(image.Key, image.Value);
+        }
+        _imagesToRemove.Clear();
+        _imagesToAdd.Clear();
+
+    }
 }
