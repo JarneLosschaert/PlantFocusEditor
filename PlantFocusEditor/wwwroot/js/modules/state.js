@@ -1,4 +1,4 @@
-import { changeTr, changeHoverTr, changeSelectionRectangle, front, setFront, back, currentGroup, setCurrentGroup } from "./constants.js";
+import { changeTr, changeHoverTr, changeSelectionRectangle, front, setFront, back, setBack, currentGroup, setCurrentGroup } from "./constants.js";
 import { handleTextEventListeners } from "./textLayers.js";
 import { handleSelections } from "./selectionHandling.js";
 import { sceneFunc } from "./shapeLayers.js";
@@ -128,18 +128,25 @@ function loadState(json) {
 
 function loadStateFromTemplate(json) {
     json = JSON.parse(json);
-    console.log(json);
-    const node = Konva.Node.create(json.Group);
-    setFront(node);
-    setCurrentGroup(node);
+
     layer.children.forEach(child => {
         if (child.getClassName() === "Group") {
             child.remove();
         }
     });
-    layer.add(node);
+
+    const firstGroup = loadGroupFromJson(json[0]);
+    setFront(firstGroup);
+    setCurrentGroup(firstGroup);
+    layer.add(front);
+    setBack(loadGroupFromJson(json[1]));
+}
+
+function loadGroupFromJson(json) {
+    const node = Konva.Node.create(json.Group);
     let pathData;
     let offsetX;
+
     node.children.forEach(childNode => {
         if (childNode.getClassName() === "Path") {
             pathData = childNode.attrs.data;
@@ -170,7 +177,7 @@ function loadStateFromTemplate(json) {
     node.x(offsetX);
     const clipFuncWithParam = createClipFunc(pathData);
     node.clipFunc(clipFuncWithParam);
-    console.log(layer);
+    return node;
 }
 
 function saveState() {

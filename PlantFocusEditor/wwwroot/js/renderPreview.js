@@ -7,14 +7,14 @@ function renderPreviewFromJson(jsonToRender) {
     if (!isValidJson(jsonToRender)) return "";
     const json = JSON.parse(jsonToRender);
 
-    if (json.Group === undefined) {
+    if (json.length !== 2) {
         return "";
     }
     let width;
     let height;
 
     const layer = new Konva.Layer();
-    const group = Konva.Node.create(json.Group);
+    const group = Konva.Node.create(json[0].Group);
 
     group.children.forEach((child, i, arr) => {
         const node = Konva.Node.create(child);

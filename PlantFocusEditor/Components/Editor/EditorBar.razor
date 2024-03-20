@@ -1,4 +1,6 @@
-﻿<section class="editor-bar">
+﻿@inject IJSRuntime JS
+
+<section class="editor-bar">
     <div class="undo-redo">
         <button>
             @((MarkupString)CustomIcons.Undo())
@@ -8,7 +10,7 @@
         </button>
     </div>
     <div class="switch-sides">
-        <button>
+        <button @onclick="SwitchSides">
             Recto
             @((MarkupString)CustomIcons.Rotate())
         </button>
@@ -23,5 +25,21 @@
 </section>
 
 @code {
+    private IJSObjectReference? _module;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/state.js");
+        }
+    }
+
+    private void SwitchSides()
+    {
+        if (_module != null)
+        {
+            _module.InvokeVoidAsync("switchSides");
+        }
+    }
 }
