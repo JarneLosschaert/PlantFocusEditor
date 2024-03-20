@@ -208,12 +208,12 @@ function undo() {
     if (currentGroup === front) {
         if (historyIndex > 0) {
             historyIndex--;
-            loadState(layer, history[historyIndex]);
+            loadState(history[historyIndex]);
         }
     } else {
         if (historyBacksideIndex > 0) {
             historyBacksideIndex--;
-            loadState(back, historyBackside[historyBacksideIndex]);
+            loadState(historyBackside[historyBacksideIndex]);
         }
     }
 }
@@ -222,12 +222,12 @@ function redo() {
     if (currentGroup === front) {
         if (historyIndex < history.length - 1) {
             historyIndex++;
-            loadState(layer, history[historyIndex]);
+            loadState(history[historyIndex]);
         }
     } else {
         if (historyBacksideIndex < historyBackside.length - 1) {
             historyBacksideIndex++;
-            loadState(back, historyBackside[historyBacksideIndex]);
+            loadState(historyBackside[historyBacksideIndex]);
         }
     }
 }
@@ -267,4 +267,4 @@ function setBarcodeImg(img) {
     barcodeImg = img;
 }
 
-export { stage, layer, handleState, saveState, barcodeImg, setBarcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages, loadStateFromTemplate, flip };
+export { undo, redo, stage, layer, handleState, saveState, barcodeImg, setBarcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages, loadStateFromTemplate, flip };
