@@ -1,58 +1,58 @@
-﻿<section class="styling-bar">
+﻿@inject IJSRuntime JS
+
+<section class="styling-bar">
     <div class="content-header">
-        <h2>@GetSelectedItem()</h2>
+        <h2>@_selectedNode</h2>
     </div>
     <div class="content">
-        @if (onlyText)
+        @switch (_selectedNode)
         {
-            <TextStyleContent />
-        }
-        else if (onlyImage)
-        {
-            <ImageStyleContent />
-            <BorderContent />
-        }
-        else if (onlyElement)
-        {
-            <ElementStyleContent />
-            <BorderContent />
-        }
-        @if (selecting)
-        {
-            <AppearanceContent />
-            <ControlContent />
-        }
-        else
-        {
-            <LabelStyleContent />
+            case "Text":
+                <TextStyleContent />
+                <AppearanceContent Module="_module"/>
+                <ControlContent Module="_controlBarModule" />
+                break;
+            case "Image":
+                <ImageStyleContent />
+                <AppearanceContent Module="_module" />
+                <BorderContent Module="_module" />
+                <ControlContent Module="_controlBarModule" />
+                break;
+            case "Shape":
+                <ElementStyleContent />
+                <AppearanceContent Module="_module" />
+                <BorderContent Module="_module"/>
+                <ControlContent Module="_controlBarModule" />
+                break;
+            case "Selecting":
+                <AppearanceContent Module="_module" />
+                <ControlContent Module="_controlBarModule" />
+                break;
+            default:
+                <LabelStyleContent />
+                break;
         }
     </div>
 </section>
 
 @code {
     private bool selecting = true;
-    private bool onlyText = true;
-    private bool onlyImage = false;
-    private bool onlyElement = false;
+    private string _selectedNode = "";
+    private IJSObjectReference? _module;
+    private IJSObjectReference? _controlBarModule;
 
-    private string GetSelectedItem()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (onlyText)
+        if (firstRender)
         {
-            return "Text";
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/stylingBar.js");
+            _controlBarModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/controlBar.js");
         }
-        else if (onlyImage)
-        {
-            return "Image";
-        }
-        else if (onlyElement)
-        {
-            return "Element";
-        }
-        else if (selecting)
-        {
-            return "Styling";
-        }
-        return "Label";
+    }
+
+    public async Task SetSelectedItem()
+    {
+        _selectedNode = await _module.InvokeAsync<string>("getSelectedItemType");
+        StateHasChanged();
     }
 }

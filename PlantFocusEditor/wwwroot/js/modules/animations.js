@@ -58,7 +58,6 @@ function addHoverAnimation(node) {
             hoverTr.nodes([]);
         });
     });
-
 }
 
 export { selectAnimation, addHoverAnimation, addIncomingAnimation };  

@@ -1,16 +1,6 @@
 import { tr, selectionRectangle, hoverTr, currentGroup } from "./constants.js";
-import { removeBarcode, removeQRCode } from "./barcodeLayer.js";
-
-let controlBarReference = null;
-let imageLayerReference = null;
-
-function setControlBarReference(reference) {
-    controlBarReference = reference;
-}
-
-function setImageLayerReference(ref) {
-    imageLayerReference = ref;
-}
+import { removeBarcode } from "./barcodeLayer.js";
+import { addHoverAnimation } from "./animations.js";
 
 function deleteNodes() {
     const selectedNodes = tr.nodes();
@@ -18,13 +8,6 @@ function deleteNodes() {
         if (node.attrs.name === "barcode") {
             removeBarcode();
             return;
-        } 
-        if (node.attrs.name === "qrcode") {
-            removeQRCode();
-            return;
-        }
-        if (node.attrs.name === "img") {
-            imageLayerReference.invokeMethodAsync("RemoveImage", node.attrs.id);
         }
         node.destroy();
     });
@@ -60,19 +43,26 @@ function cloneNode() {
         if (node.getClassName() === "Image") {
             const oldId = node.attrs.id;
             const newId = uuidv4();
-            imageLayerReference.invokeMethodAsync("DuplicateImage", oldId, newId);
             const clone = node.clone({
                 x: node.x() + 10,
                 y: node.y() + 10,
-                id: newId
+                id: newId,
+                locked: node.attrs.locked
             });
             currentGroup.add(clone);
+            clone.off("mouseover");
+            clone.off("mouseout");
+            addHoverAnimation(clone);
         } else {
             const clone = node.clone({
                 x: node.x() + 10,
-                y: node.y() + 10
+                y: node.y() + 10,
+                locked: node.attrs.locked
             });
             currentGroup.add(clone);
+            clone.off("mouseover");
+            clone.off("mouseout");
+            addHoverAnimation(clone);
         }
     });
 }
@@ -84,44 +74,19 @@ function uuidv4() {
 }
 
 function lockNode() {
-    const selectedNodes = tr.nodes();
+    const selectedNodes = tr.nodes();    
     selectedNodes.forEach(node => {
-        node.locked = !node.locked;
+        node.attrs.locked = !node.attrs.locked;
         node.draggable(!node.draggable());
     });
-    const locked = selectedNodes.every(node => node.locked);
+    const locked = selectedNodes.every(node => node.attrs.locked);
     tr.rotateEnabled(!locked);
     tr.resizeEnabled(!locked);
 }
-function displayControlBar() {
+
+function getIsLocked() {
     const selectedNodes = tr.nodes();
-    if (selectedNodes.length > 0) {
-        //controlBarReference.invokeMethodAsync('displayControlBar', true, areDifferentNodes());
-    } else {
-        //controlBarReference.invokeMethodAsync('displayControlBar', false, areDifferentNodes());
-    }
-    updateControlBarValues();
+    return selectedNodes.every(node => node.attrs.locked);
 }
 
-function areDifferentNodes() {
-    const selectedNodes = tr.nodes();
-
-    const hasOnlyText = selectedNodes.every(node =>
-        node.attrs.name === "text"
-    );
-
-    const hasOnlyImagesShapes = selectedNodes.every(node =>
-        node.attrs.name === "img" || node.attrs.name === "shape"
-    );
-
-    return !(hasOnlyText || hasOnlyImagesShapes);
-}
-function updateControlBarValues() {
-    const selectedNodes = tr.nodes();
-    if (selectedNodes.length > 0) {
-        const firstNode = selectedNodes[0];
-        //controlBarReference.invokeMethodAsync('updateControlBarValues', firstNode.draggable())
-    }
-}
-
-export { displayControlBar, setControlBarReference, deleteNodes, changePosition, cloneNode, lockNode, setImageLayerReference };
+export { deleteNodes, changePosition, cloneNode, lockNode, getIsLocked };

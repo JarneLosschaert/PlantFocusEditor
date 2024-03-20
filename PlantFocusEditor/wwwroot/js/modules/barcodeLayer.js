@@ -1,6 +1,7 @@
 import { tr, currentGroup } from "./constants.js";
 import { addHoverAnimation } from "./animations.js";
-import { barcodeImg, qrcodeImg } from "./state.js";
+import { barcodeImg } from "./state.js";
+import { addImage } from "./imageLayers.js";
 
 
 function createBarcode(inputValue) {
@@ -33,18 +34,7 @@ function generateBarcode(value) {
 }
 
 function addQRCode(src) {
-    if (src === "") {
-        removeQRCode();
-        return;
-    }
-    const img = new Image();
-    img.src = src;
-    if (qrcodeImg.attrs.src === "") {
-        currentGroup.add(qrcodeImg);
-    }
-    qrcodeImg.attrs.src = src;
-    qrcodeImg.image(img);
-    addHoverAnimation(qrcodeImg);
+    addImage(src);
     tr.forceUpdate();
 }
 
@@ -56,11 +46,4 @@ function removeBarcode() {
     document.getElementById("barcodeInput").value = "";
 }
 
-function removeQRCode() {
-    qrcodeImg.remove();
-    qrcodeImg.attrs.src = "";
-    tr.nodes([]);
-    document.getElementById("qrcodeInput").value = "";
-}
-
-export { removeBarcode, createBarcode, addQRCode, removeQRCode };
+export { removeBarcode, createBarcode, addQRCode };

@@ -1,10 +1,16 @@
 ﻿<section class="editor">
     <EditorBar />
-    <div id="konva-container">
+    <div id="konva-container" @onclick="OnKonvaClicked">
 
     </div>
 </section>
 
 @code {
+    [Parameter]
+    public Action KonvaClicked { get; set; }
 
+    private void OnKonvaClicked()
+    {
+        InvokeAsync(KonvaClicked);
+    }
 }

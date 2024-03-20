@@ -2,12 +2,11 @@ import { stage } from "./state.js";
 import { addHoverAnimation } from "./animations.js";
 import { tr, currentGroup } from "./constants.js";
 
-function addImage(src, id) {
+function addImage(src) {
     const img = new Image();
     img.src = src;
     const kimg = new Konva.Image({
         name: "img",
-        id: id,
         image: img,
         src: img.src,
         width: 100,

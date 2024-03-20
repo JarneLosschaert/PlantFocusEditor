@@ -34,19 +34,19 @@
             {
                 <div class="position-popup">
                     <ul>
-                        <li>
+                        <li @onclick="@(() => ChangePosition(true, true))">
                             @((MarkupString)CustomIcons.Front())
                             Bring to front
                         </li>
-                        <li>
+                        <li @onclick="@(() => ChangePosition(true, false))">
                             @((MarkupString)CustomIcons.Forward())
                             Bring forward
                         </li>
-                        <li>
+                        <li @onclick="@(() => ChangePosition(false, false))">
                             @((MarkupString)CustomIcons.Backward())
                             Send backward
                         </li>
-                        <li>
+                        <li @onclick="@(() => ChangePosition(false, true))">
                             @((MarkupString)CustomIcons.Back())
                             Send to back
                         </li>
@@ -58,27 +58,57 @@
 </article>
 
 @code {
+    [Parameter]
+    public IJSObjectReference? Module { get; set; }
     private bool isPositionPopupVisible = false;
-
     private bool isLocked = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Module != null)
+        {
+            isLocked = await Module.InvokeAsync<bool>("getIsLocked");
+        } else
+        {
+            Console.WriteLine("module is null");
+        }
+    }
 
     private void Lock()
     {
         isLocked = !isLocked;
+        if (Module != null)
+        {
+            Module.InvokeVoidAsync("lockNode");
+        }
     }
 
     private void Clone()
     {
-
+        if (Module != null)
+        {
+            Module.InvokeVoidAsync("cloneNode");
+        }
     }
 
     private void Delete()
     {
-        
+        if (Module != null)
+        {
+            Module.InvokeVoidAsync("deleteNodes");
+        }
     }
 
     private void TogglePositionPopup()
     {
         isPositionPopupVisible = !isPositionPopupVisible;
+    }
+
+    private void ChangePosition(bool forward, bool full)
+    {
+        if (Module != null)
+        {
+            Module.InvokeVoidAsync("changePosition", forward, full);
+        }
     }
 }

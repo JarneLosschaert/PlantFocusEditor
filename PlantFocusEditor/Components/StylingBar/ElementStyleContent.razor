@@ -1,19 +1,35 @@
-﻿<article class="elements-content">
+﻿@inject IJSRuntime JS
+
+<article class="elements-content">
     <h3>Fill</h3>
     <div>
         <div>
             <h4>Color</h4>
-            <ColorInput fontColor="@FillColor"
+            <ColorInput fontColor="@_fillColor"
                         handleColor="@ChangeColor" />
         </div>
     </div>
 </article>
 
 @code {
-    private string FillColor = "#000000";
+    private IJSObjectReference? _module;
+    private string _fillColor = "#000000";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
+            _fillColor = await _module.InvokeAsync<string>("getFillColor");
+        }
+    }
 
     private void ChangeColor(string color)
     {
-        FillColor = color;
+        _fillColor = color;
+        if (_module != null)
+        {
+            _module.InvokeVoidAsync("handleShapeColorChange", _fillColor);
+        }
     }
 }

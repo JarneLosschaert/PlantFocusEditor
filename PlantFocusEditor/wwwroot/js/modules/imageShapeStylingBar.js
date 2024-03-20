@@ -1,18 +1,7 @@
 import { tr } from "./constants.js";
 import { layer } from "./state.js";
 
-let imageShapeStylingBarReference = null;
-let imageLayerReference = null;
-
-function setImageShapeStylingBarReference(reference) {
-    imageShapeStylingBarReference = reference;
-}
-
-function setImageLayerReference(ref) {
-    imageLayerReference = ref;
-}
-
-function addTransformEventListener() {
+/*function addTransformEventListener() {
     tr.on('transformend', () => {
         const nodes = tr.nodes();
         nodes.forEach(node => {
@@ -34,7 +23,7 @@ function addTransformEventListener() {
             node.scaleY(1);
         })
     });
-}
+}*/
 
 function updateDimensionsOnInput(value, isWidth) {
     if (value !== 0) {
@@ -42,7 +31,6 @@ function updateDimensionsOnInput(value, isWidth) {
         selectedImages.forEach(img => {
             if (isWidth) {
                 img.width(value);
-                imageShapeStylingBarReference.handle
             } else {
                 img.height(value);
             }
@@ -57,7 +45,6 @@ function changeImage(src) {
         newImg.src = src;
         img.image(newImg);
         img.attrs.src = src;
-        imageLayerReference.invokeMethodAsync("ChangeImage", img.attrs.id, src);
     });
     layer.batchDraw();
 }
@@ -71,66 +58,14 @@ function handleShapeColorChange(color) {
     });
 }
 
-function handleBorderColorChange(color) {
-    const selectedNodes = tr.nodes();
-    selectedNodes.forEach((node) => {
-        if (node.getClassName() === "Image" || node.attrs.name === "shape") {
-            node.stroke(color);
-        }
-    });
+function getFillColor() {
+    const firstNode = tr.nodes()[0];
+    return firstNode.fill();
 }
 
-function handleBorderWidthChange(width) {
-    const selectedNodes = tr.nodes();
-    selectedNodes.forEach((node) => {
-        if (node.getClassName() === "Image" || node.attrs.name === "shape") {
-            const value = parseFloat(width);
-            node.strokeWidth(value);
-        }
-    });
+function getSource() {
+    const firstNode = tr.nodes()[0];
+    return firstNode.attrs.src;
 }
 
-function handleTransparencyChange(transparency) {
-    const selectedNodes = tr.nodes();
-    selectedNodes.forEach((node) => {
-        if (node.getClassName() === "Image" || node.attrs.name === "shape") {
-            const value = parseFloat(transparency);
-            node.opacity(value);
-        }
-    });
-}
-
-function handleShadowChange(shadow) {
-    const selectedNodes = tr.nodes();
-    selectedNodes.forEach((node) => {
-        if (node.getClassName() === "Image" || node.attrs.name === "shape") {
-            const value = parseFloat(shadow);
-            node.shadowOpacity(value);
-        }
-    });
-}
-
-function displayImageShapeStylingBar() {
-    const selectedNodes = tr.nodes();
-    const onlyImages = selectedNodes.length > 0 && selectedNodes.every(node => node.getClassName() === "Image");
-    const onlyShapes = selectedNodes.length > 0 && selectedNodes.every(node => node.attrs.name === "shape");
-    imageShapeStylingBarReference.invokeMethodAsync('displayImageShapeStylingBar', onlyImages, onlyShapes);
-    updateStylingBarValues();
-}
-
-function updateStylingBarValues() {
-    const selectedNodes = tr.nodes();
-    if (selectedNodes.length > 0) {
-        const firstNode = selectedNodes[0];
-        if (firstNode.getClassName() === "Image" || firstNode.attrs.name === "shape") {
-            let fill = firstNode.fill();
-            if (fill === undefined) fill = "#000000";
-            imageShapeStylingBarReference.invokeMethodAsync('updateImageShapeStylingBarValues',
-                fill, firstNode.stroke(), firstNode.strokeWidth(),
-                firstNode.opacity(), firstNode.shadowOpacity(), Math.round(firstNode.width()), Math.round(firstNode.height())
-            );
-        }
-    }
-}
-
-export { addTransformEventListener, displayImageShapeStylingBar, setImageShapeStylingBarReference, handleBorderColorChange, handleBorderWidthChange, handleTransparencyChange, handleShadowChange, changeImage, updateDimensionsOnInput, handleShapeColorChange, setImageLayerReference };
+export { changeImage, updateDimensionsOnInput, handleShapeColorChange, getFillColor, getSource };

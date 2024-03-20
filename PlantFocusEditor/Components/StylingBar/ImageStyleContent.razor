@@ -1,9 +1,11 @@
-﻿<article class="image-style-content">
+﻿@inject IJSRuntime JS
+
+<article class="image-style-content">
     <h3>Image</h3>
     <div>
         <div>
             <label for="change-image-image">
-                <img src="@currentImageSrc" id="current-image" alt="img">
+                <img src="@_currentImageSrc" id="current-image" alt="img">
             </label>
             <InputFile id="change-image-image" class="input-file" OnChange="ChangeImage"></InputFile>
         </div>
@@ -17,8 +19,18 @@
 </article>
 
 @code {
+    private IJSObjectReference? _module;
+    private string _currentImageSrc = "../../sample-data/flower.jpg";
 
-    private string currentImageSrc = "../../sample-data/flower.jpg";
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
+            _currentImageSrc = await _module.InvokeAsync<string>("getSource");
+            StateHasChanged();
+        }
+    }
 
     private async Task ChangeImage(InputFileChangeEventArgs e)
     {
@@ -29,11 +41,15 @@
             await selectedImage.OpenReadStream().CopyToAsync(memoryStream);
             var imageBytes = memoryStream.ToArray();
 
-            currentImageSrc = $"data:{selectedImage.ContentType};base64,{Convert.ToBase64String(imageBytes)}";
+            _currentImageSrc = $"data:{selectedImage.ContentType};base64,{Convert.ToBase64String(imageBytes)}";
+            if (_module != null)
+            {
+                await _module.InvokeVoidAsync("changeImage", _currentImageSrc);
+            }
         }
         else
         {
-            currentImageSrc = "";
+            _currentImageSrc = "";
         }
     }
 }

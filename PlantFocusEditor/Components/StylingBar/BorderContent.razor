@@ -1,10 +1,12 @@
-﻿<article class="border-content">
+﻿@inject IJSRuntime JS
+
+<article class="border-content">
     <h3>Border</h3>
     <div>
         <div>
             <h4>Color</h4>
             <ColorInput fontColor="@borderColor"
-                        handleColor="@ChangeColor" />
+                        handleColor="ChangeColor" />
         </div>
         <div>
             <h4>Width</h4>
@@ -17,15 +19,36 @@
 </article>
 
 @code {
+    [Parameter]
+    public IJSObjectReference? Module { get; set; }
     private int width = 0;
     private string borderColor = "#000000";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Module != null)
+        {
+            Dictionary<string, JsonElement> values = await Module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
+            width = values["borderWidth"].GetInt16();
+            borderColor = values["borderColor"].ToString();
+        }
+    }
 
     private void changeWidth(int value)
     {
         width = value;
+        if (Module != null)
+        {
+            Module.InvokeVoidAsync("handleBorderWidthChange", width);
+        }
     }
+
     private void ChangeColor(string color)
     {
         borderColor = color;
+        if (Module != null)
+        {
+            Module.InvokeVoidAsync("handleBorderColorChange", borderColor);
+        }
     }
 }
