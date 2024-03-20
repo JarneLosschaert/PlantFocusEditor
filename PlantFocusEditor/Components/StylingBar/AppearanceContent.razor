@@ -24,6 +24,16 @@
     private int opacity = 100;
     private int shadow = 0;
 
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Module != null)
+        {
+            Dictionary<string, JsonElement> values = await Module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
+            opacity = Convert.ToInt16(values["opacity"].GetDouble() * 100);
+            shadow = Convert.ToInt16(values["shadowOpacity"].GetDouble() * 100);
+        }
+    }
+
     private void changeOpacity(int value)
     {
         opacity = value;

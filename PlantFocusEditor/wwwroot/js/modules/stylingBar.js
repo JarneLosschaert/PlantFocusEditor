@@ -45,6 +45,16 @@ function getSelectedItemType() {
         return "Selecting";
     }
     return "";
-
 }
-export { handleShadowChange, handleTransparencyChange, getSelectedItemType, handleBorderColorChange, handleBorderWidthChange };
+
+function getValues() {
+    const firstNode = tr.nodes()[0];
+    return {
+        borderWidth: firstNode.strokeWidth(),
+        borderColor: firstNode.stroke(),
+        shadowOpacity: firstNode.shadowOpacity(),
+        opacity: firstNode.opacity()
+    };
+};
+
+export { handleShadowChange, handleTransparencyChange, getSelectedItemType, handleBorderColorChange, handleBorderWidthChange, getValues };
