@@ -1,51 +1,127 @@
-﻿@inject IJSRuntime JSRuntime;
+﻿@inject IJSRuntime JS;
+
 <article class="elements-content">
     <div>
         <h3>Shapes</h3>
-        <ul class="shapes-list">
-            <li>
-                <img src="../../sample-data/shape.png" alt="shape" />
-            </li>
-            <li>
-                <img src="../../sample-data/shape.png" alt="shape" />
-            </li>
-            <li>
-                <img src="../../sample-data/shape.png" alt="shape" />
-            </li>
-            <li>
-                <img src="../../sample-data/shape.png" alt="shape" />
-            </li>
-            <li>
-                <img src="../../sample-data/shape.png" alt="shape" />
-            </li>
-            <li>
-                <img src="../../sample-data/shape.png" alt="shape" />
-            </li>
-        </ul>
+        <div>
+            <ul id="shapes-list">
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+            </ul>
+            <button @onclick='() => ScrollLeft("shapes-list")' class="left" style="display: @(_scrollStateShapes == "start" ? "none" : "block")">
+                @((MarkupString)CustomIcons.ChevronLeft())
+            </button>
+            <button @onclick='() => ScrollRight("shapes-list")' class="right" style="display: @(_scrollStateShapes == "end" ? "none" : "block")">
+                @((MarkupString)CustomIcons.ChevronRight())
+            </button>
+        </div>
     </div>
-    <button @onclick="ScrollLeft">
-        Left
-    </button>
-    <button @onclick="ScrollRight">
-        Right
-    </button>
+    <div>
+        <h3>Icons</h3>
+        <div>
+            <ul id="icons-list">
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../sample-data/shape.png" alt="shape" />
+                </li>
+            </ul>
+            <button @onclick='() => ScrollLeft("icons-list")' class="left" style="display: @(_scrollStateIcons == "start" ? "none" : "block")">
+                @((MarkupString)CustomIcons.ChevronLeft())
+            </button>
+            <button @onclick='() => ScrollRight("icons-list")' class="right" style="display: @(_scrollStateIcons == "end" ? "none" : "block")">
+                @((MarkupString)CustomIcons.ChevronRight())
+            </button>
+        </div>
+    </div>
 </article>
 
 @code {
-    private void ScrollLeft()
+    private IJSObjectReference? _scrollModule;
+
+    private int _scrollAmount = 150;
+    private string _scrollStateShapes = "start";
+    private string _scrollStateIcons = "start";
+
+    private async Task ScrollLeft(string id)
     {
-        Scroll(-100); // Adjust scroll amount as per your requirement
+        await _scrollModule.InvokeVoidAsync("scrollLeft", _scrollAmount, id);
     }
 
-    // Scroll right
-    private void ScrollRight()
+    private async Task ScrollRight(string id)
     {
-        Scroll(100); // Adjust scroll amount as per your requirement
+        await _scrollModule.InvokeVoidAsync("scrollRight", _scrollAmount, id);
     }
 
-    // Scroll function using JavaScript Interop
-    private async Task Scroll(int scrollAmount)
+    [JSInvokable]
+    public void UpdateScrollStateShapes(string state)
     {
-        await JSRuntime.InvokeVoidAsync("scrollFunction", scrollAmount, "shapes-list");
+        _scrollStateShapes = state;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void UpdateScrollStateIcons(string state)
+    {
+        _scrollStateIcons = state;
+        StateHasChanged();
+    }
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _scrollModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/scroll.js");
+            await _scrollModule.InvokeVoidAsync("setScrollReference", DotNetObjectReference.Create(this));
+            await _scrollModule.InvokeVoidAsync("handleScrollEventListener", "shapes-list");
+            await _scrollModule.InvokeVoidAsync("handleScrollEventListener", "icons-list");
+        }
     }
 }

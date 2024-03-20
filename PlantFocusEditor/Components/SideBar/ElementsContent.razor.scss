@@ -2,54 +2,73 @@
 @import "../../wwwroot/css/config.scss";
 
 .elements-content {
-    div {
-        ul {
-            overflow-x: auto;
-            white-space: nowrap;
-            width: 100%;
-            scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 
-            li {
-                display: inline-block;
-                width: 5rem;
-                background: $btn-dark;
-                border-radius: $border-radius;
-                margin-right: 20px;
+    & > div {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        & > div {
+            position: relative;
+            margin-left: 0.5rem;
+
+            ul {
+                display: flex;
+                gap: 0.5rem;
+                overflow-x: hidden;
+
+                li {
+                    padding: 0.5rem;
+                    background: $btn-dark;
+                    border: 2px solid $white;
+                    border-radius: $border-radius;
+                    cursor: pointer;
+
+                    &:hover {
+                        border: 2px solid $neutral-dark;
+                    }
+
+                    img {
+                        width: 3rem;
+                    }
+                }
+            }
+
+            button {
+                position: absolute;
+                bottom: 0rem;
+                height: 100%;
+                width: 2rem;
+                padding: 0;
+                border: none;
                 cursor: pointer;
 
-                img {
-                    width: calc(100% - 2rem);
-                    margin: 1rem;
+                ::deep svg {
+                    height: 1.5rem;
+                    width: 1.5rem;
+                }
+
+                &.right {
+                    right: 0;
+                    text-align: end;
+                    background: linear-gradient(270deg, $white 50%, transparent 100%);
+                }
+
+                &.left {
+                    text-align: start;
+                    background: linear-gradient(90deg, $white 50%, transparent 100%);
                 }
             }
         }
     }
 }
-/*
-.templates-content {
-
-    ul {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-
-        li {
-            width: 8rem;
-            background: $btn-dark;
-            border-radius: $border-radius;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-
-            img {
-                width: 60%;
-                margin: 1rem 0;
-            }
-        }
-    }
-}*/
-
 
 

@@ -1,6 +1,36 @@
 @import "../../wwwroot/css/colors.scss";
 @import "../../wwwroot/css/config.scss";
 
+button {
+    color: $text-lighter;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 100%;
+    padding: 0.5rem;
+    background: $btn-dark;
+    border: 1px solid $neutral-dark;
+    border-radius: $border-radius-s;
+    box-shadow: $shadow-s;
+    cursor: pointer;
+
+    ::deep svg {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    &:hover {
+        color: $text;
+    }
+
+    &.selected {
+        background: $neutral;
+        color: $text;
+        border: 1px solid $primary;
+    }
+}
+
 .codes-content {
     display: flex;
     flex-direction: column;
@@ -14,6 +44,15 @@
         h3 {
             font-size: 1.1rem;
             font-weight: 600;
+        }
+
+        button {
+            margin-left: 0.5rem;
+            color: $text;
+
+            &:hover {
+                background: $neutral;
+            }
         }
 
         input {
