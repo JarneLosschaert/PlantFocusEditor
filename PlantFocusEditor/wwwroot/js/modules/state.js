@@ -3,7 +3,7 @@ import { handleTextEventListeners } from "./textLayers.js";
 import { handleSelections } from "./selectionHandling.js";
 import { sceneFunc } from "./shapeLayers.js";
 import { addHoverAnimation } from "./animations.js";
-import { createClipFunc, findWidthPassePartout } from "./passePartout.js";
+import { createClipFunc, findHeightPassePartout, findWidthPassePartout } from "./passePartout.js";
 
 const $konvaContainer = document.getElementById("konva-container");
 const initialWidth = $konvaContainer.offsetWidth;
@@ -73,6 +73,16 @@ function switchSides() {
         setCurrentGroup(true);
     }
     handleSelections();
+}
+
+function flip() {
+    const height = findHeightPassePartout(currentGroup.children[0].data());
+    if (currentGroup.offsetY() === 0) {
+        currentGroup.offsetY(height);
+    } else {
+        currentGroup.offsetY(0);
+    }
+    currentGroup.scaleY(-currentGroup.scaleY());
 }
 
 function loadState(json) {
@@ -257,4 +267,4 @@ function setBarcodeImg(img) {
     barcodeImg = img;
 }
 
-export { stage, layer, handleState, saveState, barcodeImg, setBarcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages, loadStateFromTemplate };
+export { stage, layer, handleState, saveState, barcodeImg, setBarcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages, loadStateFromTemplate, flip };

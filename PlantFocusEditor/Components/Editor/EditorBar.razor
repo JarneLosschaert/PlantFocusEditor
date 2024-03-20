@@ -17,7 +17,7 @@
     </div>
     
     <div class="flip">
-        <button>
+        <button @onclick="Flip">
             @((MarkupString)CustomIcons.Flip())
         </button>
     </div>
@@ -40,6 +40,15 @@
         if (_module != null)
         {
             _module.InvokeVoidAsync("switchSides");
+        }
+    }
+
+    private void Flip()
+    {
+        if (_module != null)
+        {
+            Console.WriteLine("flip");
+            _module.InvokeVoidAsync("flip");
         }
     }
 }

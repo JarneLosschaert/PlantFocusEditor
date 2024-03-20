@@ -32,4 +32,15 @@ function uuidv4() {
     );
 }
 
-export { isValidJson, uuidv4 }
+function degToRad(deg) {
+    return deg / 180 * Math.PI;
+}
+
+function getCenterPassePartout(template) {
+    return {
+        x: template.x() + findWidthPassePartout(template) / 2,
+        y: template.y() + findHeightPassePartout(template) / 2
+    };
+}
+
+export { isValidJson, uuidv4, getCenterPassePartout }
