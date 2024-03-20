@@ -1,6 +1,7 @@
 import { tr, selectionRectangle, hoverTr, currentGroup } from "./constants.js";
 import { removeBarcode } from "./barcodeLayer.js";
 import { addHoverAnimation } from "./animations.js";
+import { uuidv4 } from "./helpers.js";
 
 let dotnetRefence = null;
 
@@ -61,7 +62,6 @@ function cloneNode() {
             clone.off("mouseover");
             clone.off("mouseout");
             addHoverAnimation(clone);
-            console.log(node.attrs.src);
             dotnetRefence.invokeMethodAsync("AddImage", newId, node.attrs.src);
         } else {
             const clone = node.clone({
@@ -77,11 +77,6 @@ function cloneNode() {
     });
 }
 
-function uuidv4() {
-    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
-        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-    );
-}
 
 function lockNode() {
     const selectedNodes = tr.nodes();    
