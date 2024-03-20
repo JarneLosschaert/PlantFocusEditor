@@ -1,0 +1,30 @@
+@import "../../wwwroot/css/colors.scss";
+@import "../../wwwroot/css/config.scss";
+
+.properties-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+    h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .properties {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid $neutral-dark;
+        border-radius: $border-radius-s;
+        margin-left: 0.5rem;
+    }
+
+
+    .add-known-properties {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-left: 0.5rem;
+    }
+}

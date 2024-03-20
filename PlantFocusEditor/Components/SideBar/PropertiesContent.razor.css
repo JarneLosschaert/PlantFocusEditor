@@ -1,1 +1,23 @@
-﻿
+﻿.properties-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.properties-content h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.properties-content .properties {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #dbd9d9;
+  border-radius: 6px;
+  margin-left: 0.5rem;
+}
+.properties-content .add-known-properties {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-left: 0.5rem;
+}

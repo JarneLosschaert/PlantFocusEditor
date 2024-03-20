@@ -98,5 +98,17 @@
   {
     "outputFile": "Components/StylingBar/ImageStyleContent.razor.css",
     "inputFile": "Components/StylingBar/ImageStyleContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/PropertiesComponents/PlantProperty.razor.css",
+    "inputFile": "Components/SideBar/PropertiesComponents/PlantProperty.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/PropertiesComponents/AddPlantProperty.razor.css",
+    "inputFile": "Components/SideBar/PropertiesComponents/AddPlantProperty.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/PropertiesComponents/NewPlantProperty.razor.css",
+    "inputFile": "Components/SideBar/PropertiesComponents/NewPlantProperty.razor.scss"
   }
 ]
