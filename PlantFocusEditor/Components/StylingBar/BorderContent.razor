@@ -24,6 +24,16 @@
     private int width = 0;
     private string borderColor = "#000000";
 
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Module != null)
+        {
+            Dictionary<string, JsonElement> values = await Module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
+            width = values["borderWidth"].GetInt16();
+            borderColor = values["borderColor"].ToString();
+        }
+    }
+
     private void changeWidth(int value)
     {
         width = value;

@@ -6,6 +6,7 @@ function setTextStylingBarReference(reference) {
 }
 
 function handleFontSelect(font) {
+    console.log(font);
     const selectedNodes = tr.nodes();
     selectedNodes.forEach((node) => {
         if (node.getClassName() === "Text") {
@@ -71,19 +72,17 @@ function displayTextStylingBar() {
     //updateTextStylingBarValues();
 }
 
-/*function updateTextStylingBarValues() {
-    const selectedNodes = tr.nodes();
-    if (selectedNodes.length > 0) {
-        const firstNode = selectedNodes[0];
-        if (firstNode.getClassName() === "Text") {
-            textStylingBarReference.invokeMethodAsync('updateTextStylingBarValues',
-                firstNode.fontFamily(), firstNode.fontSize(),
-                firstNode.fill(), firstNode.fontStyle(),
-                firstNode.textDecoration(), firstNode.align(),
-                firstNode.opacity(), firstNode.shadowOpacity()
-            )
-        }
-    }
-}*/
+function getValues() {
+    const firstNode = tr.nodes()[0];
+    console.log(firstNode.fontFamily());
+    return {
+        font: firstNode.fontFamily(),
+        fontSize: firstNode.fontSize(),
+        color: firstNode.fill(),
+        fontStyle: firstNode.fontStyle(),
+        textDecoration: firstNode.textDecoration(),
+        align: firstNode.align()
+    };
+}
 
-export { setTextStylingBarReference, displayTextStylingBar, handleFontSelect, handleFontSizeChange, handleFontColorChange, handleBoldItalic, handleUnderline, handleAlignmentChange };
+export { setTextStylingBarReference, displayTextStylingBar, handleFontSelect, handleFontSizeChange, handleFontColorChange, handleBoldItalic, handleUnderline, handleAlignmentChange, getValues };

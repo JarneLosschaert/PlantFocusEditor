@@ -6,7 +6,7 @@
         <div>
             <h4>Font</h4>
             <div>
-                <select @bind="selectedFont" @oninput="ChangeFont">
+                <select @bind="_selectedFont" @oninput="ChangeFont">
                     <option>Arial</option>
                     <option>Times New Roman</option>
                     <option>Verdana</option>
@@ -22,62 +22,80 @@
         <div>
             <h4>Style</h4>
             <div>
-                <button class="@(isBold ? "selected" : "")" @onclick="ToggleBold">@((MarkupString)CustomIcons.Bold())</button>
-                <button class="@(isItalic ? "selected" : "")" @onclick="ToggleItalic">@((MarkupString)CustomIcons.Italic())</button>
-                <button class="@(isUnderline ? "selected" : "")" @onclick="ToggleUnderline">@((MarkupString)CustomIcons.Underline())</button>
+                <button class="@(_isBold ? "selected" : "")" @onclick="ToggleBold">@((MarkupString)CustomIcons.Bold())</button>
+                <button class="@(_isItalic ? "selected" : "")" @onclick="ToggleItalic">@((MarkupString)CustomIcons.Italic())</button>
+                <button class="@(_isUnderline ? "selected" : "")" @onclick="ToggleUnderline">@((MarkupString)CustomIcons.Underline())</button>
             </div>
         </div>
         <div>
             <h4>Size</h4>
             <div>
-                <input type="number" @oninput="ChangeFontSize" />
+                <input type="number" @bind="_fontSize" @oninput="ChangeFontSize" />
             </div>
         </div>
         <div>
             <h4>Color</h4>
-            <ColorInput fontColor="@fontColor"
+            <ColorInput fontColor="@_fontColor"
                         handleColor="@ChangeColor" />
         </div>
         <div>
             <h4>Align</h4>
             <div class="align-input">
-                <button class="@(align == "left" ? "selected" : "")" @onclick="SetAlignLeft">@((MarkupString)CustomIcons.AlignLeft())</button>
-                <button class="@(align == "center" ? "selected" : "")" @onclick="SetAlignCenter">@((MarkupString)CustomIcons.AlignCenter())</button>
-                <button class="@(align == "right" ? "selected" : "")" @onclick="SetAlignRight">@((MarkupString)CustomIcons.AlignRight())</button>
+                <button class="@(_align == "left" ? "selected" : "")" @onclick="SetAlignLeft">@((MarkupString)CustomIcons.AlignLeft())</button>
+                <button class="@(_align == "center" ? "selected" : "")" @onclick="SetAlignCenter">@((MarkupString)CustomIcons.AlignCenter())</button>
+                <button class="@(_align == "right" ? "selected" : "")" @onclick="SetAlignRight">@((MarkupString)CustomIcons.AlignRight())</button>
             </div>
         </div>
     </div>
 </article>
 
 @code {
-    private IJSObjectReference _module;
-    private bool isPositionPopupVisible = false;
-    private string selectedFont = "Arial";
-    private bool isBold = false;
-    private bool isItalic = false;
-    private bool isUnderline = false;
-    private string align = "left";
-    private string fontColor = "#000000";
+    private IJSObjectReference? _module;
+    private bool _isPositionPopupVisible = false;
+    private string _selectedFont = "Arial";
+    private bool _isBold = false;
+    private bool _isItalic = false;
+    private bool _isUnderline = false;
+    private int _fontSize = 30;
+    private string _align = "left";
+    private string _fontColor = "#000000";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textStylingBar.js");
+            Dictionary<string, JsonElement> values = await _module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
+            _selectedFont = values["font"].GetString() ?? "Arial";
+            string? fontStyle = values["fontStyle"].GetString();
+            string? textDecoration = values["textDecoration"].GetString();
+            if (fontStyle != null)
+            {
+                _isBold = fontStyle.Contains("bold");
+                _isItalic = fontStyle.Contains("italic");
+            }
+            if (textDecoration != null)
+            {
+                _isUnderline = textDecoration.Contains("underline");
+            }
+            _align = values["align"].GetString() ?? "center";
+            _fontColor = values["color"].GetString() == "black" ? "#000000" : values["color"].GetString() ?? "#000000";
+            _fontSize = values["fontSize"].GetInt16();
+            StateHasChanged();
         }
     }
 
     private string GetFontStyle()
     {
-        if (isBold && isItalic)
+        if (_isBold && _isItalic)
         {
             return "bold italic";
         }
-        if (isBold)
+        if (_isBold)
         {
             return "bold";
         }
-        if (isItalic)
+        if (_isItalic)
         {
             return "italic";
         }
@@ -86,26 +104,26 @@
 
     private void TogglePositionPopup()
     {
-        isPositionPopupVisible = !isPositionPopupVisible;
+        _isPositionPopupVisible = !_isPositionPopupVisible;
     }
 
     private void ToggleBold()
     {
-        isBold = !isBold;
+        _isBold = !_isBold;
         _module.InvokeVoidAsync("handleBoldItalic", GetFontStyle());
 
     }
 
     private void ToggleItalic()
     {
-        isItalic = !isItalic;
+        _isItalic = !_isItalic;
         _module.InvokeVoidAsync("handleBoldItalic", GetFontStyle());
     }
 
     private void ToggleUnderline()
     {
-        isUnderline = !isUnderline;
-        if (isUnderline)
+        _isUnderline = !_isUnderline;
+        if (_isUnderline)
         {
             _module.InvokeVoidAsync("handleUnderline", "underline");
         } else
@@ -116,25 +134,25 @@
 
     private void ChangeColor(string color)
     {
-        fontColor = color;
+        _fontColor = color;
         _module.InvokeVoidAsync("handleFontColorChange", color);
     }
 
     private void SetAlignLeft()
     {
-        align = "left";
+        _align = "left";
         _module.InvokeVoidAsync("handleAlignmentChange", "left");
     }
 
     private void SetAlignCenter()
     {
-        align = "center";
+        _align = "center";
         _module.InvokeVoidAsync("handleAlignmentChange", "center");
     }
 
     private void SetAlignRight()
     {
-        align = "right";
+        _align = "right";
         _module.InvokeVoidAsync("handleAlignmentChange", "right");
     }
 
@@ -142,12 +160,13 @@
     {
         if (int.TryParse(e.Value.ToString(), out int newFontSize))
         {
+            _fontSize = newFontSize;
             _module.InvokeVoidAsync("handleFontSizeChange", newFontSize);
         }
     }
 
-    private void ChangeFont()
+    private async Task ChangeFont(ChangeEventArgs e)
     {
-        _module.InvokeVoidAsync("handleFontSelect", selectedFont);
+        await _module.InvokeVoidAsync("handleFontSelect", e.Value.ToString());
     }
 }
