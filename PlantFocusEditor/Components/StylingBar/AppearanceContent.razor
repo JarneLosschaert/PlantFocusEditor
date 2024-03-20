@@ -1,4 +1,6 @@
-﻿<article class="appearance-content">
+﻿@inject IJSRuntime JS
+
+<article class="appearance-content">
     <h3>Appearance</h3>
     <div>
         <div>
@@ -17,17 +19,36 @@
 </article>
 
 @code {
+    private IJSObjectReference? _module;
     private int opacity = 100;
     private int shadow = 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/stylingBar.js");
+        }
+    }
 
     private void changeOpacity(int value)
     {
         opacity = value;
+        double newOpacity = opacity / 100.0;
+        if (_module != null)
+        {
+            _module.InvokeVoidAsync("handleTransparencyChange", newOpacity);
+        }
     }
 
     private void changeShadow(int value)
     {
         shadow = value;
+        double newShadow = shadow / 100.0;
+        if (_module != null)
+        {
+            _module.InvokeVoidAsync("handleShadowChange", newShadow);
+        }
     }
 }
 

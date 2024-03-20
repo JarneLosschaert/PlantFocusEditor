@@ -18,7 +18,6 @@ function handleShadowChange(shadow) {
 
 function getSelectedItemType() {
     const selectedClasses = tr.nodes().map(el => el.getClassName());
-    console.log(selectedClasses);
     const isSelected = selectedClasses.length > 0;
     if (isSelected && selectedClasses.every(el => el === "Text")) {
         return "Text";
