@@ -2,7 +2,7 @@ import { tr, hoverTr, selectionRectangle, currentGroup } from "./constants.js";
 import { stage, layer } from "./state.js";
 import { displayTextStylingBar } from "./textStylingBar.js";
 import { displayImageShapeStylingBar } from "./imageShapeStylingBar.js";
-import { displayControlBar, deleteNodes } from "./controlBar.js";
+import { deleteNodes } from "./controlBar.js";
 
 let x1, y1, x2, y2;
 let selecting = false;
@@ -136,7 +136,6 @@ function toggleLock() {
 function checkStylingBars() {
     displayTextStylingBar();
     displayImageShapeStylingBar();
-    displayControlBar();
 }
 
 export { handleSelections, addSelectionRectangle };
