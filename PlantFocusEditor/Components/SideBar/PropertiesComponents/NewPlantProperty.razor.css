@@ -1,0 +1,50 @@
+﻿.add-new-property {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 0.5rem;
+}
+.add-new-property .select-container {
+  width: 65%;
+  position: relative;
+}
+.add-new-property .select-container select {
+  width: 100%;
+  padding: 0.5rem;
+  background: #fff;
+  border: 1px solid #dbd9d9;
+  border-radius: 6px;
+  appearance: none;
+  cursor: pointer;
+}
+.add-new-property .select-container select:focus {
+  border-color: #009e4d;
+  outline: none;
+  box-shadow: 0 2px 6px #e5f5ed;
+}
+.add-new-property .select-container select ~ .icon {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+}
+.add-new-property .select-container select ~ .icon ::deep svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.add-new-property button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border: none;
+  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 60%, 0.16);
+  border-radius: 6px;
+}
+.add-new-property button ::deep svg {
+  height: 1.25rem;
+  width: 1.25rem;
+  color: #262626;
+}
+.add-new-property button:hover {
+  background: #f0f0f0;
+}

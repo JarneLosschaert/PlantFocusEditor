@@ -1,0 +1,29 @@
+﻿.add-plant-property {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 2rem;
+  width: 100%;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 60%, 0.16);
+  border: 1px solid #dbd9d9;
+  border-radius: 6px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 5px, rgba(0, 0, 0, 0.06) 0px 1px 3px;
+}
+.add-plant-property div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+}
+.add-plant-property div img {
+  height: 100%;
+}
+.add-plant-property ::deep svg {
+  height: 1.25rem;
+  width: 1.25rem;
+  color: #262626;
+}
+.add-plant-property:hover {
+  background: #f0f0f0;
+}

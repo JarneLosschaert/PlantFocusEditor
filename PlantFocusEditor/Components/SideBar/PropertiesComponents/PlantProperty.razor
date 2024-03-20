@@ -1,0 +1,68 @@
+﻿<div class="property">
+    <div class="property-info">
+        <div class="property-container">
+            <div class="property-image-container">
+                <img src="https://plantfocus.blob.core.windows.net/icons/toepassing.png" />
+            </div>
+            <div class="property-content-container">
+                <h4>Flower colour</h4>
+                <ul>
+                    <li>NL: violet</li>
+                    <li>FR: violet</li>
+                    <li>EN: violet</li>
+                    <li>DE: violett</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="property-buttons">
+            @if (_isEditing)
+            {
+                <button @onclick="ToggleEdit" class="save">
+                    @((MarkupString)CustomIcons.Save())
+                </button>
+            }
+            else
+            {
+                <button @onclick="ToggleEdit">
+                    @((MarkupString)CustomIcons.Pencil())
+                </button>
+                <button>
+                    @((MarkupString)CustomIcons.Trash())
+                </button>
+            }
+        </div>
+    </div>
+
+    @if (_isEditing)
+    {
+
+        <div class="property-edit">
+            <div>
+                <img class="flag" src="@($"/flags/nl.svg")" />
+                <input type="text" value="violet" />
+            </div>
+            <div>
+                <img class="flag" src="@($"/flags/fr.svg")" />
+                <input type="text" value="violet" />
+            </div>
+            <div>
+                <img class="flag" src="@($"/flags/en.svg")" />
+                <input type="text" value="violet" />
+            </div>
+            <div>
+                <img class="flag" src="@($"/flags/de.svg")" />
+                <input type="text" value="violett" />
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool _isEditing = false;
+
+    private void ToggleEdit()
+    {
+        _isEditing = !_isEditing;
+    }
+}
