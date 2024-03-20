@@ -1,4 +1,6 @@
-﻿<article class="image-style-content">
+﻿@inject IJSRuntime JS
+
+<article class="image-style-content">
     <h3>Image</h3>
     <div>
         <div>
@@ -17,8 +19,16 @@
 </article>
 
 @code {
-
+    private IJSObjectReference? _module;
     private string currentImageSrc = "../../sample-data/flower.jpg";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
+        }
+    }
 
     private async Task ChangeImage(InputFileChangeEventArgs e)
     {
@@ -30,6 +40,10 @@
             var imageBytes = memoryStream.ToArray();
 
             currentImageSrc = $"data:{selectedImage.ContentType};base64,{Convert.ToBase64String(imageBytes)}";
+            if (_module != null)
+            {
+                await _module.InvokeVoidAsync("changeImage", currentImageSrc);
+            }
         }
         else
         {

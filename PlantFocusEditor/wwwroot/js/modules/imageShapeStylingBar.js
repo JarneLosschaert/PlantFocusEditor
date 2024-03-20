@@ -12,7 +12,7 @@ function setImageLayerReference(ref) {
     imageLayerReference = ref;
 }
 
-function addTransformEventListener() {
+/*function addTransformEventListener() {
     tr.on('transformend', () => {
         const nodes = tr.nodes();
         nodes.forEach(node => {
@@ -34,7 +34,7 @@ function addTransformEventListener() {
             node.scaleY(1);
         })
     });
-}
+}*/
 
 function updateDimensionsOnInput(value, isWidth) {
     if (value !== 0) {
@@ -42,7 +42,6 @@ function updateDimensionsOnInput(value, isWidth) {
         selectedImages.forEach(img => {
             if (isWidth) {
                 img.width(value);
-                imageShapeStylingBarReference.handle
             } else {
                 img.height(value);
             }
@@ -57,7 +56,7 @@ function changeImage(src) {
         newImg.src = src;
         img.image(newImg);
         img.attrs.src = src;
-        imageLayerReference.invokeMethodAsync("ChangeImage", img.attrs.id, src);
+        //imageLayerReference.invokeMethodAsync("ChangeImage", img.attrs.id, src);
     });
     layer.batchDraw();
 }
@@ -94,4 +93,4 @@ function displayImageShapeStylingBar() {
     }
 }*/
 
-export { addTransformEventListener, displayImageShapeStylingBar, setImageShapeStylingBarReference, changeImage, updateDimensionsOnInput, handleShapeColorChange, setImageLayerReference };
+export { displayImageShapeStylingBar, setImageShapeStylingBarReference, changeImage, updateDimensionsOnInput, handleShapeColorChange, setImageLayerReference };
