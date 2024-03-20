@@ -2,12 +2,21 @@ import { tr, selectionRectangle, hoverTr, currentGroup } from "./constants.js";
 import { removeBarcode } from "./barcodeLayer.js";
 import { addHoverAnimation } from "./animations.js";
 
+let dotnetRefence = null;
+
+function setReference(ref) {
+    dotnetRefence = ref;
+}
+
 function deleteNodes() {
     const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
         if (node.attrs.name === "barcode") {
             removeBarcode();
             return;
+        }
+        if (node.getClassName() === "Image") {
+            dotnetRefence.invokeMethodAsync("RemoveImage", node.attrs.id);
         }
         node.destroy();
     });
@@ -41,7 +50,6 @@ function cloneNode() {
     const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
         if (node.getClassName() === "Image") {
-            const oldId = node.attrs.id;
             const newId = uuidv4();
             const clone = node.clone({
                 x: node.x() + 10,
@@ -53,6 +61,8 @@ function cloneNode() {
             clone.off("mouseover");
             clone.off("mouseout");
             addHoverAnimation(clone);
+            console.log(node.attrs.src);
+            dotnetRefence.invokeMethodAsync("AddImage", newId, node.attrs.src);
         } else {
             const clone = node.clone({
                 x: node.x() + 10,
@@ -89,4 +99,4 @@ function getIsLocked() {
     return selectedNodes.every(node => node.attrs.locked);
 }
 
-export { deleteNodes, changePosition, cloneNode, lockNode, getIsLocked };
+export { deleteNodes, changePosition, cloneNode, lockNode, getIsLocked, setReference };

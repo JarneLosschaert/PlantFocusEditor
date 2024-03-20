@@ -1,17 +1,17 @@
-﻿@inject IJSRuntime JSRuntime;
+﻿@inject IJSRuntime JS;
 
 <article class="images-content">
     <div class="input-file-container">
         <InputFile id="change-image-image" class="input-file" OnChange="OnInputFileChange"></InputFile>
     </div>
     <di class="images-container">
-        @if (images.Count > 0)
+        @if (_images.Count > 0)
         {
             <ul>
-                @foreach (var image in images)
+                @foreach (KeyValuePair<string, string> image in _images)
                 {
                     <li>
-                        <img src="@image" alt="img" />
+                        <img src="@image.Value" id="@image.Key" alt="img" />
                     </li>
                 }
             </ul>
@@ -22,13 +22,24 @@
 
 
 @code {
-    List<string> images = new List<string>(
-    new string[] {
-        "https://www.w3schools.com/w3images/lights.jpg",
-        "https://www.w3schools.com/w3images/nature.jpg" ,
-        "https://www.w3schools.com/w3images/mountains.jpg",
-        "https://www.w3schools.com/w3images/forest.jpg",
-    });
+    [Parameter]
+    public EventCallback OnRendered { get; set; }
+    private IJSObjectReference? _module;
+    private Dictionary<string, string> _images = new Dictionary<string, string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _images = await JS.InvokeAsync<Dictionary<string, string>>("getAllImages");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageLayers.js");
+            await OnRendered.InvokeAsync();
+        }
+    }
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
@@ -40,8 +51,27 @@
             var imageData = Convert.ToBase64String(buffer);
             var src = $"data:{file.ContentType};base64,{imageData}";
             var key = Guid.NewGuid().ToString();
-            images.Insert(0, src);
+            _images.Add(key, src);
             // use dictionary to store the image data later
+            if (_module != null)
+            {
+                await _module.InvokeVoidAsync("addImage", key, src);
+            }
         }
+    }
+
+    public void RemoveImage(string id)
+    {
+        if (_images.ContainsKey(id))
+        {
+            _images.Remove(id);
+            StateHasChanged();
+        }
+    }
+
+    public void AddImage(string id, string src)
+    {
+        _images.Add(id, src);
+        StateHasChanged();
     }
 }
