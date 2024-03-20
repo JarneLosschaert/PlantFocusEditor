@@ -128,7 +128,7 @@ function handleSelection(e) {
 
 function toggleLock() {
     const nodes = tr.nodes();
-    const locked = nodes.every(node => node.locked);
+    const locked = nodes.every(node => node.attrs.locked);
     tr.resizeEnabled(!locked);
     tr.rotateEnabled(!locked);
 }

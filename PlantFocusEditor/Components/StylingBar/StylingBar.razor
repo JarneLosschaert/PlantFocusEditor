@@ -10,23 +10,23 @@
             case "Text":
                 <TextStyleContent />
                 <AppearanceContent Module="_module"/>
-                <ControlContent />
+                <ControlContent Module="_controlBarModule" />
                 break;
             case "Image":
                 <ImageStyleContent />
                 <AppearanceContent Module="_module" />
                 <BorderContent Module="_module" />
-                <ControlContent />
+                <ControlContent Module="_controlBarModule" />
                 break;
             case "Shape":
                 <ElementStyleContent />
                 <AppearanceContent Module="_module" />
                 <BorderContent Module="_module"/>
-                <ControlContent />
+                <ControlContent Module="_controlBarModule" />
                 break;
             case "Selecting":
                 <AppearanceContent Module="_module" />
-                <ControlContent />
+                <ControlContent Module="_controlBarModule" />
                 break;
             default:
                 <LabelStyleContent />
@@ -39,12 +39,14 @@
     private bool selecting = true;
     private string _selectedNode = "";
     private IJSObjectReference? _module;
+    private IJSObjectReference? _controlBarModule;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/stylingBar.js");
+            _controlBarModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/controlBar.js");
         }
     }
 

@@ -1,5 +1,6 @@
 import { tr, selectionRectangle, hoverTr, currentGroup } from "./constants.js";
-import { removeBarcode, removeQRCode } from "./barcodeLayer.js";
+import { removeBarcode } from "./barcodeLayer.js";
+import { addHoverAnimation } from "./animations.js";
 
 let controlBarReference = null;
 let imageLayerReference = null;
@@ -18,14 +19,10 @@ function deleteNodes() {
         if (node.attrs.name === "barcode") {
             removeBarcode();
             return;
-        } 
-        if (node.attrs.name === "qrcode") {
-            removeQRCode();
-            return;
-        }
-        if (node.attrs.name === "img") {
+        }        
+        /*if (node.attrs.name === "img") {
             imageLayerReference.invokeMethodAsync("RemoveImage", node.attrs.id);
-        }
+        }*/
         node.destroy();
     });
     tr.nodes([]);
@@ -60,19 +57,27 @@ function cloneNode() {
         if (node.getClassName() === "Image") {
             const oldId = node.attrs.id;
             const newId = uuidv4();
-            imageLayerReference.invokeMethodAsync("DuplicateImage", oldId, newId);
+            //imageLayerReference.invokeMethodAsync("DuplicateImage", oldId, newId);
             const clone = node.clone({
                 x: node.x() + 10,
                 y: node.y() + 10,
-                id: newId
+                id: newId,
+                locked: node.attrs.locked
             });
             currentGroup.add(clone);
+            clone.off("mouseover");
+            clone.off("mouseout");
+            addHoverAnimation(clone);
         } else {
             const clone = node.clone({
                 x: node.x() + 10,
-                y: node.y() + 10
+                y: node.y() + 10,
+                locked: node.attrs.locked
             });
             currentGroup.add(clone);
+            clone.off("mouseover");
+            clone.off("mouseout");
+            addHoverAnimation(clone);
         }
     });
 }
@@ -84,15 +89,16 @@ function uuidv4() {
 }
 
 function lockNode() {
-    const selectedNodes = tr.nodes();
+    const selectedNodes = tr.nodes();    
     selectedNodes.forEach(node => {
-        node.locked = !node.locked;
+        node.attrs.locked = !node.attrs.locked;
         node.draggable(!node.draggable());
     });
-    const locked = selectedNodes.every(node => node.locked);
+    const locked = selectedNodes.every(node => node.attrs.locked);
     tr.rotateEnabled(!locked);
     tr.resizeEnabled(!locked);
 }
+
 function displayControlBar() {
     const selectedNodes = tr.nodes();
     if (selectedNodes.length > 0) {
