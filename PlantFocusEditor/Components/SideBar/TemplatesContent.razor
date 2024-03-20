@@ -25,14 +25,16 @@
             _templates = await API.GetTemplatesAsync(null, null) ?? [];
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/renderPreview.js");
             _moduleState = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/state.js");
-            foreach (Template template in _templates)
+            for (int i = 0; i < _templates.Count(); i++)
             {
-                if (_module is not null)
+                Template template = _templates[i];
+                string source = await _module.InvokeAsync<string>("renderPreviewFromJson", template.JsonToRender);
+                if (source != "")
                 {
-                    string source = await _module.InvokeAsync<string>("renderPreviewFromJson", template.JsonToRender);
-                    if (source != "")
+                    _previews.Add(template.ID, source);
+                    if (_previews.Count() == 1)
                     {
-                        _previews.Add(template.ID, source);
+                        await _moduleState.InvokeVoidAsync("loadStateFromTemplate", template.JsonToRender);
                     }
                 }
             }

@@ -110,5 +110,9 @@
   {
     "outputFile": "Components/SideBar/PropertiesComponents/NewPlantProperty.razor.css",
     "inputFile": "Components/SideBar/PropertiesComponents/NewPlantProperty.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/LabelStyleContent.razor.css",
+    "inputFile": "Components/StylingBar/LabelStyleContent.razor.scss"
   }
 ]
