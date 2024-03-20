@@ -16,7 +16,7 @@ function deleteNodes() {
             removeBarcode();
             return;
         }
-        if (node.getClassName() === "Image") {
+        if (node.getClassName() === "Image" && node.attrs.name !== "qrcode") {
             dotnetRefence.invokeMethodAsync("RemoveImage", node.attrs.id);
         }
         node.destroy();
@@ -62,7 +62,9 @@ function cloneNode() {
             clone.off("mouseover");
             clone.off("mouseout");
             addHoverAnimation(clone);
-            dotnetRefence.invokeMethodAsync("AddImage", newId, node.attrs.src);
+            if (node.attrs.name !== "qrcode" && node.attrs.name !== "barcode") {
+                dotnetRefence.invokeMethodAsync("AddImage", newId, node.attrs.src);
+            }
         } else {
             const clone = node.clone({
                 x: node.x() + 10,

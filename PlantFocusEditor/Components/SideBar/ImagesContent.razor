@@ -27,17 +27,14 @@
     private IJSObjectReference? _module;
     private Dictionary<string, string> _images = new Dictionary<string, string>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        _images = await JS.InvokeAsync<Dictionary<string, string>>("getAllImages");
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageLayers.js");
+            _images = await _module.InvokeAsync<Dictionary<string, string>>("getAllImages");
             await OnRendered.InvokeAsync();
+            StateHasChanged();
         }
     }
 

@@ -33,7 +33,7 @@ function removeImage(id) {
     tr.nodes([]);
 }
 
-window.getAllImages = function() {
+function getAllImages() {
     const images = {}
     getImages(front, images);
     getImages(back, images);
@@ -42,10 +42,10 @@ window.getAllImages = function() {
 
 function getImages(group, images) {
     group.children.forEach(child => {
-        if (child.getClassName() === "Image") {
+        if (child.getClassName() === "Image" && child.attrs.name !== "qrcode" && child.attrs.name !== "barcode") {
             images[child.attrs.id] = child.attrs.src;
         }
     });
 }
 
-export { addImage, removeImage };
+export { addImage, removeImage, getAllImages };
