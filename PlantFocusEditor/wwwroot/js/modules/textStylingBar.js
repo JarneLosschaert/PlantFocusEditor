@@ -1,12 +1,6 @@
 import { tr } from "./constants.js";
 
-let textStylingBarReference = null;
-function setTextStylingBarReference(reference) {
-    textStylingBarReference = reference;
-}
-
 function handleFontSelect(font) {
-    console.log(font);
     const selectedNodes = tr.nodes();
     selectedNodes.forEach((node) => {
         if (node.getClassName() === "Text") {
@@ -61,20 +55,8 @@ function handleAlignmentChange(alignment) {
     });
 }
 
-function displayTextStylingBar() {
-    const selectedNodes = tr.nodes();
-    const onlyText =
-        selectedNodes.length > 0 &&
-        selectedNodes.every((node) => {
-            return node.getClassName() === "Text";
-        });
-    //textStylingBarReference.invokeMethodAsync('displayTextStylingBar', onlyText)
-    //updateTextStylingBarValues();
-}
-
 function getValues() {
     const firstNode = tr.nodes()[0];
-    console.log(firstNode.fontFamily());
     return {
         font: firstNode.fontFamily(),
         fontSize: firstNode.fontSize(),
@@ -85,4 +67,4 @@ function getValues() {
     };
 }
 
-export { setTextStylingBarReference, displayTextStylingBar, handleFontSelect, handleFontSizeChange, handleFontColorChange, handleBoldItalic, handleUnderline, handleAlignmentChange, getValues };
+export { handleFontSelect, handleFontSizeChange, handleFontColorChange, handleBoldItalic, handleUnderline, handleAlignmentChange, getValues };

@@ -1,6 +1,5 @@
 import { tr, hoverTr, selectionRectangle, currentGroup } from "./constants.js";
 import { stage, layer } from "./state.js";
-import { displayTextStylingBar } from "./textStylingBar.js";
 import { displayImageShapeStylingBar } from "./imageShapeStylingBar.js";
 import { deleteNodes } from "./controlBar.js";
 
@@ -134,7 +133,6 @@ function toggleLock() {
 }
 
 function checkStylingBars() {
-    displayTextStylingBar();
     displayImageShapeStylingBar();
 }
 
