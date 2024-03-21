@@ -1,4 +1,4 @@
-import { changeTr, changeHoverTr, changeSelectionRectangle, front, setFront, back, setBack, currentGroup, setCurrentGroup } from "./constants.js";
+import { changeTr, changeHoverTr, changeSelectionRectangle, front, setFront, back, setBack, currentGroup, setCurrentGroup, tr } from "./constants.js";
 import { handleTextEventListeners } from "./textLayers.js";
 import { handleSelections } from "./selectionHandling.js";
 import { sceneFunc } from "./shapeLayers.js";
@@ -150,11 +150,13 @@ function loadStateFromTemplate(json) {
     setFront(firstGroup);
     setCurrentGroup(firstGroup);
     layer.add(front);
+    front.moveToBottom();
     setBack(loadGroupFromJson(json[1]));
 }
 
 function loadGroupFromJson(json) {
     const node = Konva.Node.create(json.Group);
+    node.attrs.name = "passepartout";
     let pathData;
     let offsetX;
     let scale;
@@ -200,7 +202,8 @@ function loadGroupFromJson(json) {
     node.x(offsetX);
     const clipFuncWithParam = createClipFunc(pathData);
     node.clipFunc(clipFuncWithParam);
-    console.log(node);
+    node.on("click tap", () => tr.nodes([]));
+    console.log(node); 
     return node;
 }
 

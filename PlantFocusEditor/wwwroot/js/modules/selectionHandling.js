@@ -89,7 +89,7 @@ function handleSelection(e) {
     if (selectionRectangle.visible()) {
         return;
     }
-    if (e.target === stage || e.target.attrs.name == "passepartout") {
+    if (e.target === stage) {
         tr.nodes([]);
         return;
     }
