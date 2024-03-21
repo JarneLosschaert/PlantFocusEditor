@@ -1,20 +1,6 @@
 import { currentGroup } from "./constants.js";
 import { addHoverAnimation, addIncomingAnimation } from "./animations.js";
 
-const $addRectangle = document.getElementById("add-rectangle");
-const $addCircle = document.getElementById("add-circle");
-const $addTriangle = document.getElementById("add-triangle");
-
-function handleShapeLayers() {
-    //handleEventListeners();
-}
-
-function handleEventListeners() {
-    $addRectangle.addEventListener("click", addRectangle);
-    $addCircle.addEventListener("click", addCircle);
-    $addTriangle.addEventListener("click", addTriangle);
-}
-
 function addRectangle() {
     const rectangle = new Konva.Rect({
         name: "shape",
@@ -109,4 +95,4 @@ function sceneFunc(context, shape) {
     context.fillStrokeShape(shape);
 }
 
-export { handleShapeLayers, sceneFunc };
+export { sceneFunc };

@@ -10,9 +10,6 @@ const $konvaContainer = document.getElementById("konva-container");
 const initialWidth = $konvaContainer.offsetWidth;
 const initialHeight = $konvaContainer.offsetHeight;
 
-const images = {};
-const selectedImages = [];
-
 const stage = new Konva.Stage({
     container: "konva-container",
     width: initialWidth,
@@ -42,9 +39,6 @@ const historyBackside = [];
 let historyIndex = 0;
 let historyBacksideIndex = 0;
 
-const $undoButton = document.getElementById("undo");
-const $redoButton = document.getElementById("redo");
-
 function handleState() {
     initKonva();
     handleEventListeners();
@@ -57,10 +51,6 @@ function initKonva() {
 
 function handleEventListeners() {
     document.addEventListener("click", saveState);
-    //window.addEventListener("beforeunload", saveState);
-    //$undoButton.addEventListener("click", undo);
-    //$redoButton.addEventListener("click", redo);
-    //$switchButton.addEventListener("click", switchSides);
 }
 
 function switchSides() {
@@ -108,13 +98,10 @@ function loadState(json) {
                         barcodeImg = childNode;
                         addHoverAnimation(childNode);
                     } else if (childNode.getClassName() === "Image") {
-                        const id = childNode.attrs.id;
                         const src = childNode.attrs.src;
                         const img = new Image();
                         img.src = src;
                         childNode.image(img);
-                        images[id] = src;
-                        selectedImages.push(id);
                         addHoverAnimation(childNode);
                     } else if (childNode.getClassName() === "Text") {
                         handleTextEventListeners(childNode);
@@ -176,13 +163,10 @@ function loadGroupFromJson(json) {
             barcodeImg = child;
             addHoverAnimation(child);
         } else if (child.getClassName() === "Image") {
-            const id = child.attrs.id;
             const src = child.attrs.src;
             const img = new Image();
             img.src = src;
-            child.image(img);
-            images[id] = src;
-            selectedImages.push(id);
+            child.image(img);           
             addHoverAnimation(child);
         } else if (child.getClassName() === "Text") {
             handleTextEventListeners(child);
@@ -272,16 +256,8 @@ function getBarcodeNumber() {
     return barcodeImg.attrs.number;
 }
 
-function getImages() {
-    return images;
-}
-
-function getSelectedImages() {
-    return selectedImages;
-}
-
 function setBarcodeImg(img) {
     barcodeImg = img;
 }
 
-export { undo, redo, stage, layer, handleState, saveState, barcodeImg, setBarcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, getImages, getSelectedImages, loadStateFromTemplate, flip };
+export { undo, redo, stage, layer, handleState, saveState, barcodeImg, setBarcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, loadStateFromTemplate, flip };
