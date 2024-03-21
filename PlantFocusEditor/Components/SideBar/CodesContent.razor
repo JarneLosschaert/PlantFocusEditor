@@ -4,11 +4,12 @@
     <div>
         <h3>Barcode</h3>
         <input type="number" id="barcodeInput" @bind="_barcode" @oninput="onBarcodeInput" />
+        <button>Generate barcode</button>
     </div>
     <div>
         <h3>QR code</h3>
         <input type="text" id="qrcodeInput" @bind="_qrcode" />
-        <button @onclick="GenerateQrCode">Generate QR Code</button>
+        <button @onclick="GenerateQrCode">Generate QR code</button>
     </div>
 </article>
 
