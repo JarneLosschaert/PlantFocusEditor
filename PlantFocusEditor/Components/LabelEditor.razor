@@ -12,7 +12,7 @@
 @code {
     public SideBarTabs _SelectedTab { get; set; } = SideBarTabs.Templates;
     private IJSObjectReference? _module;
-    private StylingBar.StylingBar _stylingBar;
+    private StylingBar.StylingBar? _stylingBar;
 
     public void SelectTab(SideBarTabs tab)
     {
@@ -26,13 +26,13 @@
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/init.js");
             if (_module is not null)
             {
-                _module.InvokeVoidAsync("init");
+                await _module.InvokeVoidAsync("init");
             }
         }
     }
 
     private void HandleKonvaContainerClicked()
     {
-        _stylingBar.SetSelectedItem();
+        _stylingBar?.SetSelectedItem();
     }
 }

@@ -32,7 +32,7 @@
 
 @code {
     [CascadingParameter]
-    public LabelEditor LabelEditor { get; set; }
+    public LabelEditor? LabelEditor { get; set; }
     private ImagesContent? _imagesContent;
     private IJSObjectReference? _module;
     private List<string> _imagesToRemove = new();
@@ -77,11 +77,11 @@
     {
         foreach (string id in _imagesToRemove)
         {
-            _imagesContent.RemoveImage(id);
+            _imagesContent?.RemoveImage(id);
         }
         foreach (KeyValuePair<string, string> image in _imagesToAdd)
         {
-            _imagesContent.AddImage(image.Key, image.Value);
+            _imagesContent?.AddImage(image.Key, image.Value);
         }
         _imagesToRemove.Clear();
         _imagesToAdd.Clear();

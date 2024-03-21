@@ -1,4 +1,5 @@
 ﻿@inject ApiConnectorService API
+@inject TemplatesService TemplatesService
 @inject IJSRuntime JS
 
 <section class="templates-content">
@@ -13,32 +14,44 @@
 </section>
 
 @code {
+
     private IJSObjectReference? _module;
     private IJSObjectReference? _moduleState;
     private List<Template> _templates = [];
     private Dictionary<int, string> _previews = new();
 
+    protected override void OnInitialized()
+    {
+        _templates = TemplatesService.GetTemplates();
+        _previews = TemplatesService.GetPreviews();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _templates = await API.GetTemplatesAsync(null, null) ?? [];
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/renderPreview.js");
             _moduleState = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/state.js");
-            for (int i = 0; i < _templates.Count(); i++)
+            if (_templates.Count() == 0 && _previews.Count() == 0)
             {
-                Template template = _templates[i];
-                string source = await _module.InvokeAsync<string>("renderPreviewFromJson", template.JsonToRender);
-                if (source != "")
+                _templates = await API.GetTemplatesAsync(null, null) ?? [];
+                TemplatesService.SetTemplates(_templates);
+                for (int i = 0; i < _templates.Count(); i++)
                 {
-                    _previews.Add(template.ID, source);
-                    if (_previews.Count() == 1)
+                    Template template = _templates[i];
+                    string source = await _module.InvokeAsync<string>("renderPreviewFromJson", template.JsonToRender);
+                    if (source != "")
                     {
-                        await _moduleState.InvokeVoidAsync("loadStateFromTemplate", template.JsonToRender);
+                        _previews.Add(template.ID, source);
+                        if (_previews.Count() == 1)
+                        {
+                            await _moduleState.InvokeVoidAsync("loadStateFromTemplate", template.JsonToRender);
+                        }
                     }
                 }
+                TemplatesService.SetPreviews(_previews);
+                StateHasChanged();
             }
-            StateHasChanged();
         }
     }
 
