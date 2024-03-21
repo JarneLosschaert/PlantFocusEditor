@@ -159,7 +159,7 @@ function loadGroupFromJson(json) {
 
     node.children.forEach(childNode => {
         if (childNode.getClassName() === "Path") {
-            pathData = childNode.attrs.data;
+            pathData = childNode.data();
             offsetX = stage.width() / 2 - getScaledWidthAndHeight(pathData)[0] / 2;
         } else if (childNode.attrs.name === "barcode") {
             const img = new Image();
