@@ -2,53 +2,72 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1rem;
+  padding: 1rem;
   height: 4rem;
+  position: relative;
   background-color: #fff;
   border-bottom: 1px solid #dbd9d9;
   border-left: 1px solid #dbd9d9;
   border-right: 1px solid #dbd9d9;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
 }
-.editor-bar button {
+.editor-bar .switch-sides button, .editor-bar .flip button {
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
   font-size: 1rem;
   font-weight: 600;
-  gap: 0.5rem;
-  border: none;
-  background: none;
-  padding: 0.5rem 0.75rem;
+  background: #fff;
+  padding: 0.75rem;
+  border: 1px solid #dbd9d9;
+  border-radius: 6px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 5px, rgba(0, 0, 0, 0.06) 0px 1px 3px;
   transition: all 0.2s ease-in-out;
 }
-.editor-bar button ::deep svg {
+.editor-bar .switch-sides button ::deep svg, .editor-bar .flip button ::deep svg {
   height: 1.25rem;
   width: 1.25rem;
   transition: all 0.2s ease-in-out;
 }
-.editor-bar button:hover {
+.editor-bar .switch-sides button:hover, .editor-bar .flip button:hover {
   background: #f0f0f0;
 }
-.editor-bar div {
-  width: 7rem;
-}
-.editor-bar div > button, .editor-bar div .undo-redo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 100%, 0.16);
-  box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 5px, rgba(0, 0, 0, 0.06) 0px 1px 3px;
-  border-radius: 6px;
-}
-.editor-bar div.switch-sides {
-  display: flex;
-  justify-content: center;
-}
-.editor-bar div.flip {
-  display: flex;
-  justify-content: end;
+.editor-bar .switch-sides {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 .editor-bar .undo-redo {
+  height: 2.5rem;
   display: flex;
+  justify-content: space-around;
+  background: #fff;
+  border: 1px solid #dbd9d9;
+  border-radius: 6px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 5px, rgba(0, 0, 0, 0.06) 0px 1px 3px;
+  transition: all 0.2s ease-in-out;
+}
+.editor-bar .undo-redo button {
+  height: 100%;
+  padding: 0 0.75rem;
+  background: none;
+  border: none;
+}
+.editor-bar .undo-redo button ::deep svg {
+  height: 1.25rem;
+  width: 1.25rem;
+  transition: all 0.2s ease-in-out;
+}
+.editor-bar .undo-redo button:hover {
+  background: #f0f0f0;
 }
 .editor-bar .undo-redo button:first-child {
-  border-right: 1px solid #dbd9d9;
+  border-left: 1px solid #dbd9d9;
+  border-radius: 6px 0 0 6px;
+}
+.editor-bar .undo-redo button:last-child {
+  border-left: 1px solid #dbd9d9;
+  border-radius: 0 6px 6px 0;
 }

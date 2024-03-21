@@ -4,10 +4,9 @@
 .add-new-property {
     display: flex;
     justify-content: space-between;
-    margin-left: 0.5rem;
 
     .select-container {
-        width: 65%;
+        width: 70%;
         position: relative;
 
         select {
@@ -40,22 +39,22 @@
     }
 
     button {
+        width: 25%;
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.25rem 0.75rem;
-        border: none;
-        background: $btn-dark;
+        background: $neutral;
+        border: 1px solid $neutral-dark;
         border-radius: $border-radius-s;
+        transition: $transition;
 
         ::deep svg {
             height: 1.25rem;
             width: 1.25rem;
-            color: $text;
         }
 
         &:hover {
-            background: $neutral;
+            background: $neutral-dark;
         }
     }
 }

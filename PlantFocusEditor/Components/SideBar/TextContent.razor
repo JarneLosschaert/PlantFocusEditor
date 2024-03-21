@@ -1,16 +1,19 @@
 ﻿@inject IJSRuntime JS
 
 <article class="text-content">
-    <h3>Basic text</h3>
+    @* <h3>Basic text</h3> *@
     <div class="texts">
         <button class="text-header" @onclick="@(() => AddTextField(32))">
-            Add a header
+            New title
+            @((MarkupString)CustomIcons.Plus())
         </button>
         <button class="text-subheader" @onclick="@(() => AddTextField(24))">
-            Add a subheader
+            New subtitle
+            @((MarkupString)CustomIcons.Plus())
         </button>
         <button class="text-paragraph" @onclick="@(() => AddTextField(16))">
-            Add a paragraph
+            New paragraph
+            @((MarkupString)CustomIcons.Plus())
         </button>
     </div>
 </article>

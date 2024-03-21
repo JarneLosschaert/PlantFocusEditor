@@ -1,17 +1,20 @@
 ﻿.templates-content ul {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
   gap: 1rem;
 }
 .templates-content ul li {
   width: 8rem;
-  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 60%, 0.16);
+  background: #f0f0f0;
+  border: 1px solid #dbd9d9;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+.templates-content ul li:hover {
+  background: #dbd9d9;
 }
 .templates-content ul li img {
   width: 60%;

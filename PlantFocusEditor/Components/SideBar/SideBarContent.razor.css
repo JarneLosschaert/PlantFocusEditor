@@ -1,8 +1,6 @@
 ﻿.side-bar-content {
   width: 20rem;
   background-color: #fff;
-  box-shadow: 5px 0 20px rgba(0, 0, 0, 0.15);
-  z-index: 100;
 }
 .side-bar-content .content-header {
   height: 4rem;

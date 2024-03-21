@@ -12,16 +12,18 @@
         color: $text-lighter;
         font-weight: 600;
         position: absolute;
-        top: 0.25rem;
+        top: 50%;
+        transform: translateY(-50%);
         left: 1rem;
         cursor: pointer;
+        pointer-events: none;
     }
 
     input[type=range] {
         -webkit-appearance: none;
         position: relative;
         width: 100%;
-        height: 1.5rem;
+        height: 2rem;
         background: $neutral;
         border: 1px solid $neutral-dark;
         border-radius: $border-radius-s;
@@ -32,7 +34,7 @@
         -webkit-appearance: none;
         appearance: none;
         width: 0.5rem;
-        height: 1.5rem;
+        height: 2rem;
         border: none;
         border-radius: $border-radius-m;
         background: $neutral-dark;
@@ -53,7 +55,7 @@
     input[type=range]:active,
     input[type=range]:hover {
         &::-webkit-slider-thumb {
-            height: 2rem;
+            height: 2.5rem;
         }
     }
 }

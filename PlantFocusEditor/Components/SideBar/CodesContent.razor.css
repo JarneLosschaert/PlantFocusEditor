@@ -6,23 +6,28 @@
   gap: 0.5rem;
   height: 100%;
   padding: 0.5rem;
-  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 60%, 0.16);
+  background: #f0f0f0;
   border: 1px solid #dbd9d9;
   border-radius: 6px;
-  box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 5px, rgba(0, 0, 0, 0.06) 0px 1px 3px;
   cursor: pointer;
 }
 button ::deep svg {
+  color: #919191;
   width: 1rem;
   height: 1rem;
 }
 button:hover {
   color: #262626;
 }
+button:hover ::deep svg {
+  color: #262626;
+}
 button.selected {
-  background: #f0f0f0;
   color: #262626;
   border: 1px solid #009e4d;
+}
+button.selected ::deep svg {
+  color: #262626;
 }
 
 .codes-content {
@@ -40,21 +45,18 @@ button.selected {
   font-weight: 600;
 }
 .codes-content div button {
-  margin-left: 0.5rem;
   color: #262626;
 }
 .codes-content div button:hover {
-  background: #f0f0f0;
+  background: #dbd9d9;
 }
 .codes-content div input {
   color: #262626;
   font-size: 1rem;
   padding: 0.5rem 0.75rem;
-  margin-left: 0.5rem;
   border: 1px solid #dbd9d9;
   border-radius: 6px;
   transition: all 0.2s ease-in-out;
-  width: calc(100% - 0.5rem);
   /*&[type="number"] {
       -webkit-appearance: none;
       -moz-appearance: textfield;

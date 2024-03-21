@@ -5,21 +5,27 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 1rem;
+    padding: 1rem;
     height: 4rem;
+    position: relative;
     background-color: $white;
     border-bottom: 1px solid $neutral-dark;
     border-left: 1px solid $neutral-dark;
     border-right: 1px solid $neutral-dark;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
 
-    button {
+    .switch-sides button, .flip button {
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
         font-size: 1rem;
         font-weight: 600;
-        gap: 0.5rem;
-        border: none;
-        background: none;
-        padding: 0.5rem 0.75rem;
+        background: $white;
+        padding: 0.75rem;
+        border: 1px solid $neutral-dark;
+        border-radius: $border-radius-s;
+        box-shadow: $shadow-s;
         transition: $transition;
 
         ::deep svg {
@@ -33,36 +39,48 @@
         }
     }
 
-    div {
-        width: 7rem;
-
-        & > button, .undo-redo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: $btn;
-            box-shadow: $shadow-s;
-            border-radius: $border-radius-s;
-        }
-
-        &.switch-sides {
-            display: flex;
-            justify-content: center;
-        }
-
-        &.flip {
-            display: flex;
-            justify-content: end;
-        }
+    .switch-sides {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 
-
-
     .undo-redo {
+        height: 2.5rem;
         display: flex;
+        justify-content: space-around;
+        background: $white;
+        border: 1px solid $neutral-dark;
+        border-radius: $border-radius-s;
+        box-shadow: $shadow-s;
+        transition: $transition;
 
-        button:first-child {
-            border-right: 1px solid $neutral-dark;
+        button {
+            height: 100%;
+            padding: 0 0.75rem;
+            background: none;
+            border: none;
+
+            ::deep svg {
+                height: 1.25rem;
+                width: 1.25rem;
+                transition: $transition;
+            }
+
+            &:hover {
+                background: $neutral;
+            }
+
+            &:first-child {
+                border-left: 1px solid $neutral-dark;
+                border-radius: $border-radius-s 0 0 $border-radius-s;
+            }
+
+            &:last-child {
+                border-left: 1px solid $neutral-dark;
+                border-radius: 0 $border-radius-s $border-radius-s 0;
+            }
         }
     }
 }

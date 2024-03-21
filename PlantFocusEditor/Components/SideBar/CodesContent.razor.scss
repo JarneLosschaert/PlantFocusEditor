@@ -9,25 +9,33 @@ button {
     gap: 0.5rem;
     height: 100%;
     padding: 0.5rem;
-    background: $btn-dark;
+    background: $neutral;
     border: 1px solid $neutral-dark;
     border-radius: $border-radius-s;
-    box-shadow: $shadow-s;
     cursor: pointer;
 
     ::deep svg {
+        color: $text-lighter;
         width: 1rem;
         height: 1rem;
     }
 
     &:hover {
         color: $text;
+
+        ::deep svg {
+            color: $text;
+        }
     }
 
     &.selected {
-        background: $neutral;
         color: $text;
+        //background: $neutral-dark;
         border: 1px solid $primary;
+
+        ::deep svg {
+            color: $text;
+        }
     }
 }
 
@@ -47,11 +55,10 @@ button {
         }
 
         button {
-            margin-left: 0.5rem;
             color: $text;
 
             &:hover {
-                background: $neutral;
+                background: $neutral-dark;
             }
         }
 
@@ -59,11 +66,9 @@ button {
             color: $text;
             font-size: 1rem;
             padding: 0.5rem 0.75rem;
-            margin-left: 0.5rem;
             border: 1px solid $neutral-dark;
             border-radius: $border-radius-s;
             transition: $transition;
-            width: calc(100% - 0.5rem);
 
             /*&[type="number"] {
                 -webkit-appearance: none;

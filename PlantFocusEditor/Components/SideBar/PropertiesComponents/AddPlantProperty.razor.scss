@@ -2,16 +2,25 @@
 @import "../../../wwwroot/css/config.scss";
 
 .add-plant-property {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     height: 2rem;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 0.25rem 0.75rem;
-    background: $btn-dark;
+    background: $neutral;
     border: 1px solid $neutral-dark;
     border-radius: $border-radius-s;
-    box-shadow: $shadow-s;
+    transition: $transition;
+
+    ::deep svg {
+        height: 1.25rem;
+        width: 1.25rem;
+    }
+
+    &:hover {
+        background: $neutral-dark;
+    }
 
     div {
         display: flex;
@@ -22,15 +31,5 @@
         img {
             height: 100%;
         }
-    }
-
-    ::deep svg {
-        height: 1.25rem;
-        width: 1.25rem;
-        color: $text;
-    }
-
-    &:hover {
-        background: $neutral;
     }
 }

@@ -2,8 +2,6 @@
   width: 20rem;
   background-color: #fff;
   border-radius: 0 10px 10px 0;
-  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.15);
-  z-index: 100;
 }
 .styling-bar .content-header {
   height: 4rem;

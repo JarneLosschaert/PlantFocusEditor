@@ -1,15 +1,13 @@
 ﻿button {
-  color: #919191;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   height: 100%;
   padding: 0.5rem;
-  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 60%, 0.16);
+  background: #f0f0f0;
   border: 1px solid #dbd9d9;
   border-radius: 6px;
-  box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 5px, rgba(0, 0, 0, 0.06) 0px 1px 3px;
   cursor: pointer;
 }
 button ::deep svg {
@@ -17,18 +15,24 @@ button ::deep svg {
   height: 1rem;
 }
 button:hover {
+  background: #dbd9d9;
+  color: #262626;
+}
+button:hover ::deep svg {
   color: #262626;
 }
 button.selected {
-  background: #f0f0f0;
   color: #262626;
   border: 1px solid #009e4d;
+}
+button.selected ::deep svg {
+  color: #262626;
 }
 
 .control-content {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.75rem;
 }
 .control-content h3 {
   font-size: 1.1rem;
@@ -58,7 +62,6 @@ button.selected {
   justify-content: center;
   background: #f0f0f0;
   border-radius: 6px;
-  box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 5px, rgba(0, 0, 0, 0.06) 0px 1px 3px;
 }
 .control-content > div .position .position-popup ul {
   display: flex;
@@ -74,10 +77,4 @@ button.selected {
 }
 .control-content > div .position .position-popup ul li:hover {
   color: #262626;
-}
-.control-content > div button {
-  color: #262626;
-}
-.control-content > div button:hover {
-  background: #f0f0f0;
 }

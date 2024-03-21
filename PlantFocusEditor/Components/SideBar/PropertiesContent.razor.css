@@ -13,11 +13,12 @@
   flex-direction: column;
   border: 1px solid #dbd9d9;
   border-radius: 6px;
-  margin-left: 0.5rem;
+}
+.properties-content .properties div:not(:last-child) {
+  border-bottom: 1px solid #dbd9d9;
 }
 .properties-content .add-known-properties {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin-left: 0.5rem;
 }

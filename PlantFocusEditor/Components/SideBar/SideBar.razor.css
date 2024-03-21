@@ -35,5 +35,5 @@
 }
 .side-bar ul .selected {
   color: #262626;
-  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 60%, 0.16);
+  background: #f0f0f0;
 }
