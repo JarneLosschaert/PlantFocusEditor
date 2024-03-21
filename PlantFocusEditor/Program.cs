@@ -11,6 +11,8 @@ builder.Services.AddHttpClient("Plantfocus Editor API",
     c => c.BaseAddress = new Uri("https://localhost:7203"));
 
 builder.Services.AddScoped<ApiConnectorService>();
+builder.Services.AddScoped<TemplatesService>();
+builder.Services.AddScoped<ImagesService>();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 await builder.Build().RunAsync();

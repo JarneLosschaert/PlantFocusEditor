@@ -30,15 +30,15 @@ function handleBorderWidthChange(width) {
 }
 
 function getSelectedItemType() {
-    const selectedClasses = tr.nodes().map(el => el.getClassName());
-    const isSelected = selectedClasses.length > 0;
-    if (isSelected && selectedClasses.every(el => el === "Text")) {
+    const selected = tr.nodes();
+    const isSelected = selected.length > 0;
+    if (isSelected && selected.every(el => el.getClassName() === "Text")) {
         return "Text";
     }
-    if (isSelected && selectedClasses.every(el => el === "Image")) {
+    if (isSelected && selected.every(el => el.getClassName() === "Image") && !selected.every(el => el.attrs.name === "qrcode") && !selected.every(el => el.attrs.name === "barcode")) {
         return "Image";
     }
-    if (isSelected && selectedClasses.every(el => el === "Shape")) {
+    if (isSelected && selected.every(el => el.getClassName() === "Shape")) {
         return "Shape";
     }
     if (isSelected) {

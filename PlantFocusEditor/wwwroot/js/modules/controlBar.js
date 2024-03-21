@@ -2,24 +2,23 @@ import { tr, selectionRectangle, hoverTr, currentGroup } from "./constants.js";
 import { removeBarcode } from "./barcodeLayer.js";
 import { addHoverAnimation } from "./animations.js";
 import { uuidv4 } from "./helpers.js";
+import { removedImages } from "./imageLayers.js";
 
-let dotnetRefence = null;
+let imagesReference = null;
 
-function setReference(ref) {
-    dotnetRefence = ref;
-}
+const setReference = (ref) => imagesReference = ref;
 
 function deleteNodes() {
     const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
         if (node.attrs.name === "barcode") {
             removeBarcode();
-            return;
+        } else if (node.getClassName() === "Image" && node.attrs.name !== "qrcode") {
+            removedImages.push(node);
+            node.remove();
+        } else {
+            node.destroy();
         }
-        if (node.getClassName() === "Image" && node.attrs.name !== "qrcode") {
-            dotnetRefence.invokeMethodAsync("RemoveImage", node.attrs.id);
-        }
-        node.destroy();
     });
     tr.nodes([]);
 }
@@ -50,6 +49,9 @@ function changePosition(forward, full) {
 function cloneNode() {
     const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
+        if (node.attrs.name === "barcode" || node.attrs.name === "qrcode") {
+            return;
+        }
         if (node.getClassName() === "Image") {
             const newId = uuidv4();
             const clone = node.clone({
@@ -62,9 +64,7 @@ function cloneNode() {
             clone.off("mouseover");
             clone.off("mouseout");
             addHoverAnimation(clone);
-            if (node.attrs.name !== "qrcode" && node.attrs.name !== "barcode") {
-                dotnetRefence.invokeMethodAsync("AddImage", newId, node.attrs.src);
-            }
+            imagesReference.invokeMethodAsync("CloneImage", newId, node.attrs.src);
         } else {
             const clone = node.clone({
                 x: node.x() + 10,

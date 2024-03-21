@@ -32,10 +32,9 @@
 
 @code {
     [CascadingParameter]
-    public LabelEditor LabelEditor { get; set; }
+    public LabelEditor? LabelEditor { get; set; }
     private ImagesContent? _imagesContent;
     private IJSObjectReference? _module;
-    private List<string> _imagesToRemove = new();
     private Dictionary<string, string> _imagesToAdd = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -49,21 +48,8 @@
     }
 
     [JSInvokable]
-    public void RemoveImage(string id)
+    public void CloneImage(string id, string src)
     {
-        if (_imagesContent != null)
-        {
-            _imagesContent.RemoveImage(id);
-        } else
-        {
-            _imagesToRemove.Add(id);
-        }
-    }
-
-    [JSInvokable]
-    public void AddImage(string id, string src)
-    {
-        Console.WriteLine(src);
         if (_imagesContent != null)
         {
             _imagesContent.AddImage(id, src);
@@ -75,16 +61,10 @@
 
     private void OnImagesContentRendered()
     {
-        foreach (string id in _imagesToRemove)
-        {
-            _imagesContent.RemoveImage(id);
-        }
         foreach (KeyValuePair<string, string> image in _imagesToAdd)
         {
-            _imagesContent.AddImage(image.Key, image.Value);
+            _imagesContent?.AddImage(image.Key, image.Value);
         }
-        _imagesToRemove.Clear();
         _imagesToAdd.Clear();
-
     }
 }

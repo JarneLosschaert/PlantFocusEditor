@@ -2,10 +2,10 @@
 
 <section class="editor-bar">
     <div class="undo-redo">
-        <button>
+        <button @onclick="Undo">
             @((MarkupString)CustomIcons.Undo())
         </button>
-        <button>
+        <button @onclick="Redo">
             @((MarkupString)CustomIcons.Redo())
         </button>
     </div>
@@ -47,8 +47,23 @@
     {
         if (_module != null)
         {
-            Console.WriteLine("flip");
             _module.InvokeVoidAsync("flip");
+        }
+    }
+
+    private void Undo()
+    {
+        if (_module != null)
+        {
+            _module.InvokeVoidAsync("undo");
+        }
+    }
+
+    private void Redo()
+    {
+        if (_module != null)
+        {
+            _module.InvokeVoidAsync("redo");
         }
     }
 }

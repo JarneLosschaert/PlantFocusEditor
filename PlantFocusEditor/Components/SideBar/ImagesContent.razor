@@ -1,4 +1,5 @@
-﻿@inject IJSRuntime JS;
+﻿@inject ImagesService ImagesService
+@inject IJSRuntime JS
 
 <article class="images-content">
     <div class="input-file-container">
@@ -15,7 +16,7 @@
                 @foreach (KeyValuePair<string, string> image in _images)
                 {
                     <li>
-                        <img src="@image.Value" id="@image.Key" alt="img" />
+                        <img src="@image.Value" id="@image.Key" alt="img" @onclick="@(() => SelectImageFromList(image.Key, image.Value))" />
                     </li>
                 }
             </ul>
@@ -31,12 +32,16 @@
     private IJSObjectReference? _module;
     private Dictionary<string, string> _images = new Dictionary<string, string>();
 
+    protected override void OnInitialized()
+    {
+        _images = ImagesService.GetImages();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageLayers.js");
-            _images = await _module.InvokeAsync<Dictionary<string, string>>("getAllImages");
             await OnRendered.InvokeAsync();
             StateHasChanged();
         }
@@ -51,28 +56,23 @@
             await file.OpenReadStream().ReadAsync(buffer);
             var imageData = Convert.ToBase64String(buffer);
             var src = $"data:{file.ContentType};base64,{imageData}";
-            var key = Guid.NewGuid().ToString();
-            _images.Add(key, src);
-            // use dictionary to store the image data later
+            var id = Guid.NewGuid().ToString();
+            ImagesService.AddImage(id, src);
             if (_module != null)
             {
-                await _module.InvokeVoidAsync("addImage", key, src);
+                await _module.InvokeVoidAsync("addImage", id, src);
             }
-        }
-    }
-
-    public void RemoveImage(string id)
-    {
-        if (_images.ContainsKey(id))
-        {
-            _images.Remove(id);
-            StateHasChanged();
         }
     }
 
     public void AddImage(string id, string src)
     {
-        _images.Add(id, src);
+        ImagesService.AddImage(id, src);
         StateHasChanged();
+    }
+
+    public void SelectImageFromList(string id, string src)
+    {
+        _module?.InvokeVoidAsync("addImage", id, src);
     }
 }
