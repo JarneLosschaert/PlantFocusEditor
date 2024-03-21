@@ -144,4 +144,58 @@
             }
         }
     }
+
+    .size-input {
+        position: relative;
+
+        & > div {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: absolute;
+            right: 0.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $text-lighter;
+            font-weight: 600;
+
+            .dropdown {
+                position: relative;
+
+                button {
+                    height: 80%;
+                    padding: 0;
+
+                    ::deep svg {
+                        width: 1.25rem;
+                        height: 1.25rem;
+                    }
+                }
+
+                ul {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.25rem;
+                    position: absolute;
+                    top: -9.25rem;
+                    left: -4rem;
+                    width: 5rem;
+                    height: 9rem;
+                    overflow-y: auto;
+                    scrollbar-width: thin;
+                    padding: 0.5rem;
+                    border-radius: $border-radius-s;
+                    background: $neutral-dark;
+
+                    li {
+                        cursor: pointer;
+
+                        &:hover {
+                            color: $text;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
