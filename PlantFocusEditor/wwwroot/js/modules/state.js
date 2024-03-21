@@ -3,7 +3,7 @@ import { handleTextEventListeners } from "./textLayers.js";
 import { handleSelections } from "./selectionHandling.js";
 import { sceneFunc } from "./shapeLayers.js";
 import { addHoverAnimation } from "./animations.js";
-import { createClipFunc, findHeightPassePartout, findWidthPassePartout } from "./passePartout.js";
+import { createClipFunc, getScaledWidthAndHeight } from "./passePartout.js";
 
 const $konvaContainer = document.getElementById("konva-container");
 const initialWidth = $konvaContainer.offsetWidth;
@@ -76,7 +76,7 @@ function switchSides() {
 }
 
 function flip() {
-    const height = findHeightPassePartout(currentGroup.children[0].data());
+    const height = getScaledWidthAndHeight(currentGroup.children[0].data())[1];
     if (currentGroup.offsetY() === 0) {
         currentGroup.offsetY(height);
     } else {
@@ -160,7 +160,7 @@ function loadGroupFromJson(json) {
     node.children.forEach(childNode => {
         if (childNode.getClassName() === "Path") {
             pathData = childNode.attrs.data;
-            offsetX = stage.width() / 2 - findWidthPassePartout(pathData) / 2;
+            offsetX = stage.width() / 2 - getScaledWidthAndHeight(pathData)[0] / 2;
         } else if (childNode.attrs.name === "barcode") {
             const img = new Image();
             img.src = childNode.attrs.src;
