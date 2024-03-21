@@ -1,4 +1,4 @@
-import { getScaledWidthAndHeight } from "./passePartout.js";
+import { findWidthPassePartout } from "./passePartout.js";
 
 function isValidJson(json) {
     try {
@@ -20,11 +20,29 @@ function degToRad(deg) {
 }
 
 function getCenterPassePartout(template) {
-    const [width, height] = getScaledWidthAndHeight(template);
+    const width = findWidthPassePartout(template);
+    const height = findHeightPassePartout(template);
     return {
         x: template.x() + width / 2,
         y: template.y() + height / 2
     };
 }
 
-export { isValidJson, uuidv4, getCenterPassePartout }
+function convertToSVGPath(commands) {
+    let pathData = '';
+    for (let i = 0; i < commands.length; i++) {
+        const command = commands[i];
+        if (command.command === 'M') {
+            pathData += `M${command.points[0]},${command.points[1]}`;
+        } else if (command.command === 'L') {
+            pathData += `L${command.points[0]},${command.points[1]}`;
+        } else if (command.command === 'C') {
+            pathData += `C${command.points[0]},${command.points[1]},${command.points[2]},${command.points[3]},${command.points[4]},${command.points[5]}`;
+        } else if (command.command === 'z' || command.command === 'Z') {
+            pathData += 'Z';
+        }
+    }
+    return pathData;
+}
+
+export { isValidJson, uuidv4, getCenterPassePartout, convertToSVGPath }

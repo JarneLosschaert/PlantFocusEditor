@@ -94,34 +94,6 @@ function getScaledCommands(pathData) {
     return commands
 }
 
-function getScaledWidthAndHeight(pathData) {
-    const height = stage.height() - MARGIN_HEIGHT;
-    const heightPath = findHeightPassePartout(pathData);
-    const scale = height / heightPath;
-
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-
-    const commands = Konva.Path.parsePathData(pathData);
-    for (let i = 0; i < commands.length; i++) {
-        const command = commands[i];
-        for (let j = 0; j < command.points.length; j += 2) {
-            const x = command.points[j];
-            const y = command.points[j + 1];
-            minX = Math.min(minX, x);
-            minY = Math.min(minY, y);
-            maxX = Math.max(maxX, x);
-            maxY = Math.max(maxY, y);
-            command.points[j] *= scale;
-            command.points[j + 1] *= scale;
-        }
-    }
-
-    const scaledWidth = (maxX - minX) * scale;
-    const scaledHeight = (maxY - minY) * scale;
-
-    return [scaledWidth, scaledHeight];
-}
-
 function findHeightPassePartout(pathData) {
     const commands = Konva.Path.parsePathData(pathData);
     let maxY = 0;
@@ -150,4 +122,4 @@ function findWidthPassePartout(pathData) {
     return maxX;
 }
 
-export { handlePassePartout, createClipFunc, getScaledCommands, getScaledWidthAndHeight };
+export { handlePassePartout, findWidthPassePartout, findHeightPassePartout, createClipFunc, getScaledCommands };

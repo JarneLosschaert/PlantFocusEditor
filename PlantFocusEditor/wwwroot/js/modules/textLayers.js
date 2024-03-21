@@ -1,7 +1,7 @@
 import { tr, currentGroup } from "./constants.js";
 import { stage } from "./state.js";
 import { selectAnimation, addHoverAnimation } from "./animations.js";
-import { getScaledWidthAndHeight } from "./passePartout.js";
+import { findHeightPassePartout, findWidthPassePartout } from "./passePartout.js";
 
 export function createTextLayer(size = 16) {
     const path = currentGroup.children.find(node => node.getClassName() === "Path");
@@ -21,9 +21,8 @@ export function createTextLayer(size = 16) {
         shadowOpacity: 0,
         locked: false
     });
-    const [width, height] = getScaledWidthAndHeight(pathData);
-    text.x(width / 2 - text.width() / 2);
-    text.y(height / 2 - text.height() / 2);
+    text.x(findWidthPassePartout(pathData) / 2 - text.width() / 2);
+    text.y(findHeightPassePartout(pathData) / 2 - text.height() / 2);
     currentGroup.add(text);
     addHoverAnimation(text);
     handleTextEventListeners(text);

@@ -3,7 +3,8 @@ import { handleTextEventListeners } from "./textLayers.js";
 import { handleSelections } from "./selectionHandling.js";
 import { sceneFunc } from "./shapeLayers.js";
 import { addHoverAnimation } from "./animations.js";
-import { createClipFunc, getScaledWidthAndHeight } from "./passePartout.js";
+import { createClipFunc, findHeightPassePartout, findWidthPassePartout, getScaledCommands } from "./passePartout.js";
+import { convertToSVGPath } from "./helpers.js";
 
 const $konvaContainer = document.getElementById("konva-container");
 const initialWidth = $konvaContainer.offsetWidth;
@@ -76,7 +77,7 @@ function switchSides() {
 }
 
 function flip() {
-    const height = getScaledWidthAndHeight(currentGroup.children[0].data())[1];
+    const height = findHeightPassePartout(currentGroup.children[0].data());
     if (currentGroup.offsetY() === 0) {
         currentGroup.offsetY(height);
     } else {
@@ -157,36 +158,39 @@ function loadGroupFromJson(json) {
     let pathData;
     let offsetX;
 
-    node.children.forEach(childNode => {
-        if (childNode.getClassName() === "Path") {
-            pathData = childNode.data();
-            offsetX = stage.width() / 2 - getScaledWidthAndHeight(pathData)[0] / 2;
-        } else if (childNode.attrs.name === "barcode") {
+    node.children.forEach((child, i, arr) => {
+        if (child.getClassName() === "Path") {
+            const commands = getScaledCommands(child.attrs.data);
+            pathData = convertToSVGPath(commands);
+            child.data(pathData);
+            offsetX = stage.width() / 2 - findWidthPassePartout(pathData) / 2;
+        } else if (child.attrs.name === "barcode") {
             const img = new Image();
-            img.src = childNode.attrs.src;
-            childNode.image(img);
-            barcodeImg = childNode;
-            addHoverAnimation(childNode);
-        } else if (childNode.getClassName() === "Image") {
-            const id = childNode.attrs.id;
-            const src = childNode.attrs.src;
+            img.src = child.attrs.src;
+            child.image(img);
+            barcodeImg = child;
+            addHoverAnimation(child);
+        } else if (child.getClassName() === "Image") {
+            const id = child.attrs.id;
+            const src = child.attrs.src;
             const img = new Image();
             img.src = src;
-            childNode.image(img);
+            child.image(img);
             images[id] = src;
             selectedImages.push(id);
-            addHoverAnimation(childNode);
-        } else if (childNode.getClassName() === "Text") {
-            handleTextEventListeners(childNode);
-            addHoverAnimation(childNode);
-        } else if (childNode.getClassName() === "Shape") {
-            childNode.sceneFunc(sceneFunc);
-            addHoverAnimation(childNode);
+            addHoverAnimation(child);
+        } else if (child.getClassName() === "Text") {
+            handleTextEventListeners(child);
+            addHoverAnimation(child);
+        } else if (child.getClassName() === "Shape") {
+            child.sceneFunc(sceneFunc);
+            addHoverAnimation(child);
         }
     });
     node.x(offsetX);
     const clipFuncWithParam = createClipFunc(pathData);
     node.clipFunc(clipFuncWithParam);
+    console.log(node);
     return node;
 }
 
