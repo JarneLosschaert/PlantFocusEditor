@@ -29,8 +29,32 @@
         </div>
         <div>
             <h4>Size</h4>
-            <div>
-                <input type="number" @bind="_fontSize" @oninput="ChangeFontSize" />
+            <div class="size-input">
+                <input type="number" @bind="_fontSize" @oninput="ChangeFontSize"/>
+                <div>
+                    <p>pt</p>
+                    <div class="dropdown">
+                        <button @onclick="ToggleSizePopup">
+                            @if (_isSizePopupVisible)
+                            {
+                                @((MarkupString)CustomIcons.ChevronUp())
+                            }
+                            else
+                            {
+                                @((MarkupString)CustomIcons.ChevronDown())
+                            }
+                        </button>
+                        @if (_isSizePopupVisible)
+                        {
+                            <ul>
+                                @foreach (var size in _sizeList)
+                                {
+                                    <li @onclick="() => _fontSize = int.Parse(size)">@size pt</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
             </div>
         </div>
         <div>
@@ -51,7 +75,12 @@
 
 @code {
     private IJSObjectReference? _module;
+
+    private List<string> _sizeList = new List<string> { "8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72" };
+
     private bool _isPositionPopupVisible = false;
+    private bool _isSizePopupVisible = false;
+
     private string _selectedFont = "Arial";
     private bool _isBold = false;
     private bool _isItalic = false;
@@ -107,6 +136,11 @@
         _isPositionPopupVisible = !_isPositionPopupVisible;
     }
 
+    private void ToggleSizePopup()
+    {
+        _isSizePopupVisible = !_isSizePopupVisible;
+    }
+
     private void ToggleBold()
     {
         _isBold = !_isBold;
@@ -126,7 +160,8 @@
         if (_isUnderline)
         {
             _module.InvokeVoidAsync("handleUnderline", "underline");
-        } else
+        }
+        else
         {
             _module.InvokeVoidAsync("handleUnderline", "normal");
         }
