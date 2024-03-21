@@ -2,7 +2,7 @@
 
 <section class="styling-bar">
     <div class="content-header">
-        <h2>@_selectedNode</h2>
+        <h2>@(_selectedNode == "" ? "Styling bar" : _selectedNode)</h2>
     </div>
     <div class="content">
         @switch (_selectedNode)
