@@ -122,4 +122,4 @@ function findWidthPassePartout(pathData) {
     return maxX;
 }
 
-export { handlePassePartout, createClipFunc, findWidthPassePartout, findHeightPassePartout, getScaledCommands };
+export { handlePassePartout, findWidthPassePartout, findHeightPassePartout, createClipFunc, getScaledCommands };

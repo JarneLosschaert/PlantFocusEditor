@@ -1,7 +1,7 @@
 import { tr, currentGroup } from "./constants.js";
 import { stage } from "./state.js";
 import { selectAnimation, addHoverAnimation } from "./animations.js";
-import { findWidthPassePartout, findHeightPassePartout } from "./passePartout.js";
+import { findHeightPassePartout, findWidthPassePartout } from "./passePartout.js";
 
 export function createTextLayer(size = 16) {
     const path = currentGroup.children.find(node => node.getClassName() === "Path");

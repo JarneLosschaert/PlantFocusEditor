@@ -1,21 +1,4 @@
-import { findWidthPassePartout, findHeightPassePartout } from "./passePartout.js";
-
-function resizePath(stage, path) {
-    let newHeight = stage.height() + 1;
-    let newWidth;
-    let i = 0;
-    const r = findWidthPassePartout(path.data()) / findHeightPassePartout(path.data());
-    while (newHeight > stage.height()) {
-        newWidth = findWidthPassePartout(path.data()) - i;
-        newHeight = newWidth / r;
-        path.width(newWidth);
-        path.height(newHeight);
-        i++
-    }
-    const diffWidth = findWidthPassePartout(path.data()) - path.width();
-    const diffHeight = findHeightPassePartout(path.data()) - path.height();
-    return [diffWidth, diffHeight];
-}
+import { findWidthPassePartout } from "./passePartout.js";
 
 function isValidJson(json) {
     try {
@@ -37,10 +20,29 @@ function degToRad(deg) {
 }
 
 function getCenterPassePartout(template) {
+    const width = findWidthPassePartout(template);
+    const height = findHeightPassePartout(template);
     return {
-        x: template.x() + findWidthPassePartout(template) / 2,
-        y: template.y() + findHeightPassePartout(template) / 2
+        x: template.x() + width / 2,
+        y: template.y() + height / 2
     };
 }
 
-export { isValidJson, uuidv4, getCenterPassePartout }
+function convertToSVGPath(commands) {
+    let pathData = '';
+    for (let i = 0; i < commands.length; i++) {
+        const command = commands[i];
+        if (command.command === 'M') {
+            pathData += `M${command.points[0]},${command.points[1]}`;
+        } else if (command.command === 'L') {
+            pathData += `L${command.points[0]},${command.points[1]}`;
+        } else if (command.command === 'C') {
+            pathData += `C${command.points[0]},${command.points[1]},${command.points[2]},${command.points[3]},${command.points[4]},${command.points[5]}`;
+        } else if (command.command === 'z' || command.command === 'Z') {
+            pathData += 'Z';
+        }
+    }
+    return pathData;
+}
+
+export { isValidJson, uuidv4, getCenterPassePartout, convertToSVGPath }

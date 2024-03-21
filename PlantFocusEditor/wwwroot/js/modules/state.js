@@ -3,7 +3,8 @@ import { handleTextEventListeners } from "./textLayers.js";
 import { handleSelections } from "./selectionHandling.js";
 import { sceneFunc } from "./shapeLayers.js";
 import { addHoverAnimation } from "./animations.js";
-import { createClipFunc, findHeightPassePartout, findWidthPassePartout } from "./passePartout.js";
+import { createClipFunc, findHeightPassePartout, findWidthPassePartout, getScaledCommands } from "./passePartout.js";
+import { convertToSVGPath } from "./helpers.js";
 
 const $konvaContainer = document.getElementById("konva-container");
 const initialWidth = $konvaContainer.offsetWidth;
@@ -156,37 +157,50 @@ function loadGroupFromJson(json) {
     const node = Konva.Node.create(json.Group);
     let pathData;
     let offsetX;
+    let scale;
 
-    node.children.forEach(childNode => {
-        if (childNode.getClassName() === "Path") {
-            pathData = childNode.attrs.data;
+    node.children.forEach(child => {
+        if (child.getClassName() === "Path") {
+            scale = stage.height() / findHeightPassePartout(child.data());
+            const commands = getScaledCommands(child.data());
+            pathData = convertToSVGPath(commands);
+            child.data(pathData);
+            
             offsetX = stage.width() / 2 - findWidthPassePartout(pathData) / 2;
-        } else if (childNode.attrs.name === "barcode") {
+        } else if (child.attrs.name === "barcode") {
             const img = new Image();
-            img.src = childNode.attrs.src;
-            childNode.image(img);
-            barcodeImg = childNode;
-            addHoverAnimation(childNode);
-        } else if (childNode.getClassName() === "Image") {
-            const id = childNode.attrs.id;
-            const src = childNode.attrs.src;
+            img.src = child.attrs.src;
+            child.image(img);
+            barcodeImg = child;
+            addHoverAnimation(child);
+        } else if (child.getClassName() === "Image") {
+            const id = child.attrs.id;
+            const src = child.attrs.src;
             const img = new Image();
             img.src = src;
-            childNode.image(img);
+            child.image(img);
             images[id] = src;
             selectedImages.push(id);
-            addHoverAnimation(childNode);
-        } else if (childNode.getClassName() === "Text") {
-            handleTextEventListeners(childNode);
-            addHoverAnimation(childNode);
-        } else if (childNode.getClassName() === "Shape") {
-            childNode.sceneFunc(sceneFunc);
-            addHoverAnimation(childNode);
+            addHoverAnimation(child);
+        } else if (child.getClassName() === "Text") {
+            handleTextEventListeners(child);
+            addHoverAnimation(child);
+        } else if (child.getClassName() === "Shape") {
+            child.sceneFunc(sceneFunc);
+            addHoverAnimation(child);
         }
     });
+    node.children.forEach(child => {
+        if (child.getClassName() !== "Path") {
+            child.scale({ x: scale, y: scale });
+            child.x(child.x() * scale);
+            child.y(child.y() * scale);
+        }
+    })
     node.x(offsetX);
     const clipFuncWithParam = createClipFunc(pathData);
     node.clipFunc(clipFuncWithParam);
+    console.log(node);
     return node;
 }
 
