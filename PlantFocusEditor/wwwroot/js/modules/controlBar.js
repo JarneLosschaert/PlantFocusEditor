@@ -13,7 +13,7 @@ function deleteNodes() {
     selectedNodes.forEach(node => {
         if (node.attrs.name === "barcode") {
             removeBarcode();
-        } else if (node.getClassName() === "Image") {
+        } else if (node.getClassName() === "Image" && node.attrs.name !== "qrcode") {
             removedImages.push(node);
             node.remove();
         } else {
@@ -49,6 +49,9 @@ function changePosition(forward, full) {
 function cloneNode() {
     const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
+        if (node.attrs.name === "barcode" || node.attrs.name === "qrcode") {
+            return;
+        }
         if (node.getClassName() === "Image") {
             const newId = uuidv4();
             const clone = node.clone({
