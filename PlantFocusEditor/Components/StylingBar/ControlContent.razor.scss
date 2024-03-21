@@ -2,17 +2,15 @@
 @import "../../wwwroot/css/config.scss";
 
 button {
-    color: $text-lighter;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     height: 100%;
     padding: 0.5rem;
-    background: $btn-dark;
+    background: $neutral;
     border: 1px solid $neutral-dark;
     border-radius: $border-radius-s;
-    box-shadow: $shadow-s;
     cursor: pointer;
 
     ::deep svg {
@@ -21,20 +19,28 @@ button {
     }
 
     &:hover {
+        background: $neutral-dark;
         color: $text;
+
+        ::deep svg {
+            color: $text;
+        }
     }
 
     &.selected {
-        background: $neutral;
         color: $text;
         border: 1px solid $primary;
+
+        ::deep svg {
+            color: $text;
+        }
     }
 }
 
 .control-content {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 0.75rem;
 
     h3 {
         font-size: 1.1rem;
@@ -67,7 +73,6 @@ button {
                 justify-content: center;
                 background: $neutral;
                 border-radius: $border-radius-s;
-                box-shadow: $shadow-s;
 
                 ul {
                     display: flex;
@@ -86,14 +91,6 @@ button {
                         }
                     }
                 }
-            }
-        }
-
-        button {
-            color: $text;
-
-            &:hover {
-                background: $neutral;
             }
         }
     }

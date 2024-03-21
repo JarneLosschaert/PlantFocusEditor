@@ -34,7 +34,7 @@
                 <div>
                     <p>pt</p>
                     <div class="dropdown">
-                        <button @onclick="ToggleSizePopup">
+                        <button @onclick="ToggleSizePopup" class="@(_isSizePopupVisible ? "selected" : "")">
                             @if (_isSizePopupVisible)
                             {
                                 @((MarkupString)CustomIcons.ChevronUp())

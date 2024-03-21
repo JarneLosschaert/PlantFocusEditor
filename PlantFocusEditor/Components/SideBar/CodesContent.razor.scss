@@ -47,7 +47,6 @@ button {
         }
 
         button {
-            margin-left: 0.5rem;
             color: $text;
 
             &:hover {
@@ -59,7 +58,6 @@ button {
             color: $text;
             font-size: 1rem;
             padding: 0.5rem 0.75rem;
-            margin-left: 0.5rem;
             border: 1px solid $neutral-dark;
             border-radius: $border-radius-s;
             transition: $transition;

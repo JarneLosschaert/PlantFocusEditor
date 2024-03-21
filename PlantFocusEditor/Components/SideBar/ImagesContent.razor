@@ -2,7 +2,11 @@
 
 <article class="images-content">
     <div class="input-file-container">
-        <InputFile id="change-image-image" class="input-file" OnChange="OnInputFileChange"></InputFile>
+        <label for="add-image">
+            <span>Choose your own image here</span>
+            <span>Supports: PNG & JPG</span>
+        </label>
+        <InputFile id="add-image" OnChange="OnInputFileChange"></InputFile>
     </div>
     <di class="images-container">
         @if (_images.Count > 0)

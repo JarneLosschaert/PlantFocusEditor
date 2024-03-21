@@ -2,21 +2,24 @@
 @import "../../wwwroot/css/config.scss";
 
 .templates-content {
-
     ul {
         display: flex;
-        justify-content: center;
         flex-wrap: wrap;
         gap: 1rem;
 
         li {
             width: 8rem;
-            background: $btn-dark;
+            background: $neutral;
+            border: 1px solid $neutral-dark;
             border-radius: $border-radius;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+
+            &:hover {
+                background: $neutral-dark;
+            }
 
             img {
                 width: 60%;

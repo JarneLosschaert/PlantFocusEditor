@@ -10,40 +10,36 @@
 .text-content .texts {
   display: flex;
   flex-direction: column;
-  margin-left: 1rem;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 .text-content .texts button {
   display: flex;
   align-items: center;
-  background: linear-gradient(180deg, hsla(0deg, 0%, 100%, 0.08), hsla(0deg, 0%, 0%, 0.08)), hsla(0deg, 0%, 60%, 0.16);
-  box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 5px, rgba(0, 0, 0, 0.06) 0px 1px 3px;
+  justify-content: space-between;
+  background: #f0f0f0;
   border: 1px solid #dbd9d9;
   border-radius: 6px;
-  gap: 0.5rem;
-  border: none;
   transition: all 0.2s ease-in-out;
 }
 .text-content .texts button ::deep svg {
   height: 1.25rem;
   width: 1.25rem;
-  transition: all 0.2s ease-in-out;
 }
 .text-content .texts button:hover {
-  background: #f0f0f0;
+  background: #dbd9d9;
 }
 .text-content .texts .text-header {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 600;
   padding: 1.25rem 0.75rem;
 }
 .text-content .texts .text-subheader {
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  padding: 0.75rem 0.75rem;
+  padding: 1rem 0.75rem;
 }
 .text-content .texts .text-paragraph {
   font-size: 1rem;
   font-weight: 400;
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem 0.75rem;
 }
