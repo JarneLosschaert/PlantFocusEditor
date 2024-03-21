@@ -157,12 +157,15 @@ function loadGroupFromJson(json) {
     const node = Konva.Node.create(json.Group);
     let pathData;
     let offsetX;
+    let scale;
 
-    node.children.forEach((child, i, arr) => {
+    node.children.forEach(child => {
         if (child.getClassName() === "Path") {
-            const commands = getScaledCommands(child.attrs.data);
+            scale = stage.height() / findHeightPassePartout(child.data());
+            const commands = getScaledCommands(child.data());
             pathData = convertToSVGPath(commands);
             child.data(pathData);
+            
             offsetX = stage.width() / 2 - findWidthPassePartout(pathData) / 2;
         } else if (child.attrs.name === "barcode") {
             const img = new Image();
@@ -187,6 +190,13 @@ function loadGroupFromJson(json) {
             addHoverAnimation(child);
         }
     });
+    node.children.forEach(child => {
+        if (child.getClassName() !== "Path") {
+            child.scale({ x: scale, y: scale });
+            child.x(child.x() * scale);
+            child.y(child.y() * scale);
+        }
+    })
     node.x(offsetX);
     const clipFuncWithParam = createClipFunc(pathData);
     node.clipFunc(clipFuncWithParam);
