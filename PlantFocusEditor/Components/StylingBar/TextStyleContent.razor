@@ -74,7 +74,8 @@
 </article>
 
 @code {
-    private IJSObjectReference? _module;
+    [Parameter]
+    public IJSObjectReference? Module { get; set; }
 
     private List<string> _sizeList = new List<string> { "8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72" };
 
@@ -89,12 +90,11 @@
     private string _align = "left";
     private string _fontColor = "#000000";
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnParametersSetAsync()
     {
-        if (firstRender)
+        if (Module != null)
         {
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textStylingBar.js");
-            Dictionary<string, JsonElement> values = await _module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
+            Dictionary<string, JsonElement> values = await Module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
             _selectedFont = values["font"].GetString() ?? "Arial";
             string? fontStyle = values["fontStyle"].GetString();
             string? textDecoration = values["textDecoration"].GetString();
@@ -111,7 +111,7 @@
             _fontColor = values["color"].GetString() == "black" ? "#000000" : values["color"].GetString() ?? "#000000";
             _fontSize = values["fontSize"].GetInt16();
             StateHasChanged();
-        }
+        }        
     }
 
     private string GetFontStyle()
@@ -144,14 +144,14 @@
     private void ToggleBold()
     {
         _isBold = !_isBold;
-        _module.InvokeVoidAsync("handleBoldItalic", GetFontStyle());
+        Module?.InvokeVoidAsync("handleBoldItalic", GetFontStyle());
 
     }
 
     private void ToggleItalic()
     {
         _isItalic = !_isItalic;
-        _module.InvokeVoidAsync("handleBoldItalic", GetFontStyle());
+        Module?.InvokeVoidAsync("handleBoldItalic", GetFontStyle());
     }
 
     private void ToggleUnderline()
@@ -159,36 +159,36 @@
         _isUnderline = !_isUnderline;
         if (_isUnderline)
         {
-            _module.InvokeVoidAsync("handleUnderline", "underline");
+            Module?.InvokeVoidAsync("handleUnderline", "underline");
         }
         else
         {
-            _module.InvokeVoidAsync("handleUnderline", "normal");
+            Module?.InvokeVoidAsync("handleUnderline", "normal");
         }
     }
 
     private void ChangeColor(string color)
     {
         _fontColor = color;
-        _module.InvokeVoidAsync("handleFontColorChange", color);
+        Module?.InvokeVoidAsync("handleFontColorChange", color);
     }
 
     private void SetAlignLeft()
     {
         _align = "left";
-        _module.InvokeVoidAsync("handleAlignmentChange", "left");
+        Module?.InvokeVoidAsync("handleAlignmentChange", "left");
     }
 
     private void SetAlignCenter()
     {
         _align = "center";
-        _module.InvokeVoidAsync("handleAlignmentChange", "center");
+        Module?.InvokeVoidAsync("handleAlignmentChange", "center");
     }
 
     private void SetAlignRight()
     {
         _align = "right";
-        _module.InvokeVoidAsync("handleAlignmentChange", "right");
+        Module?.InvokeVoidAsync("handleAlignmentChange", "right");
     }
 
     private void ChangeFontSize(ChangeEventArgs e)
@@ -196,12 +196,12 @@
         if (int.TryParse(e.Value.ToString(), out int newFontSize))
         {
             _fontSize = newFontSize;
-            _module.InvokeVoidAsync("handleFontSizeChange", newFontSize);
+            Module?.InvokeVoidAsync("handleFontSizeChange", newFontSize);
         }
     }
 
-    private async Task ChangeFont(ChangeEventArgs e)
+    private void ChangeFont(ChangeEventArgs e)
     {
-        await _module.InvokeVoidAsync("handleFontSelect", e.Value.ToString());
+        Module?.InvokeVoidAsync("handleFontSelect", e.Value.ToString());
     }
 }

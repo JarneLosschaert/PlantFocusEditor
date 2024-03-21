@@ -8,12 +8,12 @@
         @switch (_selectedNode)
         {
             case "Text":
-                <TextStyleContent />
+                <TextStyleContent Module="_textModule"/>
                 <AppearanceContent Module="_module"/>
                 <ControlContent Module="_controlBarModule" />
                 break;
             case "Image":
-                <ImageStyleContent />
+                <ImageStyleContent Module="_imageModule"/>
                 <AppearanceContent Module="_module" />
                 <BorderContent Module="_module" />
                 <ControlContent Module="_controlBarModule" />
@@ -39,6 +39,8 @@
     private bool selecting = true;
     private string _selectedNode = "";
     private IJSObjectReference? _module;
+    private IJSObjectReference? _textModule;
+    private IJSObjectReference? _imageModule;
     private IJSObjectReference? _controlBarModule;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -46,6 +48,8 @@
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/stylingBar.js");
+            _textModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textStylingBar.js");
+            _imageModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
             _controlBarModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/controlBar.js");
         }
     }

@@ -57,7 +57,7 @@
 
     private async void SelectTemplate(int id)
     {
-        Template template = _templates.Find(el => el.ID == id);
+        Template? template = _templates?.Find(el => el.ID == id);
         if (_moduleState is not null && template is not null)
         {
             await _moduleState.InvokeVoidAsync("loadStateFromTemplate", template.JsonToRender);

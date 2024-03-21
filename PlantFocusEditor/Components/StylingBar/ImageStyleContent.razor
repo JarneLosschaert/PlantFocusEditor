@@ -19,15 +19,15 @@
 </article>
 
 @code {
-    private IJSObjectReference? _module;
+    [Parameter]
+    public IJSObjectReference? Module { get; set; }
     private string _currentImageSrc = "../../sample-data/flower.jpg";
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnParametersSetAsync()
     {
-        if (firstRender)
+        if (Module != null)
         {
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
-            _currentImageSrc = await _module.InvokeAsync<string>("getSource");
+            _currentImageSrc = await Module.InvokeAsync<string>("getSource");
             StateHasChanged();
         }
     }
@@ -42,9 +42,9 @@
             var imageBytes = memoryStream.ToArray();
 
             _currentImageSrc = $"data:{selectedImage.ContentType};base64,{Convert.ToBase64String(imageBytes)}";
-            if (_module != null)
+            if (Module != null)
             {
-                await _module.InvokeVoidAsync("changeImage", _currentImageSrc);
+                await Module.InvokeVoidAsync("changeImage", _currentImageSrc);
             }
         }
         else
