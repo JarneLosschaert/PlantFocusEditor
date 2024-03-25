@@ -1,6 +1,5 @@
 import { addHoverAnimation } from "../animations.js";
 import { currentGroup } from "../constants.js";
-import { incomingAnimation } from "../animations.js";
 
 function addImage(id, src) {
     const img = new Image();
@@ -22,7 +21,6 @@ function addImage(id, src) {
         locked: false
     });
     currentGroup.add(kimg);
-    incomingAnimation(kimg);
     addHoverAnimation(kimg);
 }
 
