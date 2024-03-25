@@ -144,6 +144,7 @@ function loadStateFromTemplate(json) {
 function loadGroupFromJson(json) {
     const node = Konva.Node.create(json.Group);
     node.attrs.name = "passepartout";
+
     let pathData;
     let offsetX;
     let scale;
@@ -187,7 +188,7 @@ function loadGroupFromJson(json) {
     const clipFuncWithParam = createClipFunc(pathData);
     node.clipFunc(clipFuncWithParam);
     node.on("click tap", () => tr.nodes([]));
-    console.log(node); 
+    console.log(node);
     return node;
 }
 

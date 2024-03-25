@@ -1,14 +1,15 @@
-import { tr, selectionRectangle, hoverTr, currentGroup } from "./constants.js";
-import { removeBarcode } from "./barcodeLayer.js";
-import { addHoverAnimation } from "./animations.js";
-import { uuidv4 } from "./helpers.js";
-import { removedImages } from "./imageLayers.js";
+import { tr, selectionRectangle, hoverTr, currentGroup } from "../constants.js";
+import { removeBarcode } from "../barcodeLayer.js";
+import { addHoverAnimation } from "../animations.js";
+import { uuidv4 } from "../helpers.js";
+import { removedImages } from "../imageLayers.js";
 
 let imagesReference = null;
 
 const setReference = (ref) => imagesReference = ref;
 
 function deleteNodes() {
+    // remove it all
     const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
         if (node.attrs.name === "barcode") {
@@ -49,10 +50,9 @@ function changePosition(forward, full) {
 function cloneNode() {
     const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
-        if (node.attrs.name === "barcode" || node.attrs.name === "qrcode") {
-            return;
-        }
         if (node.getClassName() === "Image") {
+
+            // use add image
             const newId = uuidv4();
             const clone = node.clone({
                 x: node.x() + 10,
@@ -81,7 +81,7 @@ function cloneNode() {
 
 
 function lockNode() {
-    const selectedNodes = tr.nodes();    
+    const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
         node.attrs.locked = !node.attrs.locked;
         node.draggable(!node.draggable());
@@ -91,9 +91,12 @@ function lockNode() {
     tr.resizeEnabled(!locked);
 }
 
-function getIsLocked() {
+function getValues() {
     const selectedNodes = tr.nodes();
-    return selectedNodes.every(node => node.attrs.locked);
+    return {
+        locked: selectedNodes.every(node => node.attrs.locked)
+    };
+
 }
 
-export { deleteNodes, changePosition, cloneNode, lockNode, getIsLocked, setReference };
+export { deleteNodes, changePosition, cloneNode, lockNode, getValues, setReference };
