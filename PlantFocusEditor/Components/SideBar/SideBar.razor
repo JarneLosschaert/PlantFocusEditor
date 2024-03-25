@@ -1,4 +1,6 @@
-﻿<div class="side-bar">
+﻿@inject IJSRuntime JS
+
+<div class="side-bar">
     <ul>
         <li @onclick="() => SelectTabAsync(SideBarTabs.Templates)" class="@GetSelectedClass(SideBarTabs.Templates)">
             @((MarkupString)CustomIcons.Templates())
@@ -25,12 +27,14 @@
             Properties
         </li>
     </ul>
+    <button @onclick="Save">Save to pdf</button>
 </div>
 
 @code {
     [CascadingParameter]
     public LabelEditor LabelEditor { get; set; }
-
+    [Parameter]
+    public IJSObjectReference? Module { get; set; }
     [Parameter]
     public EventCallback<SideBarTabs> SelectTab { get; set; }
 
@@ -42,5 +46,11 @@
     private string GetSelectedClass(SideBarTabs tab)
     {
         return LabelEditor._SelectedTab == tab ? "selected" : "";
+    }
+
+    private void Save()
+    {
+        Console.WriteLine("save");
+        Module?.InvokeVoidAsync("saveToPdfFromJson");
     }
 }

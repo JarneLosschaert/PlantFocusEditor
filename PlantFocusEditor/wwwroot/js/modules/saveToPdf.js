@@ -1,6 +1,6 @@
-import { stage } from "./state.js";
+import { stage, layer } from "./state.js";
 import { getScaledCommands } from "./passePartout.js";
-import { front } from "./constants.js";
+import { front, back } from "./constants.js";
 import {arialRegular} from '../fonts/arial-normal.js';
 import { arialBold } from "../fonts/arial-bold.js";
 import { arialItalic } from "../fonts/arial-italic.js";
@@ -21,6 +21,10 @@ import { comicSansMsRegular } from "../fonts/comic-sans-ms-normal.js";
 import { comicSansMsBold } from "../fonts/comic-sans-ms-bold.js";
 import { comicSansMsItalic } from "../fonts/comic-sans-ms-italic.js";
 import { comicSansMsBoldItalic } from "../fonts/comic-sans-ms-bold-italic.js";
+import { georgia } from "../fonts/georgia-normal.js";
+import { georgiaBold } from "../fonts/georgia-bold.js";
+import { georgiaItalic } from "../fonts/georgia-italic.js";
+import { georgiaBoldItalic } from "../fonts/georgia-bold-italic.js";
 
 //const minWidth = 1200;
 //const minHeight = 900;
@@ -43,24 +47,26 @@ import { comicSansMsBoldItalic } from "../fonts/comic-sans-ms-bold-italic.js";
 }*/
 
 async function saveToPdfFromJson() {
+    console.log("save to pdf from json");
     const doc = new window.jspdf.jsPDF({
         orientation: 'p',
         unit: 'px',
-        format: [stage.width(), stage.height()],
+        format: [layer.width(), layer.height()],
         hotfixes: ['px_scaling']
     });
     addFonts(doc);
-    convertLayerToPdf(doc);
-    //doc.addPage([stage.width(), stage.height()], 'p');
-    //convertLayerToPdf(doc);
+    convertLayerToPdf(doc, front);
+    console.log("layer converted");
+    doc.addPage([stage.width(), stage.height()], 'p');
+    convertLayerToPdf(doc, back);
     doc.save('doc.pdf');
 }
 
-function convertLayerToPdf(doc) {
-    console.log(front);
-    for (let child of front.children) {
-        const groupX = front.x();
-        const groupY = front.y();
+function convertLayerToPdf(doc, group) {
+    console.log(group);
+    const groupX = group.x();
+    const groupY = group.y();
+    for (let child of group.children) {
         if (child.getClassName() === "Path") {
             const lines = [];
             const pathData = child.data();
@@ -84,7 +90,6 @@ function convertLayerToPdf(doc) {
                         break;
                 }
             };
-            console.log(lines);
             lines.forEach((segment, i, arr) => {
                 const newCoords = segment.c.map((coord, i) => {
                     if (i % 2 === 0) {
@@ -95,8 +100,8 @@ function convertLayerToPdf(doc) {
                 });
                 arr[i] = { op: segment.op, c: newCoords };
             });
-            console.log(lines);
             doc.path(lines);
+            doc.clip(lines);
             doc.setDrawColor('#000000');
             doc.stroke();
         }
@@ -135,63 +140,78 @@ function convertLayerToPdf(doc) {
                 doc.addImage(...attrs);
             }
         } else if (child.getClassName() === 'Text') {
-            const width = child.attrs.width;
-            const padding = child.attrs.padding;
+            const width = child.width() * (child.scaleX() ?? 1);
+            const padding = child.attrs.padding * (child.scaleX() ?? 1);
             const fontFamily = child.attrs.fontFamily;
-            const fontSize = child.attrs.fontSize;
+            const fontSize = child.attrs.fontSize * (child.scaleX() ?? 1);
             const fontStyle = child.attrs.fontStyle;
             const align = child.attrs.align;
             const fontSizePoints = fontSize * 0.75;
-            const txt = child.attrs.text;
-            let txtWidth;
-            doc.setLineWidth(2);
-            if (fontStyle && fontFamily) {
-                doc.setFont(fontFamily, fontStyle);
-                txtWidth = getTextDimensions(txt, fontStyle, fontSize, fontFamily);
-            } else if (fontFamily) {
-                doc.setFont(fontFamily, 'normal');
-                txtWidth = getTextDimensions(txt, '', fontSize, fontFamily);
-            } else if (fontStyle) {
-                doc.setFont('Arial', fontStyle);
-                txtWidth = getTextDimensions(txt, fontStyle, fontSize, 'Arial');
-            } else {
-                doc.setFont('Arial', 'normal');
-                txtWidth = getTextDimensions(txt, '', fontSize, 'Arial');
-            }
+            const text = splitText(child);
             doc.setFontSize(fontSizePoints);
-            let textX;
-            const textY = y + fontSizePoints + padding;
-            const textLineY = y + fontSize + padding;
-            if (align === "center") {
-                textX = x + (width / 2) - (txtWidth / 2);
-            } else if (align === "right") {
-                textX = x + width - txtWidth - padding;
-            } else {
-                textX = x + padding;
-            }
-            addText(doc, child, textX, textY, textLineY, txt, txtWidth, shadowOpacity);
+            doc.setLineWidth(2);
+            const stepY = y + fontSizePoints + padding;
+            const stepLineY = y + fontSize + padding;
+            text.forEach((txt, i) => {
+                let txtWidth;
+                if (fontStyle && fontFamily) {
+                    doc.setFont(fontFamily, fontStyle);
+                    txtWidth = getTextDimensions(txt, fontStyle, fontSize, fontFamily);
+                } else if (fontFamily) {
+                    doc.setFont(fontFamily, 'normal');
+                    txtWidth = getTextDimensions(txt, '', fontSize, fontFamily);
+                } else if (fontStyle) {
+                    doc.setFont('Arial', fontStyle);
+                    txtWidth = getTextDimensions(txt, fontStyle, fontSize, 'Arial');
+                } else {
+                    doc.setFont('Arial', 'normal');
+                    txtWidth = getTextDimensions(txt, '', fontSize, 'Arial');
+                }
+                
+                let textX;
+                const textY = stepY + (i * stepY);
+                const textLineY = stepLineY + (i * stepLineY);
+                if (align === "center") {
+                    textX = x + (width / 2) - (txtWidth / 2);
+                } else if (align === "right") {
+                    textX = x + width - txtWidth - padding;
+                } else {
+                    textX = x + padding;
+                }
+                console.log("adding text");
+                addText(doc, child, textX, textY, textLineY, txt, txtWidth, shadowOpacity);
+                console.log("text added");
+            });
             doc.restoreGraphicsState();
         } else if (child.getClassName() === 'Ellipse') {
-            const radiusX = child.radiusX();
-            const radiusY = child.radiusY();
+            const radiusX = child.radiusX() * (child.scaleX() ?? 1);
+            const radiusY = child.radiusY() * (child.scaleX() ?? 1);
             if (shadowOpacity !== 0) {
                 blurShadow(doc, child);
             }
             doc.setLineWidth(strokeWidth);
             doc.setDrawColor(stroke);
             setFillColor(doc, child);
-            doc.ellipse(x, y, radiusX, radiusY, 'FD');
+            if (strokeWidth === 0) {
+                doc.ellipse(x, y, radiusX, radiusY, 'F');
+            } else {
+                doc.ellipse(x, y, radiusX, radiusY, 'FD');
+            }
             doc.restoreGraphicsState();
         } else if (child.className === 'Rect') {
-            const width = child.attrs.width;
-            const height = child.attrs.height;
+            const width = child.attrs.width * (child.scaleX() ?? 1);
+            const height = child.attrs.height * (child.scaleX() ?? 1);
             if (shadowOpacity !== 0) {
                 blurShadow(doc, child);
             }
             doc.setLineWidth(strokeWidth);
             doc.setDrawColor(stroke);
             setFillColor(doc, child);
-            doc.rect(x, y, width, height, 'FD');
+            if (strokeWidth === 0) {
+                doc.rect(x, y, width, height, 'F');
+            } else {
+                doc.rect(x, y, width, height, 'FD');
+            }            
             doc.restoreGraphicsState();
         } else if (child.getClassName() === 'Shape') {
             const x1 = child.attrs.x1;
@@ -214,7 +234,11 @@ function convertLayerToPdf(doc) {
             doc.setLineWidth(strokeWidth);
             doc.setDrawColor(stroke);
             setFillColor(doc, child);
-            doc.triangle(absX1, absY1, absX2, absY2, absX3, absY3, 'FD');
+            if (strokeWidth === 0) {
+                doc.triangle(absX1, absY1, absX2, absY2, absX3, absY3, 'F')
+            } else {
+                doc.triangle(absX1, absY1, absX2, absY2, absX3, absY3, 'FD');
+            }
             doc.restoreGraphicsState();
         }
     }
@@ -226,9 +250,39 @@ function addText(doc, child, x, y, textLineY, txt, txtWidth, shadowOpacity) {
     }
     setFillColor(doc, child);
     if (child.attrs.textDecoration === "underline") {
+        doc.setDrawColor(child.attrs.fill);
         doc.line(x, textLineY, x + txtWidth, textLineY);
+        doc.setDrawColor("#000");
     }
     doc.text(txt, x, y);
+}
+
+function splitText(text, txtWidth) {
+    if (txtWidth < text.width()) {
+        return [text.text()];
+    }
+    const words = text.text().split(' ');
+    const font = text.fontFamily() === undefined ? 'Arial' : text.fontFamily();
+    const fontStyle = text.fontStyle() === undefined ? 'normal' : text.fontStyle();
+    const lines = [];
+    let currentLine = '';
+
+    for (const word of words) {
+        const tempLine = currentLine ? currentLine + ' ' + word : word;
+        const tempWidth = getTextDimensions(tempLine, fontStyle, text.fontSize() * (text.scaleX() ?? 1), font ?? 'Arial');
+        if (tempWidth <= text.width()) {
+            currentLine = tempLine;
+        } else {
+            lines.push(currentLine);
+            currentLine = word;
+        }
+    }
+
+    if (currentLine) {
+        lines.push(currentLine);
+    }
+    console.log(lines);
+    return lines;
 }
 
 function getTextDimensions(text, fontStyle, fontSizePx, font) {
@@ -330,6 +384,14 @@ function addFonts(doc) {
     doc.addFont('comic-sans-ms-italic.ttf', 'Comic Sans MS', 'italic');
     doc.addFileToVFS('comic-sans-ms-bold-italic.ttf', comicSansMsBoldItalic);
     doc.addFont('comic-sans-ms-bold-italic.ttf', 'Comic Sans MS', 'bold italic');
+    doc.addFileToVFS('georgia.ttf', georgia);
+    doc.addFont('georgia.ttf', 'Georgia', 'normal');
+    doc.addFileToVFS('georgia-bold.ttf', georgiaBold);
+    doc.addFont('georgia-bold.ttf', 'Georgia', 'bold');
+    doc.addFileToVFS('georgia-italic.ttf', georgiaItalic);
+    doc.addFont('georgia-italic.ttf', 'Georgia', 'italic');
+    doc.addFileToVFS('georgia-bold-italic.ttf', georgiaBoldItalic);
+    doc.addFont('georgia-bold-italic.ttf', 'Georgia', 'bold italic');
 }
 
 /*function saveLayer(doc, clone, layerToAdd, layerToRemove) {
@@ -392,4 +454,4 @@ function calcCoordinates(node) {
     return [X, Y];
 }
 
-export { saveToPdfFromJson };
+export { saveToPdfFromJson }
