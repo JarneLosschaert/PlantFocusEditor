@@ -35,8 +35,8 @@
   gap: 1rem;
 }
 .images-content .images-container ul li {
-  width: 8rem;
-  height: 8rem;
+  width: 8.5rem;
+  height: 8.5rem;
   cursor: pointer;
   display: flex;
   align-items: center;
