@@ -40,21 +40,29 @@
                 width: 70%;
 
                 label {
-                    width: 100%;
-                    color: $text;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     gap: 0.5rem;
+                    width: 100%;
                     padding: 0.5rem;
-                    background: $btn-dark;
+                    background: $neutral;
                     border: 1px solid $neutral-dark;
                     border-radius: $border-radius-s;
-                    box-shadow: $shadow-s;
                     cursor: pointer;
 
+                    ::deep svg {
+                        width: 1rem;
+                        height: 1rem;
+                    }
+
                     &:hover {
-                        background: $neutral;
+                        background: $neutral-dark;
+                        color: $text;
+
+                        ::deep svg {
+                            color: $text;
+                        }
                     }
                 }
             }

@@ -10,13 +10,13 @@
             @if (_shapesSelected)
             {
                 <li>
-                    <img src="../../images/rectangle.png" alt="shape" @onclick="AddRectangle"/>
+                    <img src="../../images/rectangle.png" alt="shape" @onclick="AddRectangle" />
                 </li>
                 <li>
-                    <img src="../../images/circle.png" alt="shape" @onclick="AddCircle"/>
+                    <img src="../../images/circle.png" alt="shape" @onclick="AddCircle" />
                 </li>
                 <li>
-                    <img src="../../images/triangle.png" alt="shape" @onclick="AddTriangle"/>
+                    <img src="../../images/triangle.png" alt="shape" @onclick="AddTriangle" />
                 </li>
             }
             else
@@ -40,22 +40,22 @@
     {
         if (firstRender)
         {
-            //_module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/shapeLayers.js");
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/layers/elementLayer.js");
         }
     }
 
     private void AddRectangle()
     {
-        // _module?.InvokeVoidAsync("addRectangle");
+        _module?.InvokeVoidAsync("addRectangle");
     }
 
     private void AddCircle()
     {
-        //_module?.InvokeVoidAsync("addCircle");
+        _module?.InvokeVoidAsync("addCircle");
     }
 
     private void AddTriangle()
     {
-        // _module?.InvokeVoidAsync("addTriangle");
+        _module?.InvokeVoidAsync("addTriangle");
     }
 }

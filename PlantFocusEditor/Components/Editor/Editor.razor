@@ -1,13 +1,32 @@
-﻿<section class="editor">
-    <EditorBar />
-    <div id="konva-container" @onclick="OnKonvaClicked">
+﻿@inject IJSRuntime JS;
 
-    </div>
+<section class="editor">
+    <EditorBar />
+    <div id="konva-container" @onclick="OnKonvaClicked"></div>
+    <button @onclick="Save">Save to pdf</button>
 </section>
 
 @code {
     [Parameter]
     public Action KonvaClicked { get; set; }
+
+    private IJSObjectReference? _module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/saveToPdf.js");
+        }
+    }
+
+    private void Save()
+    {
+        if (_module != null)
+        {
+            _module.InvokeVoidAsync("saveToPdfFromJson");
+        }
+    }
 
     private void OnKonvaClicked()
     {
