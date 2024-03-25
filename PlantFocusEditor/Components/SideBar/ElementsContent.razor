@@ -10,13 +10,13 @@
             @if (_shapesSelected)
             {
                 <li>
-                    <img src="../../images/rectangle.png" alt="shape" />
+                    <img src="../../images/rectangle.png" alt="shape" @onclick="AddRectangle"/>
                 </li>
                 <li>
-                    <img src="../../images/circle.png" alt="shape"/>
+                    <img src="../../images/circle.png" alt="shape" @onclick="AddCircle"/>
                 </li>
                 <li>
-                    <img src="../../images/triangle.png" alt="shape"/>
+                    <img src="../../images/triangle.png" alt="shape" @onclick="AddTriangle"/>
                 </li>
             }
             else
@@ -33,7 +33,29 @@
 </article>
 
 @code {
+    private IJSObjectReference? _module;
     private bool _shapesSelected = true;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/shapeLayers.js");
+        }
+    }
 
+    private void AddRectangle()
+    {
+        _module?.InvokeVoidAsync("addRectangle");
+    }
+
+    private void AddCircle()
+    {
+        _module?.InvokeVoidAsync("addCircle");
+    }
+
+    private void AddTriangle()
+    {
+        _module?.InvokeVoidAsync("addTriangle");
+    }
 }

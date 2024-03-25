@@ -4,8 +4,8 @@ import { addHoverAnimation, addIncomingAnimation } from "./animations.js";
 function addRectangle() {
     const rectangle = new Konva.Rect({
         name: "shape",
-        x: 50,
-        y: 50,
+        x: 10,
+        y: 10,
         width: 100,
         height: 100,
         fill: "#ffffff",
@@ -20,15 +20,14 @@ function addRectangle() {
         locked: false
     });
     currentGroup.add(rectangle);
-    addIncomingAnimation(rectangle);
     addHoverAnimation(rectangle);
 }
 
 function addCircle() {
     const circle = new Konva.Ellipse({
         name: "shape",
-        x: 50,
-        y: 50,
+        x: 60,
+        y: 60,
         radiusX: 50,
         radiusY: 50,
         fill: "#ffffff",
@@ -43,15 +42,14 @@ function addCircle() {
         locked: false
     });
     currentGroup.add(circle);
-    addIncomingAnimation(circle);
     addHoverAnimation(circle);
 }
 
 function addTriangle() {
     const triangle = new Konva.Shape({
         name: "shape",
-        x: 50,
-        y: 50,
+        x: 10,
+        y: 10,
         sides: 3,
         width: 100,
         height: 100,
@@ -68,7 +66,6 @@ function addTriangle() {
         locked: false
     });
     currentGroup.add(triangle);
-    addIncomingAnimation(triangle);
     addHoverAnimation(triangle);
 }
 
@@ -95,4 +92,4 @@ function sceneFunc(context, shape) {
     context.fillStrokeShape(shape);
 }
 
-export { sceneFunc };
+export { addRectangle, addCircle, addTriangle, sceneFunc };

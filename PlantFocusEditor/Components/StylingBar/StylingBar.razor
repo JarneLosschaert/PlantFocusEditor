@@ -19,7 +19,7 @@
                 <ControlContent Module="_controlBarModule" />
                 break;
             case "Shape":
-                <ElementStyleContent />
+                <ElementStyleContent Module="_shapeModule" />
                 <AppearanceContent Module="_module" />
                 <BorderContent Module="_module"/>
                 <ControlContent Module="_controlBarModule" />
@@ -42,6 +42,7 @@
     private IJSObjectReference? _textModule;
     private IJSObjectReference? _imageModule;
     private IJSObjectReference? _controlBarModule;
+    private IJSObjectReference? _shapeModule;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -51,6 +52,7 @@
             _textModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textStylingBar.js");
             _imageModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
             _controlBarModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/controlBar.js");
+            _shapeModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
         }
     }
 
