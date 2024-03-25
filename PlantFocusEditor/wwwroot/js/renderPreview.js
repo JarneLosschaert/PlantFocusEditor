@@ -1,5 +1,5 @@
 import { findWidthPassePartout, findHeightPassePartout } from "./modules/passePartout.js";
-import { sceneFunc } from "./modules/layers/shapeLayer.js";
+import { sceneFunc } from "./modules/layers/elementLayer.js";
 import { isValidJson } from "./modules/helpers.js";
 
 function renderPreviewFromJson(jsonToRender) {

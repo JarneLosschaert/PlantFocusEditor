@@ -1,6 +1,6 @@
 import { changeTr, changeHoverTr, changeSelectionRectangle, front, setFront, back, setBack, currentGroup, setCurrentGroup, tr } from "./constants.js";
 import { handleTextEventListeners } from "./layers/textLayer.js";
-import { sceneFunc } from "./layers/shapeLayer.js";
+import { sceneFunc } from "./layers/elementLayer.js";
 import { addHoverAnimation } from "./animations.js";
 import { handleSelections } from "./selectionHandling.js";
 import { createClipFunc, findHeightPassePartout, findWidthPassePartout, getScaledCommands } from "./passePartout.js";

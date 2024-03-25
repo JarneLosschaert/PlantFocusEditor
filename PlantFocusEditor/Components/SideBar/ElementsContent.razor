@@ -40,22 +40,22 @@
     {
         if (firstRender)
         {
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/shapeLayers.js");
+            //_module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/shapeLayers.js");
         }
     }
 
     private void AddRectangle()
     {
-        _module?.InvokeVoidAsync("addRectangle");
+        // _module?.InvokeVoidAsync("addRectangle");
     }
 
     private void AddCircle()
     {
-        _module?.InvokeVoidAsync("addCircle");
+        //_module?.InvokeVoidAsync("addCircle");
     }
 
     private void AddTriangle()
     {
-        _module?.InvokeVoidAsync("addTriangle");
+        // _module?.InvokeVoidAsync("addTriangle");
     }
 }
