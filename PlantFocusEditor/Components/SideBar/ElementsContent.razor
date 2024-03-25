@@ -9,12 +9,15 @@
         <ul>
             @if (_shapesSelected)
             {
-                @for (int i = 0; i < 19; i++)
-                {
-                    <li>
-                        <img src="../../sample-data/shape.png" alt="shape" />
-                    </li>
-                }
+                <li>
+                    <img src="../../images/rectangle.png" alt="shape" />
+                </li>
+                <li>
+                    <img src="../../images/circle.png" alt="shape"/>
+                </li>
+                <li>
+                    <img src="../../images/triangle.png" alt="shape"/>
+                </li>
             }
             else
             {
@@ -31,4 +34,6 @@
 
 @code {
     private bool _shapesSelected = true;
+
+
 }
