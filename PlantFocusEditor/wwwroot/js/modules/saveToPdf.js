@@ -1,6 +1,6 @@
-import { stage } from "./state.js";
+import { stage, layer } from "./state.js";
 import { getScaledCommands } from "./passePartout.js";
-import { front } from "./constants.js";
+import { front, back } from "./constants.js";
 import {arialRegular} from '../fonts/arial-normal.js';
 import { arialBold } from "../fonts/arial-bold.js";
 import { arialItalic } from "../fonts/arial-italic.js";
@@ -21,6 +21,10 @@ import { comicSansMsRegular } from "../fonts/comic-sans-ms-normal.js";
 import { comicSansMsBold } from "../fonts/comic-sans-ms-bold.js";
 import { comicSansMsItalic } from "../fonts/comic-sans-ms-italic.js";
 import { comicSansMsBoldItalic } from "../fonts/comic-sans-ms-bold-italic.js";
+import { georgia } from "../fonts/georgia-normal.js";
+import { georgiaBold } from "../fonts/georgia-bold.js";
+import { georgiaItalic } from "../fonts/georgia-italic.js";
+import { georgiaBoldItalic } from "../fonts/georgia-bold-italic.js";
 
 //const minWidth = 1200;
 //const minHeight = 900;
@@ -43,24 +47,25 @@ import { comicSansMsBoldItalic } from "../fonts/comic-sans-ms-bold-italic.js";
 }*/
 
 async function saveToPdfFromJson() {
+    console.log("save to pdf from json");
     const doc = new window.jspdf.jsPDF({
         orientation: 'p',
         unit: 'px',
-        format: [stage.width(), stage.height()],
+        format: [layer.width(), layer.height()],
         hotfixes: ['px_scaling']
     });
     addFonts(doc);
-    convertLayerToPdf(doc);
-    //doc.addPage([stage.width(), stage.height()], 'p');
-    //convertLayerToPdf(doc);
+    convertLayerToPdf(doc, front);
+    doc.addPage([stage.width(), stage.height()], 'p');
+    convertLayerToPdf(doc, back);
     doc.save('doc.pdf');
 }
 
-function convertLayerToPdf(doc) {
-    console.log(front);
-    for (let child of front.children) {
-        const groupX = front.x();
-        const groupY = front.y();
+function convertLayerToPdf(doc, group) {
+    console.log(group);
+    const groupX = group.x();
+    const groupY = group.y();
+    for (let child of group.children) {
         if (child.getClassName() === "Path") {
             const lines = [];
             const pathData = child.data();
@@ -84,7 +89,6 @@ function convertLayerToPdf(doc) {
                         break;
                 }
             };
-            console.log(lines);
             lines.forEach((segment, i, arr) => {
                 const newCoords = segment.c.map((coord, i) => {
                     if (i % 2 === 0) {
@@ -95,8 +99,8 @@ function convertLayerToPdf(doc) {
                 });
                 arr[i] = { op: segment.op, c: newCoords };
             });
-            console.log(lines);
             doc.path(lines);
+            doc.clip(lines);
             doc.setDrawColor('#000000');
             doc.stroke();
         }
@@ -135,10 +139,10 @@ function convertLayerToPdf(doc) {
                 doc.addImage(...attrs);
             }
         } else if (child.getClassName() === 'Text') {
-            const width = child.attrs.width;
-            const padding = child.attrs.padding;
+            const width = child.attrs.width * (child.attrs.scaleX ?? 1);
+            const padding = child.attrs.padding * (child.attrs.scaleX ?? 1);
             const fontFamily = child.attrs.fontFamily;
-            const fontSize = child.attrs.fontSize;
+            const fontSize = child.attrs.fontSize * (child.attrs.scaleX ?? 1);
             const fontStyle = child.attrs.fontStyle;
             const align = child.attrs.align;
             const fontSizePoints = fontSize * 0.75;
@@ -183,8 +187,8 @@ function convertLayerToPdf(doc) {
             doc.ellipse(x, y, radiusX, radiusY, 'FD');
             doc.restoreGraphicsState();
         } else if (child.className === 'Rect') {
-            const width = child.attrs.width;
-            const height = child.attrs.height;
+            const width = child.attrs.width * (child.attrs.scaleX ?? 1);
+            const height = child.attrs.height * (child.attrs.scaleY ?? 1);
             if (shadowOpacity !== 0) {
                 blurShadow(doc, child);
             }
@@ -226,7 +230,9 @@ function addText(doc, child, x, y, textLineY, txt, txtWidth, shadowOpacity) {
     }
     setFillColor(doc, child);
     if (child.attrs.textDecoration === "underline") {
+        doc.setDrawColor(child.attrs.fill);
         doc.line(x, textLineY, x + txtWidth, textLineY);
+        doc.setDrawColor("#000");
     }
     doc.text(txt, x, y);
 }
@@ -330,6 +336,14 @@ function addFonts(doc) {
     doc.addFont('comic-sans-ms-italic.ttf', 'Comic Sans MS', 'italic');
     doc.addFileToVFS('comic-sans-ms-bold-italic.ttf', comicSansMsBoldItalic);
     doc.addFont('comic-sans-ms-bold-italic.ttf', 'Comic Sans MS', 'bold italic');
+    doc.addFileToVFS('georgia.ttf', georgia);
+    doc.addFont('georgia.ttf', 'Georgia', 'normal');
+    doc.addFileToVFS('georgia-bold.ttf', georgiaBold);
+    doc.addFont('georgia-bold.ttf', 'Georgia', 'bold');
+    doc.addFileToVFS('georgia-italic.ttf', georgiaItalic);
+    doc.addFont('georgia-italic.ttf', 'Georgia', 'italic');
+    doc.addFileToVFS('georgia-bold-italic.ttf', georgiaBoldItalic);
+    doc.addFont('georgia-bold-italic.ttf', 'Georgia', 'bold italic');
 }
 
 /*function saveLayer(doc, clone, layerToAdd, layerToRemove) {
@@ -392,4 +406,4 @@ function calcCoordinates(node) {
     return [X, Y];
 }
 
-export { saveToPdfFromJson };
+export { saveToPdfFromJson }
