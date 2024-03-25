@@ -36,7 +36,7 @@ function handleTextEventListeners(text) {
 }
 
 function onTransfromText() {
-    const minWidth = this.fontSize() * 2;
+    const minWidth = this.fontSize();
     const minHeight = this.fontSize() * 1.5;
     this.setAttrs({
         width: Math.max(this.width() * this.scaleX(), minWidth),

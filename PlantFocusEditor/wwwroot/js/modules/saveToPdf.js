@@ -150,10 +150,11 @@ function convertLayerToPdf(doc, group) {
             const text = splitText(child);
             doc.setFontSize(fontSizePoints);
             doc.setLineWidth(2);
-            const stepY = y + fontSizePoints + padding;
-            const stepLineY = y + fontSize + padding;
+            const stepY = fontSizePoints + padding;
+            const stepLineY = fontSize + padding;
             text.forEach((txt, i) => {
                 let txtWidth;
+                const currentStep = i + 1;
                 if (fontStyle && fontFamily) {
                     doc.setFont(fontFamily, fontStyle);
                     txtWidth = getTextDimensions(txt, fontStyle, fontSize, fontFamily);
@@ -169,8 +170,8 @@ function convertLayerToPdf(doc, group) {
                 }
                 
                 let textX;
-                const textY = stepY + (i * stepY);
-                const textLineY = stepLineY + (i * stepLineY);
+                const textY = y + (currentStep * stepY);
+                const textLineY = y + (currentStep * stepLineY);
                 if (align === "center") {
                     textX = x + (width / 2) - (txtWidth / 2);
                 } else if (align === "right") {
@@ -269,7 +270,7 @@ function splitText(text, txtWidth) {
 
     for (const word of words) {
         const tempLine = currentLine ? currentLine + ' ' + word : word;
-        const tempWidth = getTextDimensions(tempLine, fontStyle, text.fontSize() * (text.scaleX() ?? 1), font ?? 'Arial');
+        const tempWidth = getTextDimensions(tempLine, fontStyle, text.fontSize(), font ?? 'Arial') + text.attrs.padding * 2;
         if (tempWidth <= text.width()) {
             currentLine = tempLine;
         } else {
