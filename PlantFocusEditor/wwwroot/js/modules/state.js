@@ -1,10 +1,11 @@
 import { changeTr, changeHoverTr, changeSelectionRectangle, front, setFront, back, setBack, currentGroup, setCurrentGroup, tr } from "./constants.js";
-import { handleTextEventListeners } from "./textLayers.js";
-import { handleSelections } from "./selectionHandling.js";
-import { sceneFunc } from "./shapeLayers.js";
+import { handleTextEventListeners } from "./layers/textLayer.js";
+import { sceneFunc } from "./layers/shapeLayer.js";
 import { addHoverAnimation } from "./animations.js";
+import { handleSelections } from "./selectionHandling.js";
 import { createClipFunc, findHeightPassePartout, findWidthPassePartout, getScaledCommands } from "./passePartout.js";
 import { convertToSVGPath } from "./helpers.js";
+import { saveState } from "./stateControls.js";
 
 const $konvaContainer = document.getElementById("konva-container");
 const initialWidth = $konvaContainer.offsetWidth;
@@ -17,30 +18,10 @@ const stage = new Konva.Stage({
 });
 
 const layer = new Konva.Layer();
-let barcodeImg = new Konva.Image({
-    x: 0,
-    y: 0,
-    width: 100,
-    height: 100,
-    name: "barcode",
-    number: "",
-    draggable: true,
-    src: "",
-    stroke: "#000000",
-    strokeWidth: 0,
-    shadowBlur: 10,
-    shadowOffset: { x: 5, y: 5 },
-    shadowOpacity: 0,
-    locked: false
-});
 
-const history = [];
-const historyBackside = [];
-let historyIndex = 0;
-let historyBacksideIndex = 0;
-
-function handleState() {
+function init() {
     initKonva();
+    handleSelections();
     handleEventListeners();
 }
 function initKonva() {
@@ -51,29 +32,6 @@ function initKonva() {
 
 function handleEventListeners() {
     document.addEventListener("click", saveState);
-}
-
-function switchSides() {
-    if (currentGroup === front) {
-        front.remove();
-        layer.add(back);
-        setCurrentGroup(false);
-    } else {
-        back.remove();
-        layer.add(front);
-        setCurrentGroup(true);
-    }
-    handleSelections();
-}
-
-function flip() {
-    const height = findHeightPassePartout(currentGroup.children[0].data());
-    if (currentGroup.offsetY() === 0) {
-        currentGroup.offsetY(height);
-    } else {
-        currentGroup.offsetY(0);
-    }
-    currentGroup.scaleY(-currentGroup.scaleY());
 }
 
 function loadState(json) {
@@ -95,7 +53,6 @@ function loadState(json) {
                         const img = new Image();
                         img.src = childNode.attrs.src;
                         childNode.image(img);
-                        barcodeImg = childNode;
                         addHoverAnimation(childNode);
                     } else if (childNode.getClassName() === "Image") {
                         const src = childNode.attrs.src;
@@ -157,12 +114,6 @@ function loadGroupFromJson(json) {
             child.data(pathData);
             
             offsetX = stage.width() / 2 - findWidthPassePartout(pathData) / 2;
-        } else if (child.attrs.name === "barcode") {
-            const img = new Image();
-            img.src = child.attrs.src;
-            child.image(img);
-            barcodeImg = child;
-            addHoverAnimation(child);
         } else if (child.getClassName() === "Image") {
             const src = child.attrs.src;
             const img = new Image();
@@ -192,73 +143,16 @@ function loadGroupFromJson(json) {
     return node;
 }
 
-function saveState() {
-    if (history[historyIndex] !== layer.toJSON()) {
-        historyIndex++;
-        history[historyIndex] = layer.toJSON();
-        history.length = historyIndex + 1;
-    }
-    if (historyBackside[historyBacksideIndex] !== back.toJSON()) {
-        historyBacksideIndex++;
-        historyBackside[historyBacksideIndex] = back.toJSON();
-        historyBackside.length = historyBacksideIndex + 1;
-    }
-    //saveStateLS();
-}
-
-function undo() {
-    if (currentGroup === front) {
-        if (historyIndex > 0) {
-            historyIndex--;
-            loadState(history[historyIndex]);
-        }
-    } else {
-        if (historyBacksideIndex > 0) {
-            historyBacksideIndex--;
-            loadState(historyBackside[historyBacksideIndex]);
-        }
-    }
-}
-
-function redo() {
-    if (currentGroup === front) {
-        if (historyIndex < history.length - 1) {
-            historyIndex++;
-            loadState(history[historyIndex]);
-        }
-    } else {
-        if (historyBacksideIndex < historyBackside.length - 1) {
-            historyBacksideIndex++;
-            loadState(historyBackside[historyBacksideIndex]);
-        }
-    }
-}
-
-function saveStateLS() {
-    const state = history[historyIndex];
-    const backsideState = historyBackside[historyBacksideIndex];
-    localStorage.setItem("state", JSON.stringify(state));
-    localStorage.setItem("backside", JSON.stringify(backsideState));
-}
-
 function getStateLS() {
-    if (localStorage.getItem("state")) {
-        return JSON.parse(localStorage.getItem("state"));
+    if (localStorage.getItem("front")) {
+        return JSON.parse(localStorage.getItem("front"));
     }
 }
 
 function getBacksideState() {
-    if (localStorage.getItem("backside")) {
-        return JSON.parse(localStorage.getItem("backside"));
+    if (localStorage.getItem("back")) {
+        return JSON.parse(localStorage.getItem("back"));
     }
 }
 
-function getBarcodeNumber() {
-    return barcodeImg.attrs.number;
-}
-
-function setBarcodeImg(img) {
-    barcodeImg = img;
-}
-
-export { undo, redo, stage, layer, handleState, saveState, barcodeImg, setBarcodeImg, switchSides, getBacksideState, getStateLS, getBarcodeNumber, loadStateFromTemplate, flip };
+export { stage, layer, init, getBacksideState, loadState, getStateLS, loadStateFromTemplate };

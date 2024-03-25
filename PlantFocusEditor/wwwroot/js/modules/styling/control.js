@@ -1,8 +1,6 @@
 import { tr, selectionRectangle, hoverTr, currentGroup } from "../constants.js";
-import { removeBarcode } from "../barcodeLayer.js";
 import { addHoverAnimation } from "../animations.js";
 import { uuidv4 } from "../helpers.js";
-import { removedImages } from "../imageLayers.js";
 
 let imagesReference = null;
 
@@ -13,9 +11,8 @@ function deleteNodes() {
     const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
         if (node.attrs.name === "barcode") {
-            removeBarcode();
+            //removeBarcode();
         } else if (node.getClassName() === "Image" && node.attrs.name !== "qrcode") {
-            removedImages.push(node);
             node.remove();
         } else {
             node.destroy();

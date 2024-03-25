@@ -1,6 +1,6 @@
 import { tr, hoverTr, selectionRectangle } from "./constants.js";
 import { stage, layer } from "./state.js";
-import { deleteNodes } from "./controlBar.js";
+import { deleteNodes } from "./styling/control.js";
 
 let x1, y1, x2, y2;
 let selecting = false;
@@ -10,7 +10,6 @@ function handleSelections() {
     tr.remove();
     selectionRectangle.remove();
     layer.add(selectionRectangle);
-    addSelectionRectangle();
     layer.add(tr);
     layer.add(hoverTr);
     handleEventListeners();
@@ -30,12 +29,9 @@ function removeLayer(event) {
     }
 }
 
-function addSelectionRectangle() {
-    layer.add(selectionRectangle);
-}
-
 function handleSelectionStart(e) {
-    if (e.target == stage || e.target.attrs.name === "passepartout") {
+    // has to be passepartout change name
+    if (e.target == stage || e.target.getClassName() === "Path") {
         e.evt.preventDefault();
         x1 = stage.getPointerPosition().x;
         y1 = stage.getPointerPosition().y;
@@ -71,15 +67,18 @@ function handleSelectionEnd(e) {
     e.evt.preventDefault();
     selectionRectangle.visible(false);
     const shapes = stage.find(
-        (node) => node.attrs.name === "text" || node.attrs.name === "img" || node.attrs.name === "barcode" || node.attrs.name === "shape"
+        (node) => node.attrs.name === "text" ||
+            node.attrs.name === "img" ||
+            node.attrs.name === "barcode" ||
+            node.attrs.name === "shape"
     );
     const box = selectionRectangle.getClientRect();
     const selected = shapes.filter((shape) =>
         Konva.Util.haveIntersection(box, shape.getClientRect())
     );
     tr.nodes(selected);
-    toggleLock();
     hoverTr.nodes([]);
+    toggleLock();
 }
 
 function handleSelection(e) {
@@ -106,17 +105,15 @@ function handleSelection(e) {
     const isSelected = tr.nodes().indexOf(e.target) >= 0;
     if (!metaPressed && !isSelected) {
         tr.nodes([e.target]);
-        toggleLock();
     } else if (metaPressed && isSelected) {
         const nodes = tr.nodes().slice();
         nodes.splice(nodes.indexOf(e.target), 1);
         tr.nodes(nodes);
-        toggleLock();
     } else if (metaPressed && !isSelected) {
         const nodes = tr.nodes().concat([e.target]);
         tr.nodes(nodes);
-        toggleLock();
     }
+    toggleLock();
     hoverTr.nodes([]);
 }
 
@@ -127,4 +124,4 @@ function toggleLock() {
     tr.rotateEnabled(!locked);
 }
 
-export { handleSelections, addSelectionRectangle };
+export { handleSelections };

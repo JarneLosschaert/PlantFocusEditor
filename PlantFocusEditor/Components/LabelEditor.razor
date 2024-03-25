@@ -23,7 +23,7 @@
     {
         if (firstRender)
         {
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/init.js");
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/state.js");
             if (_module is not null)
             {
                 await _module.InvokeVoidAsync("init");

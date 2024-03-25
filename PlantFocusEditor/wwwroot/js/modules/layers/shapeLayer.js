@@ -1,5 +1,5 @@
-import { currentGroup } from "./constants.js";
-import { addHoverAnimation, addIncomingAnimation } from "./animations.js";
+import { currentGroup } from "../constants.js";
+import { addHoverAnimation } from "../animations.js";
 
 function addRectangle() {
     const rectangle = new Konva.Rect({
@@ -20,7 +20,6 @@ function addRectangle() {
         locked: false
     });
     currentGroup.add(rectangle);
-    addIncomingAnimation(rectangle);
     addHoverAnimation(rectangle);
 }
 
@@ -43,7 +42,6 @@ function addCircle() {
         locked: false
     });
     currentGroup.add(circle);
-    addIncomingAnimation(circle);
     addHoverAnimation(circle);
 }
 
@@ -68,7 +66,6 @@ function addTriangle() {
         locked: false
     });
     currentGroup.add(triangle);
-    addIncomingAnimation(triangle);
     addHoverAnimation(triangle);
 }
 
