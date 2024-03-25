@@ -2,7 +2,7 @@
 
 <CascadingValue Value="this">
     <div class="label-editor">
-        <SideBar SelectTab="SelectTab" Module="_pdfModule" />
+        <SideBar SelectTab="SelectTab" />
         <SideBarContent />
         <Editor KonvaClicked="HandleKonvaContainerClicked" />
         <StylingBar @ref="_stylingBar"  />
@@ -10,9 +10,9 @@
 </CascadingValue>
 
 @code {
+    public IJSObjectReference? PdfModule { get; set; }
     public SideBarTabs _SelectedTab { get; set; } = SideBarTabs.Templates;
     private IJSObjectReference? _module;
-    private IJSObjectReference? _pdfModule;
     private StylingBar.StylingBar? _stylingBar;
 
     public void SelectTab(SideBarTabs tab)
@@ -24,8 +24,9 @@
     {
         if (firstRender)
         {
+            Console.WriteLine("in firstRender");
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/init.js");
-            _pdfModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/saveToPdf.js");
+            PdfModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/saveToPdf.js");
             if (_module is not null)
             {
                 await _module.InvokeVoidAsync("init");

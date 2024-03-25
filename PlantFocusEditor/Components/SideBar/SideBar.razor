@@ -34,8 +34,6 @@
     [CascadingParameter]
     public LabelEditor LabelEditor { get; set; }
     [Parameter]
-    public IJSObjectReference? Module { get; set; }
-    [Parameter]
     public EventCallback<SideBarTabs> SelectTab { get; set; }
 
     public async Task SelectTabAsync(SideBarTabs tab)
@@ -51,6 +49,7 @@
     private void Save()
     {
         Console.WriteLine("save");
-        Module?.InvokeVoidAsync("saveToPdfFromJson");
+        Console.WriteLine(LabelEditor.PdfModule);
+        LabelEditor.PdfModule?.InvokeVoidAsync("saveToPdfFromJson");
     }
 }

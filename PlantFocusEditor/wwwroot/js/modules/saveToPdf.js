@@ -151,7 +151,7 @@ function convertLayerToPdf(doc, group) {
             doc.setFontSize(fontSizePoints);
             doc.setLineWidth(2);
             const stepY = fontSizePoints + padding;
-            const stepLineY = fontSize + padding;
+            const stepLineY = fontSize + padding / 2;
             text.forEach((txt, i) => {
                 let txtWidth;
                 const currentStep = i + 1;
