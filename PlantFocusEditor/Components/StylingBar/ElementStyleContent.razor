@@ -12,24 +12,22 @@
 </article>
 
 @code {
-    private IJSObjectReference? _module;
+    [Parameter]
+    public IJSObjectReference? Module { get; set; }
     private string _fillColor = "#000000";
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnParametersSetAsync()
     {
-        if (firstRender)
-        {
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
-            _fillColor = await _module.InvokeAsync<string>("getFillColor");
-        }
+        _fillColor = await Module.InvokeAsync<string>("getFillColor");
+        StateHasChanged();
     }
 
     private void ChangeColor(string color)
     {
         _fillColor = color;
-        if (_module != null)
+        if (Module != null)
         {
-            _module.InvokeVoidAsync("handleShapeColorChange", _fillColor);
+            Module.InvokeVoidAsync("handleShapeColorChange", _fillColor);
         }
     }
 }

@@ -40,20 +40,16 @@
     private IJSObjectReference? _module;
     private IJSObjectReference? _textModule;
     private IJSObjectReference? _imageModule;
-    private IJSObjectReference? _borderModule;
-    private IJSObjectReference? _appearanceModule;
-    private IJSObjectReference? _controlsModule;
+    private IJSObjectReference? _controlBarModule;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/stylingBar.js");
-            _textModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/textStyling.js");
-            _imageModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/imageStyling.js");
-            _borderModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/borderStyling.js");
-            _appearanceModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/appearanceStyling.js");
-            _controlsModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/control.js");
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/stylingBar.js");
+            _textModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textStylingBar.js");
+            _imageModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
+            _controlBarModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/controlBar.js");
         }
     }
 

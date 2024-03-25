@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="C:\Users\lgde\source\repos\saveToPdf.js" Link="saveToPdf.js" />
     <Content Include="wwwroot\node_modules\.package-lock.json" />
     <Content Include="wwwroot\node_modules\konva\package.json" />
   </ItemGroup>
