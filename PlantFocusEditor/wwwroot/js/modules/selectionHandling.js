@@ -1,4 +1,4 @@
-import { tr, hoverTr, selectionRectangle } from "./constants.js";
+import { tr, hoverTr, selectionRectangle, currentGroup } from "./constants.js";
 import { stage, layer } from "./state.js";
 import { deleteNodes } from "./controlBar.js";
 
@@ -83,6 +83,7 @@ function handleSelectionEnd(e) {
 }
 
 function handleSelection(e) {
+    console.log(currentGroup);
     tr.moveToTop();
     selectionRectangle.moveToTop();
     hoverTr.moveToTop();
