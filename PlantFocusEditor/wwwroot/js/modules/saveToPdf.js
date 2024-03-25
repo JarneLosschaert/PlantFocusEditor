@@ -150,28 +150,23 @@ function convertLayerToPdf(doc, group) {
             const text = splitText(child);
             doc.setFontSize(fontSizePoints);
             doc.setLineWidth(2);
+            doc.setFont(fontFamily ?? 'Arial', fontStyle ?? 'normal');
             const stepY = fontSizePoints + padding;
-            const stepLineY = fontSize + padding / 2;
             text.forEach((txt, i) => {
-                let txtWidth;
+                const txtWidth = getTextDimensions(txt, fontStyle ?? '', fontSize, fontFamily ?? 'Arial').width;
                 const currentStep = i + 1;
-                if (fontStyle && fontFamily) {
-                    doc.setFont(fontFamily, fontStyle);
-                    txtWidth = getTextDimensions(txt, fontStyle, fontSize, fontFamily);
-                } else if (fontFamily) {
-                    doc.setFont(fontFamily, 'normal');
-                    txtWidth = getTextDimensions(txt, '', fontSize, fontFamily);
-                } else if (fontStyle) {
-                    doc.setFont('Arial', fontStyle);
-                    txtWidth = getTextDimensions(txt, fontStyle, fontSize, 'Arial');
-                } else {
-                    doc.setFont('Arial', 'normal');
-                    txtWidth = getTextDimensions(txt, '', fontSize, 'Arial');
+
+                let maxDescent = 0;
+                for (let j = 0; j < txt.length; j++) {
+                    const char = txt[j];
+                    const descent = getTextDimensions(char, fontStyle ?? '', fontSize, fontFamily ?? 'Arial').descent;
+                    maxDescent = Math.min(maxDescent, descent);
                 }
-                
-                let textX;
+
                 const textY = y + (currentStep * stepY);
-                const textLineY = y + (currentStep * stepLineY);
+                const textLineY = textY + padding / 2 + maxDescent;
+
+                let textX;
                 if (align === "center") {
                     textX = x + (width / 2) - (txtWidth / 2);
                 } else if (align === "right") {
@@ -270,7 +265,7 @@ function splitText(text, txtWidth) {
 
     for (const word of words) {
         const tempLine = currentLine ? currentLine + ' ' + word : word;
-        const tempWidth = getTextDimensions(tempLine, fontStyle, text.fontSize(), font ?? 'Arial') + text.attrs.padding * 2;
+        const tempWidth = getTextDimensions(tempLine, fontStyle, text.fontSize(), font ?? 'Arial').width + text.attrs.padding * 2;
         if (tempWidth <= text.width()) {
             currentLine = tempLine;
         } else {
@@ -291,11 +286,13 @@ function getTextDimensions(text, fontStyle, fontSizePx, font) {
     const context = canvas.getContext("2d");
 
     context.font = fontStyle + ' ' + fontSizePx + 'px ' + font;
-    const textMetrics = context.measureText(text);
+    const metrics = context.measureText(text);
+    const descent = metrics.actualBoundingBoxDescent;
 
-    const width = textMetrics.width;
+    const width = metrics.width;
     canvas = null;
-    return width;
+    return { width: width, descent: descent }
+;
 }
 
 function blurShadow(doc, shape, textX, textY) {
