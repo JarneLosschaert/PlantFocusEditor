@@ -1,5 +1,5 @@
-import { currentGroup } from "./constants.js";
-import { addHoverAnimation, addIncomingAnimation } from "./animations.js";
+import { currentGroup } from "../constants.js";
+import { addHoverAnimation } from "../animations.js";
 
 function addRectangle() {
     const rectangle = new Konva.Rect({

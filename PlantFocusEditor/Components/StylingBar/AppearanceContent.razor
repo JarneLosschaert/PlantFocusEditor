@@ -5,13 +5,13 @@
     <div>
         <div>
             <h4>Opacity</h4>
-            <Slider value="@opacity"
+            <Slider value="@_opacity"
                     unit="%"
                     handleValue="@changeOpacity" />
         </div>
         <div>
             <h4>Shadow</h4>
-            <Slider value="@shadow"
+            <Slider value="@_shadow"
                     unit="%"
                     handleValue="@changeShadow" />
         </div>
@@ -21,23 +21,25 @@
 @code {
     [Parameter]
     public IJSObjectReference? Module { get; set; }
-    private int opacity = 100;
-    private int shadow = 0;
+
+    private int _opacity = 100;
+    private int _shadow = 0;
 
     protected override async Task OnParametersSetAsync()
     {
         if (Module != null)
         {
             Dictionary<string, JsonElement> values = await Module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
-            opacity = Convert.ToInt16(values["opacity"].GetDouble() * 100);
-            shadow = Convert.ToInt16(values["shadowOpacity"].GetDouble() * 100);
+            _opacity = values["opacity"].GetInt16() * 100;
+            _shadow = values["shadow"].GetInt16() * 100;
+            StateHasChanged();
         }
     }
 
     private void changeOpacity(int value)
     {
-        opacity = value;
-        double newOpacity = opacity / 100.0;
+        _opacity = value;
+        double newOpacity = _opacity / 100.0;
         if (Module != null)
         {
             Module.InvokeVoidAsync("handleTransparencyChange", newOpacity);
@@ -46,8 +48,8 @@
 
     private void changeShadow(int value)
     {
-        shadow = value;
-        double newShadow = shadow / 100.0;
+        _shadow = value;
+        double newShadow = _shadow / 100.0;
         if (Module != null)
         {
             Module.InvokeVoidAsync("handleShadowChange", newShadow);

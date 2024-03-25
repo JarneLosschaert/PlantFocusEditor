@@ -1,5 +1,4 @@
 import { hoverTr, tr } from "./constants.js";
-import { stage } from "./state.js";
 
 function selectAnimation(node) {
     const flickering = new Konva.Tween({
@@ -27,24 +26,6 @@ function selectAnimation(node) {
     };
 }
 
-function addIncomingAnimation(node) {
-    const centerX = stage.width() / 2;
-    const centerY = stage.height() / 2;
-    const centerOffsetX = centerX - node.width() / 2;
-    const centerOffsetY = centerY - node.height() / 2;
-    node.x(centerOffsetX);
-    const tween = new Konva.Tween({
-        node: node,
-        y: centerOffsetY,
-        duration: 0.5,
-        easing: Konva.Easings.ElasticEaseOut,
-        onFinish: function () {
-            tween.destroy()
-        }
-    });
-    tween.play();
-}
-
 function addHoverAnimation(node) {
     node.on("mouseover", function () {
         node.getStage().container().style.cursor = "pointer";
@@ -60,4 +41,4 @@ function addHoverAnimation(node) {
     });
 }
 
-export { selectAnimation, addHoverAnimation, addIncomingAnimation };  
+export { selectAnimation, addHoverAnimation };  

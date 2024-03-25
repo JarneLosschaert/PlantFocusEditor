@@ -1,15 +1,12 @@
-import { tr, currentGroup } from "./constants.js";
-import { stage } from "./state.js";
-import { selectAnimation, addHoverAnimation } from "./animations.js";
-import { findHeightPassePartout, findWidthPassePartout } from "./passePartout.js";
+import { tr, currentGroup } from "../constants.js";
+import { stage } from "../state.js";
+import { selectAnimation, addHoverAnimation } from "../animations.js";
 
-export function createTextLayer(size = 16) {
-    const path = currentGroup.children.find(node => node.getClassName() === "Path");
-    const pathData = path.data();
+function createTextLayer(type) {
     const text = new Konva.Text({
         name: "text",
-        text: "New text",
-        fontSize: size,
+        text: "New paragraph",
+        fontSize: 16,
         draggable: true,
         width: 250,
         height: "auto",
@@ -21,8 +18,15 @@ export function createTextLayer(size = 16) {
         shadowOpacity: 0,
         locked: false
     });
-    text.x(findWidthPassePartout(pathData) / 2 - text.width() / 2);
-    text.y(findHeightPassePartout(pathData) / 2 - text.height() / 2);
+    if (type === "subtitle") {
+        text.fontSize(24);
+        text.text("New subtitle");
+        text.fontStyle("bold");
+    } else if (type === "title") {
+        text.fontSize(32);
+        text.text("New title");
+        text.fontStyle("bold");
+    }
     currentGroup.add(text);
     addHoverAnimation(text);
     handleTextEventListeners(text);
@@ -132,4 +136,4 @@ function onEditText(text) {
     });
 }
 
-export { handleTextEventListeners };
+export { createTextLayer, handleTextEventListeners };

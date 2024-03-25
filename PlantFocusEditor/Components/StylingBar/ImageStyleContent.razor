@@ -5,7 +5,7 @@
     <div>
         <div>
             <label for="change-image-image">
-                <img src="@_currentImageSrc" id="current-image" alt="img">
+                <img src="@_currentSrc" id="current-image" alt="img">
             </label>
             <InputFile id="change-image-image" class="input-file" OnChange="ChangeImage"></InputFile>
         </div>
@@ -21,13 +21,14 @@
 @code {
     [Parameter]
     public IJSObjectReference? Module { get; set; }
-    private string _currentImageSrc = "../../sample-data/flower.jpg";
+    private string _currentSrc = "../../sample-data/flower.jpg";
 
     protected override async Task OnParametersSetAsync()
     {
         if (Module != null)
         {
-            _currentImageSrc = await Module.InvokeAsync<string>("getSource");
+            Dictionary<string, JsonElement> values = await Module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
+            _currentSrc = values["src"].ToString();
             StateHasChanged();
         }
     }
@@ -41,15 +42,15 @@
             await selectedImage.OpenReadStream().CopyToAsync(memoryStream);
             var imageBytes = memoryStream.ToArray();
 
-            _currentImageSrc = $"data:{selectedImage.ContentType};base64,{Convert.ToBase64String(imageBytes)}";
+            _currentSrc = $"data:{selectedImage.ContentType};base64,{Convert.ToBase64String(imageBytes)}";
             if (Module != null)
             {
-                await Module.InvokeVoidAsync("changeImage", _currentImageSrc);
+                await Module.InvokeVoidAsync("changeImage", _currentSrc);
             }
         }
         else
         {
-            _currentImageSrc = "";
+            _currentSrc = "";
         }
     }
 }

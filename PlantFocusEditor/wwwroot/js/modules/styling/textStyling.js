@@ -1,4 +1,4 @@
-import { tr } from "./constants.js";
+import { tr } from "../constants.js";
 
 function handleFontSelect(font) {
     const selectedNodes = tr.nodes();

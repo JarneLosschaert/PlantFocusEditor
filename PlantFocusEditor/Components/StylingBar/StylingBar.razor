@@ -8,25 +8,25 @@
         @switch (_selectedNode)
         {
             case "Text":
-                <TextStyleContent Module="_textModule"/>
-                <AppearanceContent Module="_module"/>
-                <ControlContent Module="_controlBarModule" />
+                <TextStyleContent Module="_textModule" />
+                <AppearanceContent Module="_appearanceModule" />
+                <ControlContent Module="_controlsModule" />
                 break;
             case "Image":
-                <ImageStyleContent Module="_imageModule"/>
-                <AppearanceContent Module="_module" />
-                <BorderContent Module="_module" />
-                <ControlContent Module="_controlBarModule" />
+                <ImageStyleContent Module="_imageModule" />
+                <AppearanceContent Module="_appearanceModule" />
+                <BorderContent Module="_borderModule" />
+                <ControlContent Module="_controlsModule" />
                 break;
             case "Shape":
-                <ElementStyleContent Module="_shapeModule" />
-                <AppearanceContent Module="_module" />
-                <BorderContent Module="_module"/>
-                <ControlContent Module="_controlBarModule" />
+                <ElementStyleContent />
+                <AppearanceContent Module="_appearanceModule" />
+                <BorderContent Module="_borderModule" />
+                <ControlContent Module="_controlsModule" />
                 break;
             case "Selecting":
-                <AppearanceContent Module="_module" />
-                <ControlContent Module="_controlBarModule" />
+                <AppearanceContent Module="_appearanceModule" />
+                <ControlContent Module="_controlsModule" />
                 break;
             default:
                 <LabelStyleContent />
@@ -36,13 +36,11 @@
 </section>
 
 @code {
-    private bool selecting = true;
     private string _selectedNode = "";
     private IJSObjectReference? _module;
     private IJSObjectReference? _textModule;
     private IJSObjectReference? _imageModule;
     private IJSObjectReference? _controlBarModule;
-    private IJSObjectReference? _shapeModule;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -52,7 +50,6 @@
             _textModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textStylingBar.js");
             _imageModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
             _controlBarModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/controlBar.js");
-            _shapeModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
         }
     }
 

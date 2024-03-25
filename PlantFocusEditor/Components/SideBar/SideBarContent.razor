@@ -33,31 +33,9 @@
 @code {
     [CascadingParameter]
     public LabelEditor? LabelEditor { get; set; }
+
     private ImagesContent? _imagesContent;
-    private IJSObjectReference? _module;
     private Dictionary<string, string> _imagesToAdd = new();
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            var reference = DotNetObjectReference.Create(this);
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/controlBar.js");
-            await _module.InvokeVoidAsync("setReference", reference);
-        }
-    }
-
-    [JSInvokable]
-    public void CloneImage(string id, string src)
-    {
-        if (_imagesContent != null)
-        {
-            _imagesContent.AddImage(id, src);
-        } else
-        {
-            _imagesToAdd.Add(id, src);
-        }
-    }
 
     private void OnImagesContentRendered()
     {
