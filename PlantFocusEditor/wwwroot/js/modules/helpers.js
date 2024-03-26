@@ -30,4 +30,84 @@ function convertToSVGPath(commands) {
     return pathData;
 }
 
-export { isValidJson, uuidv4, convertToSVGPath }
+function calcLinearGradient(shapeInfo) {
+    const shapeGradientStartPoint = shapeInfo.fillLinearGradientStartPoint();
+    const shapeGradientEndPoint = shapeInfo.fillLinearGradientEndPoint();
+    const shapeGradientColorStops = shapeInfo.fillLinearGradientColorStops();
+
+    const startColorRgbString = shapeGradientColorStops[1];
+    const endColorRgbString = shapeGradientColorStops[3];
+    const startColor = startColorRgbString.match(/\d+/g);
+    const endColor = endColorRgbString.match(/\d+/g);
+
+    startColor.forEach((el, i, arr) => arr[i] = parseInt(el));
+    endColor.forEach((el, i, arr) => arr[i] = parseInt(el));
+    const angleRadians = calcGradientAngle(shapeGradientStartPoint, shapeGradientEndPoint);
+    const length = calcGradientLength(shapeGradientStartPoint, shapeGradientEndPoint);
+
+    // Calculate gradient vector components
+    var dx = Math.cos(angleRadians);
+    var dy = Math.sin(angleRadians);
+
+    // Calculate color step components
+    var dr = (endColor[0] - startColor[0]) / length;
+    var dg = (endColor[1] - startColor[1]) / length;
+    var db = (endColor[2] - startColor[2]) / length;
+
+    // Initialize gradient array
+    var gradient = [];    
+
+    // Iterate over each point along the gradient line
+    for (var i = 0; i < length; i++) {
+        // Calculate position along the gradient line
+        var x = i * dx;
+        var y = i * dy;
+
+        // Calculate color components at this point
+        var r = startColor[0] + i * dr;
+        var g = startColor[1] + i * dg;
+        var b = startColor[2] + i * db;
+
+        // Add color and shape info to gradient array
+        gradient.push({
+            color: [r, g, b],
+            shape: {
+                x: shapeInfo.x() + x,
+                y: shapeInfo.y() + y,
+                /*gradientStart: {
+                    x: shapeGradientStartPointX + x,
+                    y: shapeGradientStartPointY + y
+                },
+                gradientEnd: {
+                    x: shapeGradientEndPointX + x,
+                    y: shapeGradientEndPointY + y
+                }*/
+            }
+        });
+    }
+
+    return gradient;
+}
+
+function calcGradientAngle(startPoint, endPoint) {
+    // Calculate the differences in x and y coordinates
+    var dx = endPoint.x - startPoint.x;
+    var dy = endPoint.y - startPoint.y;
+
+    // Calculate the angle in radians
+     return Math.atan2(dy, dx);
+}
+
+function calcGradientLength(startPoint, endPoint) {
+    // Calculate the differences in x and y coordinates
+    var dx = endPoint.x - startPoint.x;
+    var dy = endPoint.y - startPoint.y;
+
+    // Calculate the length using the Pythagorean theorem
+    var length = Math.sqrt(dx * dx + dy * dy);
+
+    return length;
+}
+
+
+export { isValidJson, uuidv4, convertToSVGPath, calcLinearGradient }

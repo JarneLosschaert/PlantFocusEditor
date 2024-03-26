@@ -1,7 +1,8 @@
 import { stage, layer } from "./state.js";
 import { getScaledCommands } from "./passePartout.js";
 import { front, back } from "./constants.js";
-import {arialRegular} from '../fonts/arial-normal.js';
+import { calcLinearGradient } from "./helpers.js";
+import { arialRegular } from '../fonts/arial-normal.js';
 import { arialBold } from "../fonts/arial-bold.js";
 import { arialItalic } from "../fonts/arial-italic.js";
 import { arialBoldItalic } from "../fonts/arial-bold-italic.js";
@@ -133,7 +134,7 @@ function convertLayerToPdf(doc, group) {
             }
             if (child.attrs.opacity) {
                 doc.saveGraphicsState();
-                doc.setGState(new doc.GState({opacity: child.attrs.opacity}));
+                doc.setGState(new doc.GState({ opacity: child.attrs.opacity }));
                 doc.addImage(...attrs);
                 doc.restoreGraphicsState();
             } else {
@@ -196,19 +197,25 @@ function convertLayerToPdf(doc, group) {
             doc.restoreGraphicsState();
         } else if (child.className === 'Rect') {
             const width = child.attrs.width * (child.scaleX() ?? 1);
-            const height = child.attrs.height * (child.scaleX() ?? 1);
+            const height = child.attrs.height * (child.scaleY() ?? 1);
             if (shadowOpacity !== 0) {
                 blurShadow(doc, child);
             }
-            doc.setLineWidth(strokeWidth);
-            doc.setDrawColor(stroke);
-            setFillColor(doc, child);
-            if (strokeWidth === 0) {
-                doc.rect(x, y, width, height, 'F');
+            console.log(child.fillLinearGradientStartPoint());
+            if (child.fillLinearGradientStartPoint() && child.fillLinearGradientEndPoint()) {
+                console.log("in linear gradient");
+                setGradientFillColor(doc, child, groupX, groupY, width, height);
+                console.log("linear gradient set");
+                if (strokeWidth !== 0) {
+                    doc.setDrawColor(stroke);
+                    doc.setLineWidth(strokeWidth);
+                    doc.rect(x, y, width, height, 'S');
+                }
             } else {
-                doc.rect(x, y, width, height, 'FD');
-            }            
-            doc.restoreGraphicsState();
+                setFillColor(doc, child);
+            }
+            //doc.restoreGraphicsState();
+            console.log("rect end");
         } else if (child.getClassName() === 'Shape') {
             const x1 = child.attrs.x1;
             const x2 = child.attrs.x2;
@@ -238,6 +245,27 @@ function convertLayerToPdf(doc, group) {
             doc.restoreGraphicsState();
         }
     }
+}
+
+function setGradientFillColor(doc, child, x, y, width, height) {
+    const gradient = calcLinearGradient(child);
+    console.log(gradient);
+    for (let i = 0; i < gradient.length; i++) {
+        const { color, shape } = gradient[i];
+        const rectX = x + shape.x;
+        const rectY = y + shape.y;
+        // Ensure the rectangle stays within the bounds of the shape
+        const diffX = Math.abs(child.x() - shape.x);
+        const diffY = Math.abs(child.y() - shape.y);
+        const rectWidth = width - diffX;
+        const rectHeight = height - diffY;
+        drawSolidRect(doc, rectX, rectY, rectWidth, rectHeight, color);
+    }
+}
+
+function drawSolidRect(doc, x, y, width, height, color) {
+    doc.setFillColor(color[0], color[1], color[2]);
+    doc.rect(x, y, width, height, 'F');
 }
 
 function addText(doc, child, x, y, textLineY, txt, txtWidth, shadowOpacity) {
@@ -277,7 +305,6 @@ function splitText(text, txtWidth) {
     if (currentLine) {
         lines.push(currentLine);
     }
-    console.log(lines);
     return lines;
 }
 
@@ -292,7 +319,7 @@ function getTextDimensions(text, fontStyle, fontSizePx, font) {
     const width = metrics.width;
     canvas = null;
     return { width: width, descent: descent }
-;
+        ;
 }
 
 function blurShadow(doc, shape, textX, textY) {
@@ -303,7 +330,7 @@ function blurShadow(doc, shape, textX, textY) {
         const opacity = (shape.shadowOpacity() / shape.shadowBlur()) + (i / shape.shadowBlur()); // Increase opacity for each step
         const offsetX = stepX * (shape.shadowBlur() - i); // Starts at the outer shadow layer, move inward
         const offsetY = stepY * (shape.shadowBlur() - i);
-        
+
         const x = shape.x() + front.x() + offsetX;
         const y = shape.y() + front.y() + offsetY;
         doc.setFillColor(0, 0, 0, opacity);
@@ -429,7 +456,7 @@ function setFillColor(doc, node) {
     doc.saveGraphicsState();
     const isText = node.className === "Text";
     if (node.attrs.opacity) {
-        doc.setGState(new doc.GState({opacity: node.attrs.opacity}));
+        doc.setGState(new doc.GState({ opacity: node.attrs.opacity }));
         isText ? doc.setTextColor(node.attrs.fill) : doc.setFillColor(node.attrs.fill);
     } else {
         isText ? doc.setTextColor(node.attrs.fill) : doc.setFillColor(node.attrs.fill);
