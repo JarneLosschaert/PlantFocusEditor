@@ -3,15 +3,15 @@
 <article class="text-content">
     @* <h3>Basic text</h3> *@
     <div class="texts">
-        <button class="text-header" @onclick="@(() => AddTextField(32))">
+        <button class="text-header" @onclick="@(() => AddTextField("title"))">
             New title
             @((MarkupString)CustomIcons.Plus())
         </button>
-        <button class="text-subheader" @onclick="@(() => AddTextField(24))">
+        <button class="text-subheader" @onclick="@(() => AddTextField("subtitle"))">
             New subtitle
             @((MarkupString)CustomIcons.Plus())
         </button>
-        <button class="text-paragraph" @onclick="@(() => AddTextField(16))">
+        <button class="text-paragraph" @onclick="@(() => AddTextField("paragraph"))">
             New paragraph
             @((MarkupString)CustomIcons.Plus())
         </button>
@@ -25,15 +25,15 @@
     {
         if (firstRender)
         {
-            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textLayers.js");
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/layers/textLayer.js");
         }
     }
 
-    async Task AddTextField(int size = 16)
+    async Task AddTextField(string type)
     {
         if (module != null)
         {
-            await module.InvokeVoidAsync("createTextLayer", size);
+            await module.InvokeVoidAsync("createTextLayer", type);
         }
     }
 }

@@ -2,7 +2,7 @@
     <h3>Elements</h3>
     <div>
         <div class="controls">
-            @if (isLocked)
+            @if (_locked)
             {
                 <button @onclick="Lock">
                     @((MarkupString)CustomIcons.Locked())
@@ -26,11 +26,11 @@
             </button>
         </div>
         <div class="position">
-            <button class="@(isPositionPopupVisible ? "selected" : "")" @onclick="TogglePositionPopup">
+            <button class="@(_isPositionPopupVisible ? "selected" : "")" @onclick="TogglePositionPopup">
                 @((MarkupString)CustomIcons.Layers())
                 Position
             </button>
-            @if (isPositionPopupVisible)
+            @if (_isPositionPopupVisible)
             {
                 <div class="position-popup">
                     <ul>
@@ -60,23 +60,22 @@
 @code {
     [Parameter]
     public IJSObjectReference? Module { get; set; }
-    private bool isPositionPopupVisible = false;
-    private bool isLocked = false;
+    private bool _isPositionPopupVisible = false;
+    private bool _locked = false;
 
     protected override async Task OnParametersSetAsync()
     {
         if (Module != null)
         {
-            isLocked = await Module.InvokeAsync<bool>("getIsLocked");
-        } else
-        {
-            Console.WriteLine("module is null");
+            Dictionary<string, JsonElement> values = await Module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
+            _locked = values["locked"].GetBoolean();
+            StateHasChanged();
         }
     }
 
     private void Lock()
     {
-        isLocked = !isLocked;
+        _locked = !_locked;
         if (Module != null)
         {
             Module.InvokeVoidAsync("lockNode");
@@ -101,7 +100,7 @@
 
     private void TogglePositionPopup()
     {
-        isPositionPopupVisible = !isPositionPopupVisible;
+        _isPositionPopupVisible = !_isPositionPopupVisible;
     }
 
     private void ChangePosition(bool forward, bool full)

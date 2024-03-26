@@ -27,7 +27,7 @@
             Properties
         </li>
     </ul>
-    <button @onclick="Save">Save to pdf</button>
+    
 </div>
 
 @code {
@@ -44,12 +44,5 @@
     private string GetSelectedClass(SideBarTabs tab)
     {
         return LabelEditor._SelectedTab == tab ? "selected" : "";
-    }
-
-    private void Save()
-    {
-        Console.WriteLine("save");
-        Console.WriteLine(LabelEditor.PdfModule);
-        LabelEditor.PdfModule?.InvokeVoidAsync("saveToPdfFromJson");
     }
 }

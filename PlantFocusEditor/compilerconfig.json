@@ -114,5 +114,9 @@
   {
     "outputFile": "Components/StylingBar/LabelStyleContent.razor.css",
     "inputFile": "Components/StylingBar/LabelStyleContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/CodeStyleContent.razor.css",
+    "inputFile": "Components/StylingBar/CodeStyleContent.razor.scss"
   }
 ]

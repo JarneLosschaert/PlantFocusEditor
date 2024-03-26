@@ -29,22 +29,23 @@
 @code {
     [Parameter]
     public EventCallback OnRendered { get; set; }
+
     private IJSObjectReference? _module;
     private Dictionary<string, string> _images = new Dictionary<string, string>();
-
-    protected override void OnInitialized()
-    {
-        _images = ImagesService.GetImages();
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageLayers.js");
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/layers/imageLayer.js");
             await OnRendered.InvokeAsync();
             StateHasChanged();
         }
+    }
+
+    protected override void OnInitialized()
+    {
+        _images = ImagesService.GetImages();
     }
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)

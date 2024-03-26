@@ -23,19 +23,27 @@
 }
 .elements-content .elements-list ul li {
   width: 5rem;
+  height: 5rem;
   padding: 0.5rem;
   background: #f0f0f0;
   border: 1px solid #dbd9d9;
   border-radius: 6px;
   cursor: pointer;
 }
-.elements-content .elements-list ul li img {
+.elements-content .elements-list ul li ::deep svg {
+  height: 100%;
   width: 100%;
+}
+.elements-content .elements-list ul li img {
+  height: 100%;
 }
 .elements-content .elements-list ul li:hover {
   background: #dbd9d9;
   transform: translateX(0);
 }
 .elements-content .elements-list ul li:hover img {
+  transform: scale(1.05);
+}
+.elements-content .elements-list ul li:hover ::deep svg {
   transform: scale(1.05);
 }

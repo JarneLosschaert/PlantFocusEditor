@@ -33,14 +33,20 @@
 
             li {
                 width: 5rem;
+                height: 5rem;
                 padding: 0.5rem;
                 background: $neutral;
                 border: 1px solid $neutral-dark;
                 border-radius: $border-radius-s;
                 cursor: pointer;
 
-                img {
+                ::deep svg {
+                    height: 100%;
                     width: 100%;
+                }
+
+                img {
+                    height: 100%;
                 }
 
                 &:hover {
@@ -48,6 +54,10 @@
                     transform: translateX(0);
 
                     img {
+                        transform: scale(1.05);
+                    }
+
+                    ::deep svg {
                         transform: scale(1.05);
                     }
                 }

@@ -33,19 +33,25 @@
   width: 70%;
 }
 .image-style-content > div > div:last-child label {
-  width: 100%;
-  color: #262626;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  width: 100%;
   padding: 0.5rem;
   background: #f0f0f0;
   border: 1px solid #dbd9d9;
   border-radius: 6px;
-  box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 5px, rgba(0, 0, 0, 0.06) 0px 1px 3px;
   cursor: pointer;
 }
+.image-style-content > div > div:last-child label ::deep svg {
+  width: 1rem;
+  height: 1rem;
+}
 .image-style-content > div > div:last-child label:hover {
-  background: #f0f0f0;
+  background: #dbd9d9;
+  color: #262626;
+}
+.image-style-content > div > div:last-child label:hover ::deep svg {
+  color: #262626;
 }

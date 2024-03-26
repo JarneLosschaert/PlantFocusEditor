@@ -2,31 +2,37 @@
 
 <section class="styling-bar">
     <div class="content-header">
-        <h2>@(_selectedNode == "" ? "Styling bar" : _selectedNode)</h2>
+        <h2>@(_selectedNode == "" ? "Label" : _selectedNode)</h2>
     </div>
     <div class="content">
         @switch (_selectedNode)
         {
             case "Text":
-                <TextStyleContent Module="_textModule"/>
-                <AppearanceContent Module="_module"/>
-                <ControlContent Module="_controlBarModule" />
+                <TextStyleContent Module="_textModule" />
+                <AppearanceContent Module="_appearanceModule" />
+                <ControlContent Module="_controlsModule" />
                 break;
             case "Image":
-                <ImageStyleContent Module="_imageModule"/>
-                <AppearanceContent Module="_module" />
-                <BorderContent Module="_module" />
-                <ControlContent Module="_controlBarModule" />
+                <ImageStyleContent Module="_imageModule" />
+                <AppearanceContent Module="_appearanceModule" />
+                <BorderContent Module="_borderModule" />
+                <ControlContent Module="_controlsModule" />
                 break;
-            case "Shape":
-                <ElementStyleContent Module="_shapeModule" />
-                <AppearanceContent Module="_module" />
-                <BorderContent Module="_module"/>
-                <ControlContent Module="_controlBarModule" />
+            case "Element":
+                <ElementStyleContent Module="_elementModule" />
+                <AppearanceContent Module="_appearanceModule" />
+                <BorderContent Module="_borderModule" />
+                <ControlContent Module="_controlsModule" />
+                break;
+            case "Code":
+                <CodeStyleContent />
+                <AppearanceContent Module="_appearanceModule" />
+                <BorderContent Module="_borderModule" />
+                <ControlContent Module="_controlsModule" />
                 break;
             case "Selecting":
-                <AppearanceContent Module="_module" />
-                <ControlContent Module="_controlBarModule" />
+                <AppearanceContent Module="_appearanceModule" />
+                <ControlContent Module="_controlsModule" />
                 break;
             default:
                 <LabelStyleContent />
@@ -36,23 +42,26 @@
 </section>
 
 @code {
-    private bool selecting = true;
     private string _selectedNode = "";
     private IJSObjectReference? _module;
     private IJSObjectReference? _textModule;
     private IJSObjectReference? _imageModule;
-    private IJSObjectReference? _controlBarModule;
-    private IJSObjectReference? _shapeModule;
+    private IJSObjectReference? _elementModule;
+    private IJSObjectReference? _borderModule;
+    private IJSObjectReference? _appearanceModule;
+    private IJSObjectReference? _controlsModule;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/stylingBar.js");
-            _textModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/textStylingBar.js");
-            _imageModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
-            _controlBarModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/controlBar.js");
-            _shapeModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/imageShapeStylingBar.js");
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/stylingBar.js");
+            _textModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/textStyling.js");
+            _imageModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/imageStyling.js");
+            _elementModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/elementStyling.js");
+            _borderModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/borderStyling.js");
+            _appearanceModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/appearanceStyling.js");
+            _controlsModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/control.js");
         }
     }
 
