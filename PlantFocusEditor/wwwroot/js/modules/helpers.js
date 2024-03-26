@@ -43,6 +43,13 @@ function calcLinearGradient(shapeInfo) {
     startColor.forEach((el, i, arr) => arr[i] = parseInt(el));
     endColor.forEach((el, i, arr) => arr[i] = parseInt(el));
     const angleRadians = calcGradientAngle(shapeGradientStartPoint, shapeGradientEndPoint);
+
+    /*const diffR = Math.abs(startColor[0] - endColor[0]);
+    const diffG = Math.abs(startColor[1] - endColor[1]);
+    const diffB = Math.abs(startColor[2] - endColor[2]);
+
+    const length = Math.max(diffR, diffG, diffB);*/
+
     const length = calcGradientLength(shapeGradientStartPoint, shapeGradientEndPoint);
 
     // Calculate gradient vector components
@@ -86,6 +93,7 @@ function calcLinearGradient(shapeInfo) {
         });
     }
 
+    console.log(gradient);
     return gradient;
 }
 
@@ -108,6 +116,5 @@ function calcGradientLength(startPoint, endPoint) {
 
     return length;
 }
-
 
 export { isValidJson, uuidv4, convertToSVGPath, calcLinearGradient }

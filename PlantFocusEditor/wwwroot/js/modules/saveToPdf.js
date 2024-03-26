@@ -201,16 +201,17 @@ function convertLayerToPdf(doc, group) {
             if (shadowOpacity !== 0) {
                 blurShadow(doc, child);
             }
+            
             console.log(child.fillLinearGradientStartPoint());
             if (child.fillLinearGradientStartPoint() && child.fillLinearGradientEndPoint()) {
                 console.log("in linear gradient");
-                setGradientFillColor(doc, child, groupX, groupY, width, height);
+                setGradientFillLinesRect(doc, child, groupX, groupY, width, height);
                 console.log("linear gradient set");
                 if (strokeWidth !== 0) {
                     doc.setDrawColor(stroke);
                     doc.setLineWidth(strokeWidth);
                     doc.rect(x, y, width, height, 'S');
-                }
+                }                
             } else {
                 setFillColor(doc, child);
             }
@@ -250,6 +251,7 @@ function convertLayerToPdf(doc, group) {
 function setGradientFillColor(doc, child, x, y, width, height) {
     const gradient = calcLinearGradient(child);
     console.log(gradient);
+    
     for (let i = 0; i < gradient.length; i++) {
         const { color, shape } = gradient[i];
         const rectX = x + shape.x;
@@ -266,6 +268,36 @@ function setGradientFillColor(doc, child, x, y, width, height) {
 function drawSolidRect(doc, x, y, width, height, color) {
     doc.setFillColor(color[0], color[1], color[2]);
     doc.rect(x, y, width, height, 'F');
+}
+
+function setGradientFillLinesRect(doc, child, x, y, width, height) {
+    const gradient = calcLinearGradient(child);
+    const firstHalf = gradient.slice(0, Math.ceil(gradient.length / 2));
+    const secondHalf = gradient.slice(Math.ceil(gradient.length / 2), gradient.length - 1);
+    const numLines = gradient.length; 
+    const stepX = (width / numLines) * 2;
+    const stepY = (height / numLines) * 2;
+    doc.setLineWidth(Math.sqrt(stepX * stepX + stepY * stepY));
+    for (let i = 0; i < numLines; i++) {
+        const { color, shape } = gradient[i];
+
+        // Calculate the end coordinates of the line based on the gradient position
+        if (i < numLines / 2) {
+            const lineX1 = x + child.x() + stepX * i;
+            const lineY1 = y + child.y();
+            const lineX2 = x + child.x();
+            const lineY2 = lineY1 + stepY * i;
+            doc.setDrawColor(color[0], color[1], color[2]);
+            doc.line(lineX1, lineY1, lineX2, lineY2);
+        } else {
+            const lineX1 = x + child.x() + width;
+            const lineY1 = y + child.y() + stepY * i - height;
+            const lineX2 = x + child.x() + stepX * i - width;
+            const lineY2 = y + child.y() + height;
+            doc.setDrawColor(color[0], color[1], color[2]);
+            doc.line(lineX1, lineY1, lineX2, lineY2);
+        }
+    }
 }
 
 function addText(doc, child, x, y, textLineY, txt, txtWidth, shadowOpacity) {
