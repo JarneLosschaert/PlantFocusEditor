@@ -1,7 +1,7 @@
 import { stage, layer } from "./state.js";
 import { getScaledCommands } from "./passePartout.js";
 import { front, back } from "./constants.js";
-import { calcLinearGradient } from "./helpers.js";
+import { calcLinearGradient, hexToRgb } from "./helpers.js";
 import { arialRegular } from '../fonts/arial-normal.js';
 import { arialBold } from "../fonts/arial-bold.js";
 import { arialItalic } from "../fonts/arial-italic.js";
@@ -102,7 +102,9 @@ function convertLayerToPdf(doc, group) {
                 arr[i] = { op: segment.op, c: newCoords };
             });
             doc.path(lines);
-            fillPathWithGradient(doc, lines);
+            if (child.fillLinearGradientColorStops()) {
+                fillPathWithGradient(doc, child, lines);
+            }
             console.log(lines);
             if (child.attrs.name === "passepartout") {
                 doc.clip(lines);
@@ -208,9 +210,7 @@ function convertLayerToPdf(doc, group) {
             
             console.log(child.fillLinearGradientStartPoint());
             if (child.fillLinearGradientStartPoint() && child.fillLinearGradientEndPoint() && child.fillLinearGradientColorStops() && !child.fill()) {
-                console.log("in linear gradient");
                 setGradientFillLinesRect(doc, child, groupX, groupY, width, height);
-                console.log("linear gradient set");
                 if (strokeWidth !== 0) {
                     doc.setDrawColor(stroke);
                     doc.setLineWidth(strokeWidth);
@@ -259,44 +259,20 @@ function convertLayerToPdf(doc, group) {
     }
 }
 
-function fillPathWithGradient(doc, lines) {
+function fillPathWithGradient(doc, child, lines) {
+    const colorOne = hexToRgb(child.fillLinearGradientColorStops()[1]);
+    const colorTwo = hexToRgb(child.fillLinearGradientColorStops()[3]);
+    const points = [];
     for (let i = 0; i < lines.length - 1; i++) {
         const startPoint = lines[i].c;
         const endPoint = lines[i + 1].c;
-        const segmentLength = Math.sqrt(Math.pow(startPoint[0] - endPoint[0], 2) + Math.pow(startPoint[1] - endPoint[1], 2));
-        const numPixels = Math.ceil(segmentLength);
-        const dx = (endPoint[0] - startPoint[0]) / segmentLength;
-        const dy = (endPoint[1] - startPoint[1]) / segmentLength;
+        const command = lines[i].op;
 
-        for (let j = 0; j < numPixels; j++) {
-            const x = startPoint[0] + dx * j;
-            const y = startPoint[1] + dy * j;
-            const t = j / numPixels;
-            const color = interpolateColor(gradientColors[0], gradientColors[1], t);
-            doc.setDrawColor(color[0], color[1], color[2]);
-            doc.setLineWidth(1); // Adjust line width for pixel drawing
-            doc.line(x, y, x + 1, y); // Draw a short line segment to simulate a pixel
-        }
     }
-}
-
-// Function to interpolate color between two colors
-function interpolateColor(color1, color2, t) {
-    const r = Math.round(color1[0] * (1 - t) + color2[0] * t);
-    const g = Math.round(color1[1] * (1 - t) + color2[1] * t);
-    const b = Math.round(color1[2] * (1 - t) + color2[2] * t);
-    return [r, g, b];
-}
-
-function drawSolidRect(doc, x, y, width, height, color) {
-    doc.setFillColor(color[0], color[1], color[2]);
-    doc.rect(x, y, width, height, 'F');
 }
 
 function setGradientFillLinesRect(doc, child, x, y, width, height) {
     const gradient = calcLinearGradient(child);
-    const firstHalf = gradient.slice(0, Math.ceil(gradient.length / 2));
-    const secondHalf = gradient.slice(Math.ceil(gradient.length / 2), gradient.length - 1);
     const numLines = gradient.length; 
     const stepX = (width / numLines) * 2;
     const stepY = (height / numLines) * 2;

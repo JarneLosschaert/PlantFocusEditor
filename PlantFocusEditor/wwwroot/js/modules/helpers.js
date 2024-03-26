@@ -35,10 +35,10 @@ function calcLinearGradient(shapeInfo) {
     const shapeGradientEndPoint = shapeInfo.fillLinearGradientEndPoint();
     const shapeGradientColorStops = shapeInfo.fillLinearGradientColorStops();
 
-    const startColorRgbString = shapeGradientColorStops[1];
-    const endColorRgbString = shapeGradientColorStops[3];
-    const startColor = startColorRgbString.match(/\d+/g);
-    const endColor = endColorRgbString.match(/\d+/g);
+    const startColorHexString = shapeGradientColorStops[1];
+    const endColorHexString = shapeGradientColorStops[3];
+    const startColor = hexToRgb(startColorHexString);
+    const endColor = hexToRgb(endColorHexString);
 
     startColor.forEach((el, i, arr) => arr[i] = parseInt(el));
     endColor.forEach((el, i, arr) => arr[i] = parseInt(el));
@@ -117,4 +117,13 @@ function calcGradientLength(startPoint, endPoint) {
     return length;
 }
 
-export { isValidJson, uuidv4, convertToSVGPath, calcLinearGradient }
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16)
+    ] : null;
+}
+
+export { isValidJson, uuidv4, convertToSVGPath, calcLinearGradient, hexToRgb }
