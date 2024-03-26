@@ -34,10 +34,16 @@
   height: 100%;
   width: 100%;
 }
+.elements-content .elements-list ul li img {
+  height: 100%;
+}
 .elements-content .elements-list ul li:hover {
   background: #dbd9d9;
   transform: translateX(0);
 }
 .elements-content .elements-list ul li:hover img {
+  transform: scale(1.05);
+}
+.elements-content .elements-list ul li:hover ::deep svg {
   transform: scale(1.05);
 }

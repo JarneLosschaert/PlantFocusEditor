@@ -1,0 +1,54 @@
+@import "../../wwwroot/css/colors.scss";
+@import "../../wwwroot/css/config.scss";
+
+.code-style-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    & > div {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        & > div {
+            display: flex;
+            align-items: center;
+            transition: $transition;
+
+            h4 {
+                width: 30%;
+            }
+
+            input {
+                width: 70%;
+                color: $text;
+                font-size: 1rem;
+                padding: 0.5rem 0.75rem;
+                border: 1px solid $neutral-dark;
+                border-radius: $border-radius-s;
+                transition: $transition;
+                /*&[type="number"] {
+                -webkit-appearance: none;
+                -moz-appearance: textfield;
+
+                &::-webkit-outer-spin-button,
+                &::-webkit-inner-spin-button {
+                    -webkit-appearance: none;
+                }
+            }*/
+
+                &:focus {
+                    border-color: $primary;
+                    outline: none;
+                    box-shadow: 0 2px 6px $primary-lightest;
+                }
+            }
+        }
+    }
+}

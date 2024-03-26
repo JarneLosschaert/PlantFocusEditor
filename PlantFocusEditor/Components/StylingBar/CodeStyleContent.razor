@@ -1,0 +1,42 @@
+﻿@inject IJSRuntime JS;
+
+<article class="code-style-content">
+    <h3>Code</h3>
+    <div>
+        <div>
+            <h4>Code</h4>
+            <input type="text" id="codeInput" @bind="_code" />
+        </div>
+    </div>
+</article>
+
+@code {
+    private string _code = "";
+
+    private IJSObjectReference? _module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/codeStyling.js");
+            StateHasChanged();
+        }
+    }
+
+    private void GenerateCode()
+    {
+        _module.InvokeVoidAsync("addCode", _code);
+    }
+
+    private void GenerateQrCode()
+    {
+        QRCodeGenerator generator = new QRCodeGenerator();
+        QRCodeData codeData = generator.CreateQrCode(_code, QRCodeGenerator.ECCLevel.Q);
+        PngByteQRCode qrCode = new PngByteQRCode(codeData);
+        byte[] qrCodeByteArr = qrCode.GetGraphic(20);
+        string base64String = Convert.ToBase64String(qrCodeByteArr);
+        string source = $"data:image/png;base64,{base64String}";
+        _module.InvokeVoidAsync("addQRCode", source);
+    }
+}
