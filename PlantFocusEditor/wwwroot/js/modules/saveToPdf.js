@@ -102,7 +102,11 @@ function convertLayerToPdf(doc, group) {
                 arr[i] = { op: segment.op, c: newCoords };
             });
             doc.path(lines);
-            doc.clip(lines);
+            fillPathWithGradient(doc, lines);
+            console.log(lines);
+            if (child.attrs.name === "passepartout") {
+                doc.clip(lines);
+            }
             doc.setDrawColor('#000000');
             doc.stroke();
         }
@@ -203,7 +207,7 @@ function convertLayerToPdf(doc, group) {
             }
             
             console.log(child.fillLinearGradientStartPoint());
-            if (child.fillLinearGradientStartPoint() && child.fillLinearGradientEndPoint()) {
+            if (child.fillLinearGradientStartPoint() && child.fillLinearGradientEndPoint() && child.fillLinearGradientColorStops() && !child.fill()) {
                 console.log("in linear gradient");
                 setGradientFillLinesRect(doc, child, groupX, groupY, width, height);
                 console.log("linear gradient set");
@@ -214,6 +218,13 @@ function convertLayerToPdf(doc, group) {
                 }                
             } else {
                 setFillColor(doc, child);
+                if (strokeWidth !== 0) {
+                    doc.setDrawColor(stroke);
+                    doc.setLineWidth(strokeWidth);
+                    doc.rect(x, y, width, height, 'FD');
+                } else {
+                    doc.rect(x, y, width, height, 'S');
+                }
             }
             //doc.restoreGraphicsState();
             console.log("rect end");
@@ -248,21 +259,33 @@ function convertLayerToPdf(doc, group) {
     }
 }
 
-function setGradientFillColor(doc, child, x, y, width, height) {
-    const gradient = calcLinearGradient(child);
-    console.log(gradient);
-    
-    for (let i = 0; i < gradient.length; i++) {
-        const { color, shape } = gradient[i];
-        const rectX = x + shape.x;
-        const rectY = y + shape.y;
-        // Ensure the rectangle stays within the bounds of the shape
-        const diffX = Math.abs(child.x() - shape.x);
-        const diffY = Math.abs(child.y() - shape.y);
-        const rectWidth = width - diffX;
-        const rectHeight = height - diffY;
-        drawSolidRect(doc, rectX, rectY, rectWidth, rectHeight, color);
+function fillPathWithGradient(doc, lines) {
+    for (let i = 0; i < lines.length - 1; i++) {
+        const startPoint = lines[i].c;
+        const endPoint = lines[i + 1].c;
+        const segmentLength = Math.sqrt(Math.pow(startPoint[0] - endPoint[0], 2) + Math.pow(startPoint[1] - endPoint[1], 2));
+        const numPixels = Math.ceil(segmentLength);
+        const dx = (endPoint[0] - startPoint[0]) / segmentLength;
+        const dy = (endPoint[1] - startPoint[1]) / segmentLength;
+
+        for (let j = 0; j < numPixels; j++) {
+            const x = startPoint[0] + dx * j;
+            const y = startPoint[1] + dy * j;
+            const t = j / numPixels;
+            const color = interpolateColor(gradientColors[0], gradientColors[1], t);
+            doc.setDrawColor(color[0], color[1], color[2]);
+            doc.setLineWidth(1); // Adjust line width for pixel drawing
+            doc.line(x, y, x + 1, y); // Draw a short line segment to simulate a pixel
+        }
     }
+}
+
+// Function to interpolate color between two colors
+function interpolateColor(color1, color2, t) {
+    const r = Math.round(color1[0] * (1 - t) + color2[0] * t);
+    const g = Math.round(color1[1] * (1 - t) + color2[1] * t);
+    const b = Math.round(color1[2] * (1 - t) + color2[2] * t);
+    return [r, g, b];
 }
 
 function drawSolidRect(doc, x, y, width, height, color) {
