@@ -9,8 +9,8 @@ function getSelectedItemType() {
     if (isSelected && selected.every(el => el.getClassName() === "Image") && !selected.every(el => el.attrs.name === "qrcode") && !selected.every(el => el.attrs.name === "barcode")) {
         return "Image";
     }
-    if (isSelected && selected.every(el => el.getClassName() === "Shape")) {
-        return "Shape";
+    if (isSelected && selected.every(el => el.attrs.name === "element")) {
+        return "Element";
     }
     if (isSelected) {
         return "Selecting";

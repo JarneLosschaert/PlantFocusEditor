@@ -33,13 +33,15 @@
 
             li {
                 width: 5rem;
+                height: 5rem;
                 padding: 0.5rem;
                 background: $neutral;
                 border: 1px solid $neutral-dark;
                 border-radius: $border-radius-s;
                 cursor: pointer;
 
-                img {
+                ::deep svg {
+                    height: 100%;
                     width: 100%;
                 }
 

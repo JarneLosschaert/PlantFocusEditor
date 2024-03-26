@@ -1,73 +1,33 @@
 import { currentGroup } from "../constants.js";
 import { addHoverAnimation } from "../animations.js";
+import { findHeightPassePartout } from "../passePartout.js";
+function addElement(svg) {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(svg, "text/xml");
+    const path = xmlDoc.getElementsByTagName("path")[0];
+    const fillColor = path.getAttribute("fill");
 
-function addRectangle() {
-    const rectangle = new Konva.Rect({
-        name: "shape",
-        x: 10,
-        y: 10,
-        width: 100,
-        height: 100,
-        fill: "#ffffff",
+    const element = new Konva.Path({
+        name: "element",
+        data: path.getAttribute("d"),
+        fill: fillColor,
         stroke: "#000000",
-        strokeWidth: 4,
+        strokeWidth: 0,
         draggable: true,
+        scaleX: 3,
+        scaleY: 3,
         shadowBlur: 10,
         shadowOffset: { x: 5, y: 5 },
         shadowOpacity: 0,
         shadowForStrokeEnabled: false,
         hitStrokeWidth: 0,
-        locked: false
+        locked: false,
     });
-    currentGroup.add(rectangle);
-    addHoverAnimation(rectangle);
+
+    currentGroup.add(element);
+    addHoverAnimation(element);
 }
 
-function addCircle() {
-    const circle = new Konva.Ellipse({
-        name: "shape",
-        x: 60,
-        y: 60,
-        radiusX: 50,
-        radiusY: 50,
-        fill: "#ffffff",
-        stroke: "#000000",
-        strokeWidth: 4,
-        draggable: true,
-        shadowBlur: 10,
-        shadowOffset: { x: 5, y: 5 },
-        shadowOpacity: 0,
-        shadowForStrokeEnabled: false,
-        hitStrokeWidth: 0,
-        locked: false
-    });
-    currentGroup.add(circle);
-    addHoverAnimation(circle);
-}
-
-function addTriangle() {
-    const triangle = new Konva.Shape({
-        name: "shape",
-        x: 10,
-        y: 10,
-        sides: 3,
-        width: 100,
-        height: 100,
-        fill: "#ffffff",
-        stroke: "#000000",
-        strokeWidth: 4,
-        draggable: true,
-        shadowBlur: 10,
-        shadowOffset: { x: 5, y: 5 },
-        shadowOpacity: 0,
-        shadowForStrokeEnabled: false,
-        hitStrokeWidth: 0,
-        sceneFunc: sceneFunc,
-        locked: false
-    });
-    currentGroup.add(triangle);
-    addHoverAnimation(triangle);
-}
 
 function sceneFunc(context, shape) {
     var width = shape.width();
@@ -92,4 +52,4 @@ function sceneFunc(context, shape) {
     context.fillStrokeShape(shape);
 }
 
-export { addRectangle, addCircle, addTriangle, sceneFunc };
+export { addElement, sceneFunc };

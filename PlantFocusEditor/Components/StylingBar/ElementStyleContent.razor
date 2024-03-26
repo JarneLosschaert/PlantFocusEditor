@@ -14,11 +14,13 @@
 @code {
     [Parameter]
     public IJSObjectReference? Module { get; set; }
+
     private string _fillColor = "#000000";
 
     protected override async Task OnParametersSetAsync()
     {
-        _fillColor = await Module.InvokeAsync<string>("getFillColor");
+        Dictionary<string, JsonElement> values = await Module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
+        _fillColor = values["fill"].ToString();
         StateHasChanged();
     }
 
@@ -27,7 +29,7 @@
         _fillColor = color;
         if (Module != null)
         {
-            Module.InvokeVoidAsync("handleShapeColorChange", _fillColor);
+            Module.InvokeVoidAsync("handleColorChange", _fillColor);
         }
     }
 }

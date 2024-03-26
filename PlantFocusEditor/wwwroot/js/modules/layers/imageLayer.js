@@ -4,15 +4,19 @@ import { currentGroup } from "../constants.js";
 function addImage(id, src) {
     const img = new Image();
     img.src = src;
+
+    const scale = 200 / img.height;
+
     const kimg = new Konva.Image({
         name: "img",
         image: img,
         src: img.src,
         id: id,
-        width: 100,
-        height: 100,
+        height: img.height,
+        width: img.width,
+        scaleX: scale,
+        scaleY: scale,
         draggable: true,
-        margin: 30,
         stroke: "#000000",
         strokeWidth: 0,
         shadowBlur: 10,

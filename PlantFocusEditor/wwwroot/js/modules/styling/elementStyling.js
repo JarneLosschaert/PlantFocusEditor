@@ -1,15 +1,20 @@
 import { tr } from "../constants.js";
 
-function getFillColor() {
-    const firstNode = tr.nodes()[0];
-    return firstNode.fill();
+function handleColorChange(color) {
+    console.log("handleColorChange");
+    console.log(tr.nodes());
+    console.log(tr.nodes().length);
+    tr.nodes().forEach(node => {
+        node.fill(color);
+    });
+    tr.getLayer().batchDraw();
 }
 
 function getValues() {
     const firstNode = tr.nodes()[0];
     return {
-        fillColor: firstNode.fill()
+        fill: firstNode.fill()
     };
 }
 
-export { getFillColor, getValues };
+export { getValues, handleColorChange };

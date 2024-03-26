@@ -70,7 +70,7 @@ function handleSelectionEnd(e) {
         (node) => node.attrs.name === "text" ||
             node.attrs.name === "img" ||
             node.attrs.name === "barcode" ||
-            node.attrs.name === "shape"
+            node.attrs.name === "element"
     );
     const box = selectionRectangle.getClientRect();
     const selected = shapes.filter((shape) =>
@@ -97,7 +97,7 @@ function handleSelection(e) {
         !e.target.hasName("text") &&
         !e.target.hasName("img") &&
         !e.target.hasName("barcode") &&
-        !e.target.hasName("shape") &&
+        !e.target.hasName("element") &&
         !e.target.hasName("qrcode")
     ) {
         return;
