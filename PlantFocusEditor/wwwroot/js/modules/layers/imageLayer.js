@@ -8,7 +8,7 @@ function addImage(id, src) {
     const scale = 200 / img.height;
 
     const kimg = new Konva.Image({
-        name: "img",
+        name: "image",
         image: img,
         src: img.src,
         id: id,

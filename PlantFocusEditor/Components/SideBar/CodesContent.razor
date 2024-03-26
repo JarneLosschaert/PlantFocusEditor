@@ -4,7 +4,7 @@
     <div>
         <h3>Barcode</h3>
         <input type="number" id="barcodeInput" @bind="_barcode" />
-        <button @onclick="AddBarcode">Generate barcode</button>
+        <button @onclick="GenerateBarcode">Generate barcode</button>
     </div>
     <div>
         <h3>QR code</h3>
@@ -28,7 +28,7 @@
         }
     }
 
-    public void AddBarcode()
+    public void GenerateBarcode()
     {
         _module.InvokeVoidAsync("addBarcode", _barcode);
     }
