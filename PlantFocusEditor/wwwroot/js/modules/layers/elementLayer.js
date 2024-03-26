@@ -1,16 +1,15 @@
 import { currentGroup } from "../constants.js";
 import { addHoverAnimation } from "../animations.js";
-import { findHeightPassePartout } from "../passePartout.js";
 function addElement(svg) {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(svg, "text/xml");
     const path = xmlDoc.getElementsByTagName("path")[0];
-    const fillColor = path.getAttribute("fill");
 
     const element = new Konva.Path({
+        x: 50,
+        y: 50,
         name: "element",
         data: path.getAttribute("d"),
-        fill: fillColor,
         stroke: "#000000",
         strokeWidth: 0,
         draggable: true,
@@ -22,6 +21,9 @@ function addElement(svg) {
         shadowForStrokeEnabled: false,
         hitStrokeWidth: 0,
         locked: false,
+        fillLinearGradientStartPoint: { x: 0, y: 0 },
+        fillLinearGradientEndPoint: { x: 50, y: 0 },
+        fillLinearGradientColorStops: [0, "#000000", 1, "#000000"],
     });
 
     currentGroup.add(element);

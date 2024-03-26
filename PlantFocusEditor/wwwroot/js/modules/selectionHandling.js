@@ -68,7 +68,7 @@ function handleSelectionEnd(e) {
     selectionRectangle.visible(false);
     const shapes = stage.find(
         (node) => node.attrs.name === "text" ||
-            node.attrs.name === "img" ||
+            node.attrs.name === "image" ||
             node.attrs.name === "barcode" ||
             node.attrs.name === "element"
     );
@@ -95,7 +95,7 @@ function handleSelection(e) {
     }
     if (
         !e.target.hasName("text") &&
-        !e.target.hasName("img") &&
+        !e.target.hasName("image") &&
         !e.target.hasName("barcode") &&
         !e.target.hasName("element") &&
         !e.target.hasName("qrcode")

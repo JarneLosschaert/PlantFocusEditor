@@ -5,8 +5,19 @@
     <div>
         <div>
             <h4>Color</h4>
-            <ColorInput fontColor="@_fillColor"
-                        handleColor="@ChangeColor" />
+            <ColorInput fontColor="@_fillColor1"
+                        handleColor="@ChangeColor1" />
+        </div>
+        <div>
+            <h4></h4>
+            <ColorInput fontColor="@_fillColor2"
+                        handleColor="@ChangeColor2" />
+        </div>
+        <div>
+            <h4></h4>
+            <Slider value="@colorEndPoint"
+                    unit="%"
+                    handleValue="@changeColorEndPoint" />
         </div>
     </div>
 </article>
@@ -15,21 +26,46 @@
     [Parameter]
     public IJSObjectReference? Module { get; set; }
 
-    private string _fillColor = "#000000";
+    private string _fillColor1 = "#000000";
+    private string _fillColor2 = "#000000";
+    private int colorEndPoint = 50;
 
     protected override async Task OnParametersSetAsync()
     {
         Dictionary<string, JsonElement> values = await Module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
-        _fillColor = values["fill"].ToString();
+        _fillColor1 = values["fillColor1"].GetString();
+        _fillColor2 = values["fillColor2"].GetString();
         StateHasChanged();
     }
 
-    private void ChangeColor(string color)
+    private void ChangeColor()
     {
-        _fillColor = color;
         if (Module != null)
         {
-            Module.InvokeVoidAsync("handleColorChange", _fillColor);
+            List<string> colors = new List<string> { _fillColor1, _fillColor2 };
+            Module.InvokeVoidAsync("handleColorChange", colors);
+        }
+    }
+
+    private void ChangeColor1(string color)
+    {
+        _fillColor1 = color;
+        ChangeColor();
+
+    }
+
+    private void ChangeColor2(string color)
+    {
+        _fillColor2 = color;
+        ChangeColor();
+    }
+
+    private void changeColorEndPoint(int value)
+    {
+        colorEndPoint = value;
+        if (Module != null)
+        {
+            Module.InvokeVoidAsync("handleEndPointChange", colorEndPoint);
         }
     }
 }
