@@ -1,4 +1,4 @@
-﻿@inject IJSRuntime JS
+﻿@inject IJSRuntime JS;
 
 <article class="codes-content">
     <div>
@@ -41,6 +41,6 @@
         byte[] qrCodeByteArr = qrCode.GetGraphic(20);
         string base64String = Convert.ToBase64String(qrCodeByteArr);
         string source = $"data:image/png;base64,{base64String}";
-        _module.InvokeVoidAsync("addQRCode", source);
+        _module.InvokeVoidAsync("addQRCode", source, _qrcode);
     }
 }

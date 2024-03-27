@@ -24,8 +24,14 @@
                 <BorderContent Module="_borderModule" />
                 <ControlContent Module="_controlsModule" />
                 break;
-            case "Code":
-                <CodeStyleContent />
+            case "Barcode":
+                <CodeStyleContent Module="_codeModule" isBarcode="true" />
+                <AppearanceContent Module="_appearanceModule" />
+                <BorderContent Module="_borderModule" />
+                <ControlContent Module="_controlsModule" />
+                break;
+            case "QR code":
+                <CodeStyleContent Module="_codeModule" isBarcode="false" />
                 <AppearanceContent Module="_appearanceModule" />
                 <BorderContent Module="_borderModule" />
                 <ControlContent Module="_controlsModule" />
@@ -47,6 +53,7 @@
     private IJSObjectReference? _textModule;
     private IJSObjectReference? _imageModule;
     private IJSObjectReference? _elementModule;
+    private IJSObjectReference? _codeModule;
     private IJSObjectReference? _borderModule;
     private IJSObjectReference? _appearanceModule;
     private IJSObjectReference? _controlsModule;
@@ -59,6 +66,7 @@
             _textModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/textStyling.js");
             _imageModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/imageStyling.js");
             _elementModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/elementStyling.js");
+            _codeModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/codeStyling.js");
             _borderModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/borderStyling.js");
             _appearanceModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/appearanceStyling.js");
             _controlsModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/control.js");
