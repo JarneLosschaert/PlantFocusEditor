@@ -14,7 +14,7 @@
                 <TextContent />
                 break;
             case SideBarTabs.Images:
-                <ImagesContent @ref="_imagesContent" OnRendered="OnImagesContentRendered" />
+                <ImagesContent />
                 break;
             case SideBarTabs.Elements:
                 <ElementsContent />
@@ -33,16 +33,4 @@
 @code {
     [CascadingParameter]
     public LabelEditor? LabelEditor { get; set; }
-
-    private ImagesContent? _imagesContent;
-    private Dictionary<string, string> _imagesToAdd = new();
-
-    private void OnImagesContentRendered()
-    {
-        foreach (KeyValuePair<string, string> image in _imagesToAdd)
-        {
-            _imagesContent?.AddImage(image.Key, image.Value);
-        }
-        _imagesToAdd.Clear();
-    }
 }
