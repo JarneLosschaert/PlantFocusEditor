@@ -4,7 +4,7 @@
 <article class="images-content">
     <div class="input-file-container">
         <label for="add-image">
-            <span>Choose your own image here</span>
+            <span>Choose your own image</span>
             <span>Supports: PNG & JPG</span>
         </label>
         <InputFile id="add-image" OnChange="OnInputFileChange"></InputFile>
@@ -13,10 +13,10 @@
         @if (_images.Count > 0)
         {
             <ul>
-                @foreach (KeyValuePair<string, string> image in _images)
+                @foreach (var image in _images)
                 {
                     <li>
-                        <img src="@image.Value" id="@image.Key" alt="img" @onclick="@(() => SelectImageFromList(image.Key, image.Value))" />
+                        <img src="@image" alt="image" @onclick="() => AddImage(image)" />
                     </li>
                 }
             </ul>
@@ -27,18 +27,14 @@
 
 
 @code {
-    [Parameter]
-    public EventCallback OnRendered { get; set; }
-
     private IJSObjectReference? _module;
-    private Dictionary<string, string> _images = new Dictionary<string, string>();
+    private List<string> _images = new List<string>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/layers/imageLayer.js");
-            await OnRendered.InvokeAsync();
             StateHasChanged();
         }
     }
@@ -46,6 +42,18 @@
     protected override void OnInitialized()
     {
         _images = ImagesService.GetImages();
+        if (_images.Count == 0)
+        {
+            ImagesService.AddImage("https://www.w3schools.com/w3images/paris.jpg");
+            ImagesService.AddImage("https://www.w3schools.com/w3images/mountains.jpg");
+            ImagesService.AddImage("https://www.w3schools.com/w3images/lights.jpg");
+            ImagesService.AddImage("https://www.w3schools.com/w3images/nature.jpg");
+            ImagesService.AddImage("https://www.w3schools.com/w3images/snow.jpg");
+            ImagesService.AddImage("https://www.w3schools.com/w3images/forest.jpg");
+            ImagesService.AddImage("https://www.w3schools.com/w3images/rocks.jpg");
+            ImagesService.AddImage("https://www.w3schools.com/w3images/nature.jpg");
+            ImagesService.AddImage("https://www.w3schools.com/w3images/mist.jpg");
+        }
     }
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
@@ -57,23 +65,12 @@
             await file.OpenReadStream().ReadAsync(buffer);
             var imageData = Convert.ToBase64String(buffer);
             var src = $"data:{file.ContentType};base64,{imageData}";
-            var id = Guid.NewGuid().ToString();
-            ImagesService.AddImage(id, src);
-            if (_module != null)
-            {
-                await _module.InvokeVoidAsync("addImage", id, src);
-            }
+            ImagesService.AddImage(src);
         }
     }
 
-    public void AddImage(string id, string src)
+    public void AddImage(string src)
     {
-        ImagesService.AddImage(id, src);
-        StateHasChanged();
-    }
-
-    public void SelectImageFromList(string id, string src)
-    {
-        _module?.InvokeVoidAsync("addImage", id, src);
+        _module?.InvokeVoidAsync("addImage", src);
     }
 }

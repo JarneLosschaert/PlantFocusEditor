@@ -2,23 +2,15 @@
 {
     public class ImagesService
     {
-        private readonly Dictionary<string, string> _images = [];
-        public Dictionary<string, string> GetImages()
+        private readonly List<string> _images = [];
+        public List<string> GetImages()
         {
             return _images;
         }
-        public string GetImageById(string id)
-        {
-            if (_images.TryGetValue(id, out string? value))
-            {
-                return value;
-            }
-            return "";
-        }
 
-        public void AddImage(string id, string source)
+        public void AddImage(string source)
         {
-            _images.Add(id, source);
+            _images.Insert(0, source);
         }
     }
 }
