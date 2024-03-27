@@ -1,68 +1,66 @@
 import { tr, currentGroup } from "../constants.js";
 import { addHoverAnimation } from "../animations.js";
 
-function addBarcode(inputValue) {
-    inputValue = inputValue.toString();
+function addBarcode(value) {
+    value = value.toString();
     const canvas = document.createElement("canvas");
 
     JsBarcode(canvas, value, {
         format: "CODE128"
     });
 
-    const barcodeImg = new Konva.Image({
-        x: 0,
-        y: 0,
-        width: 100,
-        height: 100,
-        name: "barcode",
-        number: "",
-        draggable: true,
-        src: "",
-        stroke: "#000000",
-        strokeWidth: 0,
-        shadowBlur: 10,
-        shadowOffset: { x: 5, y: 5 },
-        shadowOpacity: 0,
-        locked: false
-    });
-
     const img = new Image();
     img.src = canvas.toDataURL("image/png");
-    if (barcodeImg.attrs.src === "") {
+
+    img.onload = function () {
+        const barcodeImg = new Konva.Image({
+            x: 0,
+            y: 0,
+            image: img,
+            src: img.src,
+            code: value,
+            name: "barcode",
+            draggable: true,
+            stroke: "#000000",
+            strokeWidth: 0,
+            shadowBlur: 10,
+            shadowOffset: { x: 5, y: 5 },
+            shadowOpacity: 0,
+            locked: false
+        });
+
+        addHoverAnimation(barcodeImg);
         currentGroup.add(barcodeImg);
     }
-
-    barcodeImg.attrs.src = img.src;
-    barcodeImg.image(img);
-    barcodeImg.attrs.number = value;
-
-    currentGroup.add(barcodeImg);
-
-    addHoverAnimation(barcodeImg);
-    tr.forceUpdate();
 }
 
-function addQRCode(src) {
+function addQRCode(src, value) {
+    value = value.toString();
+
     const img = new Image();
     img.src = src;
-    const kimg = new Konva.Image({
-        name: "qrcode",
-        image: img,
-        src: src,
-        width: 100,
-        height: 100,
-        draggable: true,
-        margin: 30,
-        stroke: "#000000",
-        strokeWidth: 0,
-        shadowBlur: 10,
-        shadowOffset: { x: 5, y: 5 },
-        shadowOpacity: 0,
-        locked: false
-    });
-    addHoverAnimation(kimg);
-    currentGroup.add(kimg);
-    tr.forceUpdate();
+
+    img.onload = function () {
+        const kimg = new Konva.Image({
+            name: "qrcode",
+            image: img,
+            src: src,
+            code: value,
+            width: 100,
+            height: 100,
+            draggable: true,
+            margin: 30,
+            stroke: "#000000",
+            strokeWidth: 0,
+            shadowBlur: 10,
+            shadowOffset: { x: 5, y: 5 },
+            shadowOpacity: 0,
+            locked: false
+        });
+
+        addHoverAnimation(kimg);
+        currentGroup.add(kimg);
+    }
 }
 
 export { addBarcode, addQRCode };

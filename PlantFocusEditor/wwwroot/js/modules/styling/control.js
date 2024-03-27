@@ -1,22 +1,10 @@
 import { tr, selectionRectangle, hoverTr, currentGroup } from "../constants.js";
 import { addHoverAnimation } from "../animations.js";
-import { uuidv4 } from "../helpers.js";
-
-let imagesReference = null;
-
-const setReference = (ref) => imagesReference = ref;
 
 function deleteNodes() {
-    // remove it all
     const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
-        if (node.attrs.name === "barcode") {
-            //removeBarcode();
-        } else if (node.getClassName() === "Image" && node.attrs.name !== "qrcode") {
-            node.remove();
-        } else {
-            node.destroy();
-        }
+        node.destroy();
     });
     tr.nodes([]);
 }
@@ -47,35 +35,17 @@ function changePosition(forward, full) {
 function cloneNode() {
     const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
-        if (node.getClassName() === "Image") {
-
-            // use add image
-            const newId = uuidv4();
-            const clone = node.clone({
-                x: node.x() + 10,
-                y: node.y() + 10,
-                id: newId,
-                locked: node.attrs.locked
-            });
-            currentGroup.add(clone);
-            clone.off("mouseover");
-            clone.off("mouseout");
-            addHoverAnimation(clone);
-            imagesReference.invokeMethodAsync("CloneImage", newId, node.attrs.src);
-        } else {
-            const clone = node.clone({
-                x: node.x() + 10,
-                y: node.y() + 10,
-                locked: node.attrs.locked
-            });
-            currentGroup.add(clone);
-            clone.off("mouseover");
-            clone.off("mouseout");
-            addHoverAnimation(clone);
-        }
+        const clone = node.clone({
+            x: node.x() + 10,
+            y: node.y() + 10,
+            locked: node.attrs.locked
+        });
+        currentGroup.add(clone);
+        clone.off("mouseover");
+        clone.off("mouseout");
+        addHoverAnimation(clone);
     });
 }
-
 
 function lockNode() {
     const selectedNodes = tr.nodes();
@@ -96,4 +66,4 @@ function getValues() {
 
 }
 
-export { deleteNodes, changePosition, cloneNode, lockNode, getValues, setReference };
+export { deleteNodes, changePosition, cloneNode, lockNode, getValues };
