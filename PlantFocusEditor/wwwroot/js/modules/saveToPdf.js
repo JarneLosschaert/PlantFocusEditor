@@ -47,6 +47,14 @@ import { georgiaBoldItalic } from "../fonts/georgia-bold-italic.js";
     clone.destroy();
 }*/
 
+function getJsonToRender() {
+    return JSON.stringify(front);
+}
+
+function getDimensions() {
+    return [stage.width(), stage.height()];
+}
+
 async function saveToPdfFromJson() {
     console.log("save to pdf from json");
     const doc = new window.jspdf.jsPDF({
@@ -510,4 +518,4 @@ function calcCoordinates(node) {
     return [X, Y];
 }
 
-export { saveToPdfFromJson }
+export { saveToPdfFromJson, getJsonToRender, getDimensions }

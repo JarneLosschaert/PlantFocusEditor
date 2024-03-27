@@ -1,9 +1,11 @@
 ﻿@inject IJSRuntime JS;
+@inject PDFConversionService PDFConversionService
 
 <section class="editor">
     <EditorBar />
     <div id="konva-container" @onclick="OnKonvaClicked"></div>
     <button @onclick="Save">Save to pdf</button>
+    <button @onclick="SaveToPdf">Save to pdf iText</button>
 </section>
 
 @code {
@@ -25,6 +27,16 @@
         if (_module != null)
         {
             _module.InvokeVoidAsync("saveToPdfFromJson");
+        }
+    }
+
+    public async Task SaveToPdf()
+    {
+        if (_module != null)
+        {
+            string jsonToRender = await _module.InvokeAsync<string>("getJsonToRender");
+            float[] dimensions = await _module.InvokeAsync<float[]>("getDimensions");
+            PDFConversionService.SaveToPdf(jsonToRender, dimensions);
         }
     }
 

@@ -9,7 +9,7 @@ function createTextLayer(type) {
         fontSize: 16,
         draggable: true,
         width: 250,
-        height: "auto",
+        height: 50,
         padding: 10,
         align: "center",
         shadowColor: 'black',
