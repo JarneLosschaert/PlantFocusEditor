@@ -21,7 +21,6 @@ function addElement(svg) {
         shadowOpacity: 0,
         shadowForStrokeEnabled: false,
         hitStrokeWidth: 0,
-        locked: false,
         fillLinearGradientStartPoint: { x: 0, y: 0 },
         fillLinearGradientEndPoint: { x: originalWidth, y: 0 },
         fillLinearGradientColorStops: [0, "#45ac34", 0.5, "#45ac34", 1, "#c6d300"],

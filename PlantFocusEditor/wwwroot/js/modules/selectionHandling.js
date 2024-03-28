@@ -8,7 +8,6 @@ let selecting = false;
 function handleSelections() {
     tr.nodes([]);
     tr.remove();
-    selectionRectangle.remove();
     layer.add(selectionRectangle);
     layer.add(tr);
     layer.add(hoverTr);
@@ -65,20 +64,47 @@ function handleSelectionEnd(e) {
     }
     e.evt.preventDefault();
     selectionRectangle.visible(false);
-    const shapes = stage.find(
+
+    const box = selectionRectangle.getClientRect();
+    const groupPos = currentGroup.absolutePosition();
+    const groupWidth = currentGroup.width() * currentGroup.scaleX();
+    console.log(groupPos);
+    console.log(box);
+    box.x -= groupPos.x;
+    box.y -= groupPos.y;
+
+
+    const shapes = currentGroup.find(
         (node) => node.attrs.name === "text" ||
             node.attrs.name === "image" ||
             node.attrs.name === "barcode" ||
+            node.attrs.name === "qrcode" ||
             node.attrs.name === "element"
     );
-    const box = selectionRectangle.getClientRect();
+    console.log(shapes);
+    console.log(box);
+
+
     const selected = shapes.filter((shape) =>
-        Konva.Util.haveIntersection(box, shape.getClientRect())
+        haveIntersection(shape.getClientRect(), box)
     );
+
     tr.nodes(selected);
-    hoverTr.nodes([]);
-    toggleLock();
+    ToggleTr();
 }
+
+function haveIntersection(rect1, rect2) {
+    console.log(rect1);
+    console.log(rect2);
+return (
+        rect1.x < rect2.x + rect2.width &&
+        rect1.x + rect1.width > rect2.x &&
+        rect1.y < rect2.y + rect2.height &&
+        rect1.y + rect1.height > rect2.y
+    );
+}
+
+
 
 function handleSelection(e) {
     tr.moveToTop();
@@ -87,7 +113,7 @@ function handleSelection(e) {
     if (selectionRectangle.visible()) {
         return;
     }
-    if (e.target === stage) {
+    if (e.target === stage || e.target.attrs.name === "passepartout") {
         tr.nodes([]);
         return;
     }
@@ -112,15 +138,32 @@ function handleSelection(e) {
         const nodes = tr.nodes().concat([e.target]);
         tr.nodes(nodes);
     }
+    ToggleTr();
+}
+
+function ToggleTr() {
+    toggleResize();
     toggleLock();
     hoverTr.nodes([]);
 }
 
-function toggleLock() {
-    const nodes = tr.nodes();
-    const locked = nodes.every(node => node.attrs.locked);
-    tr.resizeEnabled(!locked);
-    tr.rotateEnabled(!locked);
+function toggleResize() {
+    const selectedNodes = tr.nodes();
+    const locked = selectedNodes.some(node => node.attrs.name === "image" || node.attrs.name === "qrcode" || node.attrs.name === "barcode");
+    if (locked) {
+        const enabledAnchers = ["top-left", "top-right", "bottom-left", "bottom-right"];
+        tr.enabledAnchors(enabledAnchers);
+    } else {
+        const enabledAnchers = ["top-left", "top-right", "bottom-left", "bottom-right", "top-center", "bottom-center", "middle-left", "middle-right"];
+        tr.enabledAnchors(enabledAnchers);
+    }
 }
 
-export { handleSelections };
+function toggleLock() {
+    const selectedNodes = tr.nodes();
+    const locked = selectedNodes.some(node => !node.draggable());
+    tr.rotateEnabled(!locked);
+    tr.resizeEnabled(!locked);
+}
+
+export { handleSelections, toggleLock };

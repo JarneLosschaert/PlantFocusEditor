@@ -37,11 +37,26 @@ function loadTemplate(json) {
     json = JSON.parse(json);
     const front = getGroupJson(json[0]);
     const back = getGroupJson(json[1]);
+    loadGroup(back, false);
+    loadGroup(front);
+}
 
-    setFront(front);
-    setBack(back);
-    setCurrentGroup();
+function loadGroup(group, isFront = true) {
+    layer.children.forEach(child => {
+        if (child.getClassName() === "Group") {
+            child.remove();
+        }
+    });
+
+    if (isFront) {
+        setFront(group);
+    } else {
+        setBack(group);
+    }
+    setCurrentGroup(isFront);
     layer.add(currentGroup);
+    currentGroup.moveToBottom();
+    tr.nodes([]);
 }
 
 function getGroupJson(json) {
@@ -56,12 +71,6 @@ function getGroupJson(json) {
         const jsonString = jsonGroup.toJSON();
         json = JSON.parse(jsonString);
     }
-
-    layer.children.forEach(child => {
-        if (child.getClassName() === "Group") {
-            child.remove();
-        }
-    });
 
     json.children.forEach(child => {
         child = Konva.Node.create(child);
@@ -146,4 +155,4 @@ function getBackState() {
     }
 }
 
-export { stage, layer, init, loadTemplate, getGroupJson };
+export { stage, layer, init, loadTemplate, getGroupJson, loadGroup };

@@ -1,4 +1,4 @@
-import { layer, getGroupJson } from "./state.js";
+import { layer, getGroupJson, loadGroup } from "./state.js";
 import { currentGroup, front, back, setCurrentGroup, setBack, setFront, tr } from "./constants.js";
 import { findHeightPath } from "./passePartout.js";
 import { handleSelections } from "./selectionHandling.js";
@@ -38,21 +38,15 @@ function undo() {
             historyFrontIndex--;
             const json = JSON.parse(historyFront[historyFrontIndex]);
             group = getGroupJson(json);
-            setFront(group);
-            setCurrentGroup(true);
+            loadGroup(group);
         }
     } else {
         if (historyBackIndex > 0) {
             historyBackIndex--;
             const json = JSON.parse(historyBack[historyBackIndex]);
             group = getGroupJson(json);
-            setBack(group);
-            setCurrentGroup(false);
+            loadGroup(group, false);
         }
-    }
-    if (group) {
-        layer.add(group);
-        tr.nodes([]);
     }
 }
 
@@ -63,21 +57,15 @@ function redo() {
             historyFrontIndex++;
             const json = JSON.parse(historyFront[historyFrontIndex]);
             group = getGroupJson(json);
-            setFront(group);
-            setCurrentGroup(true);
+            loadGroup(group);
         }
     } else {
         if (historyBackIndex < historyBack.length - 1) {
             historyBackIndex++;
             const json = JSON.parse(historyBack[historyBackIndex]);
             group = getGroupJson(json);
-            setBack(group);
-            setCurrentGroup(false);
+            loadGroup(group, false);
         }
-    }
-    if (group) {
-        layer.add(group);
-        tr.nodes([]);
     }
 }
 

@@ -24,7 +24,6 @@ function addImage(src) {
             shadowBlur: 10,
             shadowOffset: { x: 5, y: 5 },
             shadowOpacity: 0,
-            locked: false
         });
         currentGroup.add(kimg);
         addHoverAnimation(kimg);
