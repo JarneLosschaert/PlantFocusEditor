@@ -1,7 +1,7 @@
 ﻿.images-content {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 .images-content .input-file-container {
   padding: 1rem;
@@ -35,8 +35,8 @@
   gap: 1rem;
 }
 .images-content .images-container ul li {
-  width: 8.5rem;
-  height: 8.5rem;
+  height: 8rem;
+  flex: 0 0 calc(50% - 0.5rem);
   cursor: pointer;
   display: flex;
   align-items: center;

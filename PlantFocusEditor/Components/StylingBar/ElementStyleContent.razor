@@ -9,15 +9,15 @@
                         handleColor="@ChangeColor1" />
         </div>
         <div>
-            <h4></h4>
+            <h4>Accent</h4>
             <ColorInput fontColor="@_fillColor2"
                         handleColor="@ChangeColor2" />
         </div>
         <div>
             <h4></h4>
-            <Slider value="@colorEndPoint"
+            <Slider value="@_colorStop"
                     unit="%"
-                    handleValue="@changeColorEndPoint" />
+                    handleValue="@changeColorStop" />
         </div>
     </div>
 </article>
@@ -28,13 +28,14 @@
 
     private string _fillColor1 = "#000000";
     private string _fillColor2 = "#000000";
-    private int colorEndPoint = 50;
+    private int _colorStop = 50;
 
     protected override async Task OnParametersSetAsync()
     {
         Dictionary<string, JsonElement> values = await Module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
         _fillColor1 = values["fillColor1"].GetString();
         _fillColor2 = values["fillColor2"].GetString();
+        _colorStop = values["colorStop"].GetInt16();
         StateHasChanged();
     }
 
@@ -60,12 +61,12 @@
         ChangeColor();
     }
 
-    private void changeColorEndPoint(int value)
+    private void changeColorStop(int value)
     {
-        colorEndPoint = value;
+        _colorStop = value;
         if (Module != null)
         {
-            Module.InvokeVoidAsync("handleEndPointChange", colorEndPoint);
+            Module.InvokeVoidAsync("handleColorStop", _colorStop);
         }
     }
 }

@@ -35,22 +35,22 @@ button.selected ::deep svg {
   flex-direction: column;
   gap: 1.5rem;
 }
-.codes-content div {
+.codes-content form {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
-.codes-content div h3 {
+.codes-content form h3 {
   font-size: 1.1rem;
   font-weight: 600;
 }
-.codes-content div button {
+.codes-content form button {
   color: #262626;
 }
-.codes-content div button:hover {
+.codes-content form button:hover {
   background: #dbd9d9;
 }
-.codes-content div input {
+.codes-content form input {
   color: #262626;
   font-size: 1rem;
   padding: 0.5rem 0.75rem;
@@ -67,7 +67,7 @@ button.selected ::deep svg {
       }
   }*/
 }
-.codes-content div input:focus {
+.codes-content form input:focus {
   border-color: #009e4d;
   outline: none;
   box-shadow: 0 2px 6px #e5f5ed;

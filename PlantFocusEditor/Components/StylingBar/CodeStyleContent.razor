@@ -5,28 +5,48 @@
     <div>
         <div>
             <h4>Code</h4>
-            <input type="text" id="codeInput" @bind="_code" />
+            <input type="text" id="codeInput" @bind="_code" @oninput="onCodeInput" />
         </div>
     </div>
 </article>
 
 @code {
-    private string _code = "";
 
-    private IJSObjectReference? _module;
+    [Parameter]
+    public bool isBarcode { get; set; }
+
+    [Parameter]
+    public IJSObjectReference Module { get; set; }
+
+    private string _code = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/codeStyling.js");
+            Dictionary<string, JsonElement> values = await Module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
+            _code = values["code"].GetString() ?? "";
             StateHasChanged();
         }
     }
 
-    private void GenerateCode()
+    private void onCodeInput(ChangeEventArgs e)
     {
-        _module.InvokeVoidAsync("addCode", _code);
+        _code = e.Value.ToString();
+
+        if (isBarcode)
+        {
+            GenerateBarcode();
+        }
+        else
+        {
+            GenerateQrCode();
+        }
+    }
+
+    private void GenerateBarcode()
+    {
+        Module.InvokeVoidAsync("handleBarcodeChange", _code);
     }
 
     private void GenerateQrCode()
@@ -37,6 +57,6 @@
         byte[] qrCodeByteArr = qrCode.GetGraphic(20);
         string base64String = Convert.ToBase64String(qrCodeByteArr);
         string source = $"data:image/png;base64,{base64String}";
-        _module.InvokeVoidAsync("addQRCode", source);
+        Module.InvokeVoidAsync("handleQrCodeChange", source, _code);
     }
 }
