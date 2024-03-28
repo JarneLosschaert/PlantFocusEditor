@@ -1,6 +1,6 @@
-import { layer, loadState } from "./state.js";
-import { currentGroup, front, back, setCurrentGroup } from "./constants.js";
-import { findHeightPassePartout } from "./passePartout.js";
+import { layer, getGroupJson } from "./state.js";
+import { currentGroup, front, back, setCurrentGroup, setBack, setFront, tr } from "./constants.js";
+import { findHeightPath } from "./passePartout.js";
 import { handleSelections } from "./selectionHandling.js";
 
 const historyFront = [];
@@ -22,7 +22,7 @@ function switchSides() {
 }
 
 function flip() {
-    const height = findHeightPassePartout(currentGroup.children[0].data());
+    const height = findHeightPath(currentGroup.children[0].data());
     if (currentGroup.offsetY() === 0) {
         currentGroup.offsetY(height);
     } else {
@@ -32,39 +32,66 @@ function flip() {
 }
 
 function undo() {
+    let group;
     if (currentGroup === front) {
         if (historyFrontIndex > 0) {
             historyFrontIndex--;
-            loadState(historyFront[historyFrontIndex]);
+            const json = JSON.parse(historyFront[historyFrontIndex]);
+            group = getGroupJson(json);
+            setFront(group);
+            setCurrentGroup(true);
         }
     } else {
         if (historyBackIndex > 0) {
             historyBackIndex--;
-            loadState(historyBack[historyBackIndex]);
+            const json = JSON.parse(historyBack[historyBackIndex]);
+            group = getGroupJson(json);
+            setBack(group);
+            setCurrentGroup(false);
         }
+    }
+    if (group) {
+        layer.add(group);
+        tr.nodes([]);
     }
 }
 
 function redo() {
+    let group;
     if (currentGroup === front) {
         if (historyFrontIndex < historyFront.length - 1) {
             historyFrontIndex++;
-            loadState(historyFront[historyFrontIndex]);
+            const json = JSON.parse(historyFront[historyFrontIndex]);
+            group = getGroupJson(json);
+            setFront(group);
+            setCurrentGroup(true);
         }
     } else {
         if (historyBackIndex < historyBack.length - 1) {
             historyBackIndex++;
-            loadState(historyBack[historyBackIndex]);
+            const json = JSON.parse(historyBack[historyBackIndex]);
+            group = getGroupJson(json);
+            setBack(group);
+            setCurrentGroup(false);
         }
+    }
+    if (group) {
+        layer.add(group);
+        tr.nodes([]);
     }
 }
 
-function saveState() {
-    if (historyFront[historyFrontIndex] !== layer.toJSON()) {
+function saveState(e) {
+    const target = e.target;
+    if (target.closest(".undo-redo")) {
+        return;
+    }
+    if (historyFront[historyFrontIndex] !== front.toJSON()) {
         historyFrontIndex++;
-        historyFront[historyFrontIndex] = layer.toJSON();
+        historyFront[historyFrontIndex] = front.toJSON();
         historyFront.length = historyFrontIndex + 1;
     }
+
     if (historyBack[historyBackIndex] !== back.toJSON()) {
         historyBackIndex++;
         historyBack[historyBackIndex] = back.toJSON();
@@ -74,10 +101,10 @@ function saveState() {
 }
 
 function saveStateLS() {
-    const state = historyFront[historyFrontIndex];
-    const backsideState = historyBack[historyBackIndex];
-    localStorage.setItem("front", JSON.stringify(state));
-    localStorage.setItem("back", JSON.stringify(backsideState));
+    const frontState = historyFront[historyFrontIndex];
+    const backState = historyBack[historyBackIndex];
+    localStorage.setItem("front", JSON.stringify(frontState));
+    localStorage.setItem("back", JSON.stringify(backState));
 }
 
 export { switchSides, flip, undo, redo, saveState };

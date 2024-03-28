@@ -45,7 +45,7 @@
                         _previews.Add(template.ID, source);
                         if (_previews.Count() == 1)
                         {
-                            await _moduleState.InvokeVoidAsync("loadStateFromTemplate", template.JsonToRender);
+                            await _moduleState.InvokeVoidAsync("loadTemplate", template.JsonToRender);
                         }
                     }
                 }
@@ -60,7 +60,7 @@
         Template? template = _templates?.Find(el => el.ID == id);
         if (_moduleState is not null && template is not null)
         {
-            await _moduleState.InvokeVoidAsync("loadStateFromTemplate", template.JsonToRender);
+            await _moduleState.InvokeVoidAsync("loadTemplate", template.JsonToRender);
         }
     }
 }

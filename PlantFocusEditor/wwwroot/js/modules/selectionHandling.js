@@ -30,8 +30,7 @@ function removeLayer(event) {
 }
 
 function handleSelectionStart(e) {
-    // has to be passepartout change name
-    if (e.target == stage || e.target.getClassName() === "Path") {
+    if (e.target == stage || e.target.attrs.name === "passepartout") {
         e.evt.preventDefault();
         x1 = stage.getPointerPosition().x;
         y1 = stage.getPointerPosition().y;
@@ -82,7 +81,6 @@ function handleSelectionEnd(e) {
 }
 
 function handleSelection(e) {
-    console.log(currentGroup);
     tr.moveToTop();
     selectionRectangle.moveToTop();
     hoverTr.moveToTop();
