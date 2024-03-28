@@ -6,15 +6,19 @@
         public double y { get; set; }
         public string? name { get; set; }
         public string? data { get; set; }
+        public string? src { get; set; }
         public string? fill { get; set; }
         public string? text { get; set; }
         public int fontSize { get; set; }
+        public string? fontFamily { get; set; }
+        public string? fontStyle { get; set; }
         public bool draggable { get; set; }
         public double width { get; set; }
         public double height { get; set; }
         public double padding { get; set; }
         public string? align { get; set; }
         public string? shadowColor { get; set; }
+        public double? opacity { get; set; }
         public int shadowBlur { get; set; }
         public int shadowOffsetX { get; set; }
         public int shadowOffsetY { get; set; }

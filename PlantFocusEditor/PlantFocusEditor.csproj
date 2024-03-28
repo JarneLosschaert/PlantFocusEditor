@@ -413,9 +413,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Pdf\" />
-    <Folder Include="wwwroot\pdf\" />
-    <Folder Include="wwwroot\node_modules\%40babel\" />
+	<Folder Include="wwwroot\fonts" />
+	<Folder Include="wwwroot\node_modules\%40babel\" />
     <Folder Include="wwwroot\node_modules\%40types\" />
     <Folder Include="wwwroot\node_modules\.bin\" />
   </ItemGroup>

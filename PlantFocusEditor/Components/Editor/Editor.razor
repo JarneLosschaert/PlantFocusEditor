@@ -19,6 +19,7 @@
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/saveToPdf.js");
+            Console.WriteLine(Directory.Exists("js"));
         }
     }
 
@@ -36,7 +37,8 @@
         {
             string jsonToRender = await _module.InvokeAsync<string>("getJsonToRender");
             float[] dimensions = await _module.InvokeAsync<float[]>("getDimensions");
-            byte[] pdfBytes = PDFConversionService.SaveToPdf(jsonToRender, dimensions);
+            string fontsPath = await _module.InvokeAsync<string>("getFontsDirectory");
+            byte[] pdfBytes = PDFConversionService.SaveToPdf(jsonToRender, dimensions, fontsPath);
             string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssffff");
             string fileName = $"{timeStamp}.pdf";
             string fileType = "application/pdf";

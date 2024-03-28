@@ -72,6 +72,10 @@ window.downloadFile = (fileBytes, fileName, fileType) => {
     document.body.removeChild(link);
 }
 
+function getFontsDirectory() {
+    return "fonts";
+}
+
 async function saveToPdfFromJson() {
     console.log("save to pdf from json");
     const doc = new window.jspdf.jsPDF({
@@ -535,4 +539,4 @@ function calcCoordinates(node) {
     return [X, Y];
 }
 
-export { saveToPdfFromJson, getJsonToRender, getDimensions }
+export { saveToPdfFromJson, getJsonToRender, getDimensions, getFontsDirectory }

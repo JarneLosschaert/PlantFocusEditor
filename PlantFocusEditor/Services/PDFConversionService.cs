@@ -7,13 +7,20 @@ using iText.Kernel.Pdf.Canvas;
 using iText.Kernel.Geom;
 using iText.Layout.Element;
 using iText.Layout.Properties;
-using System.Drawing;
+using PlantFocusEditor.Helpers;
 using iText.Kernel.Colors;
+using iText.Layout.Renderer;
+using iText.Kernel.Font;
+using iText.IO.Font;
+using iText.Layout.Layout;
+using iText.IO.Image;
+using iText.Layout.Borders;
 
 namespace PlantFocusEditor.Services
 {
     public class PDFConversionService
     {
+        private string _fontsDirectory;
         private MemoryStream _memoryStream;
         private PdfWriter _writer;
         private PdfDocument _pdf;
@@ -25,11 +32,12 @@ namespace PlantFocusEditor.Services
             _memoryStream = new MemoryStream();
             _writer = new PdfWriter(_memoryStream);
             _pdf = new PdfDocument(_writer);
-            _document = new Document(_pdf);            
+            _document = new Document(_pdf);  
         }
 
-        public byte[] SaveToPdf(string jsonString, float[] dimensions)
-        {            
+        public byte[] SaveToPdf(string jsonString, float[] dimensions, string fontsDir)
+        {
+            _fontsDirectory = fontsDir;
             RootObject root = ConvertFromJson(jsonString);
             _canvas = new PdfCanvas(_pdf.AddNewPage(new PageSize(dimensions[0], dimensions[1])));
             Console.WriteLine($"root class: {root.className}");
@@ -37,17 +45,26 @@ namespace PlantFocusEditor.Services
             double y = root.attrs.y;
             foreach (Child child in root.children)
             {
+                Console.WriteLine(child.attrs.y);
+                child.attrs.y = dimensions[1] - (child.attrs.y + y + 10);
+                child.attrs.x = child.attrs.x + x;
+                Console.WriteLine(child.attrs.y);
                 if (child.attrs.name == "passepartout")
                 {
-                    AddLabelShape(child, x, y);
+                    string[] commands = PathUtils.ParsePathData(child.attrs.data);
+                    AddLabelShape(commands, x, y, dimensions[1]);
                 }
                 else if (child.className == "Text")
                 {
-                    AddText(child, x, y);
+                    AddText(child);
                 }
                 else if (child.className == "Path")
                 {
-                    AddPath(child, x, y);
+                    AddPath(child);
+                }
+                else if (child.className == "Image")
+                {
+                    AddImage(child);
                 }
             }
             return GetPdfBytes();
@@ -56,17 +73,41 @@ namespace PlantFocusEditor.Services
         private byte[] GetPdfBytes()
         {
             _pdf.Close();
-            // Get the bytes from the memory stream
             return _memoryStream.ToArray();
         }
 
-        private void AddPath(Child child, double x, double y)
+        private void AddImage(Child child)
+        {
+            byte[] data = Convert.FromBase64String(child.attrs.src);
+            ImageData imgData = ImageDataFactory.Create(data);
+            Image image = new(imgData);
+            
+            image
+                .SetWidth((float) child.attrs.width)
+                .SetHeight((float) child.attrs.height)
+                .SetFixedPosition((float) child.attrs.x, (float) (child.attrs.y - child.attrs.height))
+                .SetOpacity((float) child.attrs.opacity);
+            if (child.attrs.strokeWidth != 0)
+            {
+                DeviceRgb color = HexToColor(child.attrs.stroke);
+                Border border = new SolidBorder(color, child.attrs.strokeWidth);
+                image.SetBorder(border);
+            }
+            _document.Add(image);
+        }
+
+        private void AddPath(Child child)
         {
             // ignore for now
         }
 
-        private void AddText(Child child, double x, double y)
+        private void AddText(Child child)
         {
+            //string fontName = FontUtils.GetFontFileName(child.attrs.fontFamily, child.attrs.fontStyle);
+            //string path = $"{_fontsDirectory}/{fontName}";
+            //PdfFont font = PdfFontFactory.CreateFont(path);
+            PdfFont font = PdfFontFactory.CreateFont();
+
             TextAlignment align;
             switch (child.attrs.align)
             {
@@ -79,41 +120,49 @@ namespace PlantFocusEditor.Services
                 default:
                     align = TextAlignment.CENTER; break;
             }
-            Paragraph paragraph = new Paragraph(child.attrs.text)
+            Paragraph text = new Paragraph(child.attrs.text)
                 .SetTextAlignment(align)
-                .SetFontSize(child.attrs.fontSize)
-                .SetFixedPosition((float) x,(float) y,(float) child.attrs.width);
+                .SetFont(font)
+                .SetFontSize(child.attrs.fontSize);
+
+            IRenderer renderer = text.CreateRendererSubTree();
+            LayoutResult result = renderer.SetParent(_document.GetRenderer()).Layout(new LayoutContext(new LayoutArea(1, new Rectangle(1000, 1000))));
+            float textHeight = result.GetOccupiedArea().GetBBox().GetHeight();
+            float textWidth = result.GetOccupiedArea().GetBBox().GetWidth();
+            Console.WriteLine(textHeight);
+
+            text.SetFixedPosition((float) child.attrs.x , (float) child.attrs.y - textHeight, textWidth);
+
             if (child.attrs.fill != null)
             {
                 if (child.attrs.fill.StartsWith("#"))
                 {
                     DeviceRgb color = HexToColor(child.attrs.fill);
-                    paragraph.SetFontColor(color);
+                    text.SetFontColor(color);
                 } else
                 {
-                    paragraph.SetFontColor(new DeviceRgb(0, 0, 0));
+                    text.SetFontColor(new DeviceRgb(0, 0, 0));
                 }
             }
-            _document.Add(paragraph);
+            _document.Add(text);
         }
 
-        private void AddLabelShape(Child child, double x, double y)
-        {
-            string[] commands = ParsePathData(child.attrs.data);
+        private void AddLabelShape(string[] commands, double x, double y, double stageHeight)
+        {            
             _canvas.SetLineWidth(1f);
-            foreach (var command in commands)
+            foreach (string command in commands)
             {
                 double[] coords = null;
                 if (!command.StartsWith('Z'))
                 {
-                    coords = TransformCoords(command, x, y);
+                    coords = TransformCoords(command, x, y, stageHeight);
                 }                
                 DrawPathFromCommands(command, coords);
             }
             _canvas.Stroke();
         }
 
-        private double[] TransformCoords(string command, double x, double y)
+        private double[] TransformCoords(string command, double x, double y, double stageHeight)
         {
             string stringCoords = command.Substring(1, command.Length - 1);
             double[] coords = Array.ConvertAll(stringCoords.Split(','), Double.Parse);
@@ -121,11 +170,11 @@ namespace PlantFocusEditor.Services
             {
                 if (i % 2 == 0)
                 {
-                    coords[i] = coords[i] + y;
+                    coords[i] = coords[i] + x;
                 }
                 else
                 {
-                    coords[i] = coords[i] + x;
+                    coords[i] = stageHeight - (coords[i] + y);
                 }
             }
             return coords;
@@ -149,14 +198,7 @@ namespace PlantFocusEditor.Services
             {
                 _canvas.ClosePath();
             }
-        }
-
-        private string[] ParsePathData(string pathString)
-        {
-            string pattern = @"[MLCZ][^MLCZ]*";
-            string[] matches = Regex.Matches(pathString, pattern).Cast<Match>().Select(m => m.Value).ToArray();
-            return matches;
-        }
+        }        
 
         private RootObject ConvertFromJson(string jsonString)
         {
