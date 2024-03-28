@@ -55,6 +55,23 @@ function getDimensions() {
     return [stage.width(), stage.height()];
 }
 
+window.downloadFile = (fileBytes, fileName, fileType) => {
+    // Create a Blob from the byte array
+    const blob = new Blob([fileBytes], { type: fileType });
+    // Create a link element
+    const link = document.createElement('a');
+    // Set the href attribute to the Blob object
+    link.href = URL.createObjectURL(blob);
+    // Set the download attribute to the file name
+    link.download = fileName;
+    // Append the link to the document body
+    document.body.appendChild(link);
+    // Click the link to initiate the download
+    link.click();
+    // Remove the link from the document body
+    document.body.removeChild(link);
+}
+
 async function saveToPdfFromJson() {
     console.log("save to pdf from json");
     const doc = new window.jspdf.jsPDF({

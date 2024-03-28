@@ -14,12 +14,21 @@ namespace PlantFocusEditor.Services
 {
     public class PDFConversionService
     {
-        private static PdfWriter _writer = new PdfWriter("./doc.pdf");
-        private static PdfDocument _pdf = new PdfDocument(_writer);
-        private static Document _document = new Document(_pdf);
+        private MemoryStream _memoryStream;
+        private PdfWriter _writer;
+        private PdfDocument _pdf;
+        private Document _document;
         private PdfCanvas _canvas;
 
-        public void SaveToPdf(string jsonString, float[] dimensions)
+        public PDFConversionService()
+        {
+            _memoryStream = new MemoryStream();
+            _writer = new PdfWriter(_memoryStream);
+            _pdf = new PdfDocument(_writer);
+            _document = new Document(_pdf);            
+        }
+
+        public byte[] SaveToPdf(string jsonString, float[] dimensions)
         {            
             RootObject root = ConvertFromJson(jsonString);
             _canvas = new PdfCanvas(_pdf.AddNewPage(new PageSize(dimensions[0], dimensions[1])));
@@ -28,7 +37,7 @@ namespace PlantFocusEditor.Services
             double y = root.attrs.y;
             foreach (Child child in root.children)
             {
-                if (child.className == "Path")
+                if (child.attrs.name == "passepartout")
                 {
                     AddLabelShape(child, x, y);
                 }
@@ -40,12 +49,20 @@ namespace PlantFocusEditor.Services
                 {
                     AddPath(child, x, y);
                 }
-            }            
+            }
+            return GetPdfBytes();
+        }        
+
+        private byte[] GetPdfBytes()
+        {
+            _pdf.Close();
+            // Get the bytes from the memory stream
+            return _memoryStream.ToArray();
         }
 
         private void AddPath(Child child, double x, double y)
         {
-
+            // ignore for now
         }
 
         private void AddText(Child child, double x, double y)
@@ -64,7 +81,20 @@ namespace PlantFocusEditor.Services
             }
             Paragraph paragraph = new Paragraph(child.attrs.text)
                 .SetTextAlignment(align)
-                .SetFontSize(child.attrs.fontSize);
+                .SetFontSize(child.attrs.fontSize)
+                .SetFixedPosition((float) x,(float) y,(float) child.attrs.width);
+            if (child.attrs.fill != null)
+            {
+                if (child.attrs.fill.StartsWith("#"))
+                {
+                    DeviceRgb color = HexToColor(child.attrs.fill);
+                    paragraph.SetFontColor(color);
+                } else
+                {
+                    paragraph.SetFontColor(new DeviceRgb(0, 0, 0));
+                }
+            }
+            _document.Add(paragraph);
         }
 
         private void AddLabelShape(Child child, double x, double y)
@@ -140,6 +170,20 @@ namespace PlantFocusEditor.Services
             // Use regular expression to remove backslashes from the JSON string
             string result = Regex.Replace(jsonString, @"\\", "");
             return result.Substring(1, result.Length - 2);
+        }
+
+        private static DeviceRgb HexToColor(string hexValue)
+        {
+            // Remove '#' if present            
+            hexValue = hexValue.Substring(1);
+
+            // Parse hexadecimal values
+            int r = int.Parse(hexValue.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+            int g = int.Parse(hexValue.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+            int b = int.Parse(hexValue.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+
+            // Create a new iText7 Color object
+            return new DeviceRgb(r, g, b);
         }
     }
 }
