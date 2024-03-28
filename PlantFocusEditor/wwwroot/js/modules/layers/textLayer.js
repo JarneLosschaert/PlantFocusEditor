@@ -54,10 +54,14 @@ function onEditText(text) {
     const flickerAnimation = selectAnimation(tr);
     text.hide();
 
+    const sidebarWidth = document.getElementById("side-bar").clientWidth;
+    const sidebarContentWidth = document.getElementById("side-bar-content").clientWidth;
+    // stage.container().offsetLeft doesn't work
+
     const textPosition = text.absolutePosition();
     const areaPosition = {
-        x: stage.container().offsetLeft + textPosition.x,
-        y: stage.container().offsetTop + textPosition.y,
+        x: sidebarWidth + sidebarContentWidth + textPosition.x,
+        y: stage.container().offsetTop + textPosition.y + 10,
     };
     const textarea = document.createElement("textarea");
     document.body.appendChild(textarea);
