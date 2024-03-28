@@ -7,17 +7,16 @@ function addImage(src) {
 
     img.onload = function () {
 
-        const width = 200;
-        const scale = width / img.width;
-
         const kimg = new Konva.Image({
+            x: 10,
+            y: 10,
             name: "image",
             image: img,
             src: img.src,
-            height: img.height,
-            width: img.width,
-            scaleX: scale,
-            scaleY: scale,
+            height: 100,
+            width: 100,
+            scaleX: 1,
+            scaleY: 1,
             draggable: true,
             stroke: "#000000",
             strokeWidth: 0,

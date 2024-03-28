@@ -42,7 +42,7 @@
     protected override void OnInitialized()
     {
         _images = ImagesService.GetImages();
-        if (_images.Count == 0)
+        /*if (_images.Count == 0)
         {
             ImagesService.AddImage("https://www.w3schools.com/w3images/paris.jpg");
             ImagesService.AddImage("https://www.w3schools.com/w3images/mountains.jpg");
@@ -52,7 +52,7 @@
             ImagesService.AddImage("https://www.w3schools.com/w3images/forest.jpg");
             ImagesService.AddImage("https://www.w3schools.com/w3images/rocks.jpg");
             ImagesService.AddImage("https://www.w3schools.com/w3images/nature.jpg");
-        }
+        }*/
     }
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
@@ -68,8 +68,9 @@
         }
     }
 
-    public void AddImage(string src)
+    public async Task AddImage(string src)
     {
-        _module?.InvokeVoidAsync("addImage", src);
+        string base64 = await ImagesService.ConvertImageUrlToBase64(src);
+        _module?.InvokeVoidAsync("addImage", base64);
     }
 }

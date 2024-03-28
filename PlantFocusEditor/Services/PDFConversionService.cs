@@ -40,15 +40,12 @@ namespace PlantFocusEditor.Services
             _fontsDirectory = fontsDir;
             RootObject root = ConvertFromJson(jsonString);
             _canvas = new PdfCanvas(_pdf.AddNewPage(new PageSize(dimensions[0], dimensions[1])));
-            Console.WriteLine($"root class: {root.className}");
             double x = root.attrs.x;
             double y = root.attrs.y;
             foreach (Child child in root.children)
             {
-                Console.WriteLine(child.attrs.y);
                 child.attrs.y = dimensions[1] - (child.attrs.y + y + 10);
                 child.attrs.x = child.attrs.x + x;
-                Console.WriteLine(child.attrs.y);
                 if (child.attrs.name == "passepartout")
                 {
                     string[] commands = PathUtils.ParsePathData(child.attrs.data);
@@ -78,15 +75,18 @@ namespace PlantFocusEditor.Services
 
         private void AddImage(Child child)
         {
-            byte[] data = Convert.FromBase64String(child.attrs.src);
+            string base64 = child.attrs.src.Substring(child.attrs.src.IndexOf(",") + 1);
+            byte[] data = Convert.FromBase64String(base64);
             ImageData imgData = ImageDataFactory.Create(data);
-            Image image = new(imgData);
-            
+            Image image = new(imgData);            
             image
-                .SetWidth((float) child.attrs.width)
-                .SetHeight((float) child.attrs.height)
-                .SetFixedPosition((float) child.attrs.x, (float) (child.attrs.y - child.attrs.height))
-                .SetOpacity((float) child.attrs.opacity);
+                .SetWidth((float) (child.attrs.width * child.attrs.scaleX))
+                .SetHeight((float) (child.attrs.height * child.attrs.scaleY))
+                .SetFixedPosition((float) child.attrs.x, (float) (child.attrs.y - (child.attrs.height * child.attrs.scaleY)));
+            if (child.attrs.opacity != null)
+            {
+                image.SetOpacity((float)child.attrs.opacity);
+            }
             if (child.attrs.strokeWidth != 0)
             {
                 DeviceRgb color = HexToColor(child.attrs.stroke);
@@ -202,6 +202,7 @@ namespace PlantFocusEditor.Services
 
         private RootObject ConvertFromJson(string jsonString)
         {
+            Console.WriteLine(jsonString);
             string json = RemoveBackslashesFromJson(jsonString);
             RootObject jsonObject = JsonSerializer.Deserialize<RootObject>(json);
             return jsonObject;
