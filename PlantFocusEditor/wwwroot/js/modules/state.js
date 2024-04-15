@@ -39,6 +39,7 @@ function loadTemplate(json) {
     const back = getGroupJson(json[1]);
     loadGroup(back, false);
     loadGroup(front);
+    saveState();
 }
 
 function loadGroup(group, isFront = true) {
