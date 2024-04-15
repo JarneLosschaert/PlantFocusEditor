@@ -1,4 +1,4 @@
-import { findWidthPassePartout, findHeightPassePartout } from "./modules/passePartout.js";
+import { findWidthPath, findHeightPath } from "./modules/passePartout.js";
 import { sceneFunc } from "./modules/layers/elementLayer.js";
 import { isValidJson } from "./modules/helpers.js";
 
@@ -20,8 +20,8 @@ function renderPreviewFromJson(jsonToRender) {
         const node = Konva.Node.create(child);
         arr[i] = node;
         if (node.getClassName() === "Path") {
-            width = findWidthPassePartout(node.data());
-            height = findHeightPassePartout(node.data());
+            width = findWidthPath(node.data());
+            height = findHeightPath(node.data());
         } else if (node.getClassName() === "Image") {
             const src = node.attrs.src;
             const img = new Image();

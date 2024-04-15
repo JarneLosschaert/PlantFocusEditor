@@ -38,7 +38,7 @@ function setBack(newGroup) {
     back = newGroup;
 }
 
-function setCurrentGroup(isFront) {
+function setCurrentGroup(isFront = true) {
     if (isFront) {
         currentGroup = front;
     } else {

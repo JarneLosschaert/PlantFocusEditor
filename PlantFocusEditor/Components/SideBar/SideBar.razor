@@ -1,6 +1,6 @@
 ﻿@inject IJSRuntime JS
 
-<div class="side-bar">
+<div id="side-bar">
     <ul>
         <li @onclick="() => SelectTabAsync(SideBarTabs.Templates)" class="@GetSelectedClass(SideBarTabs.Templates)">
             @((MarkupString)CustomIcons.Templates())

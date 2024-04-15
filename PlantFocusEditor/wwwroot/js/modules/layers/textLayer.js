@@ -16,7 +16,6 @@ function createTextLayer(type) {
         shadowBlur: 10,
         shadowOffset: { x: 5, y: 5 },
         shadowOpacity: 0,
-        locked: false
     });
     if (type === "subtitle") {
         text.fontSize(24);
@@ -54,10 +53,12 @@ function onEditText(text) {
     const flickerAnimation = selectAnimation(tr);
     text.hide();
 
+    const stagePosition = stage.container().getBoundingClientRect();
     const textPosition = text.absolutePosition();
+
     const areaPosition = {
-        x: stage.container().offsetLeft + textPosition.x,
-        y: stage.container().offsetTop + textPosition.y,
+        x: stagePosition.x + textPosition.x,
+        y: stagePosition.y + textPosition.y,
     };
     const textarea = document.createElement("textarea");
     document.body.appendChild(textarea);
