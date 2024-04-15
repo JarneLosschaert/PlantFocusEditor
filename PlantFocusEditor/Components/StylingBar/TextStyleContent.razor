@@ -49,7 +49,7 @@
                             <ul>
                                 @foreach (var size in _sizeList)
                                 {
-                                    <li @onclick="() => _fontSize = int.Parse(size)">@size pt</li>
+                                    <li @onclick="() => ClickFontSize(size)">@size pt</li>
                                 }
                             </ul>
                         }
@@ -113,6 +113,8 @@
             StateHasChanged();
         }        
     }
+
+    
 
     private string GetFontStyle()
     {
@@ -189,6 +191,12 @@
     {
         _align = "right";
         Module?.InvokeVoidAsync("handleAlignmentChange", "right");
+    }
+
+    private void ClickFontSize(string size)
+    {
+        _fontSize = int.Parse(size);
+        Module?.InvokeVoidAsync("handleFontSizeChange", size);
     }
 
     private void ChangeFontSize(ChangeEventArgs e)
