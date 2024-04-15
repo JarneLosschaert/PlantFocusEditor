@@ -1,5 +1,5 @@
 import { layer, getGroupJson, loadGroup } from "./state.js";
-import { currentGroup, front, back, setCurrentGroup, setBack, setFront, tr } from "./constants.js";
+import { currentGroup, front, back, setCurrentGroup } from "./constants.js";
 import { findHeightPath } from "./passePartout.js";
 import { handleSelections } from "./selectionHandling.js";
 
@@ -70,18 +70,25 @@ function redo() {
 }
 
 function saveState(e) {
-    const target = e.target;
-    if (target.closest(".undo-redo")) {
-        return;
+    if (e) {
+        const target = e.target;
+        if (target.closest(".undo-redo")) {
+            return;
+        }
     }
+    
     if (historyFront[historyFrontIndex] !== front.toJSON()) {
-        historyFrontIndex++;
+        if (historyFront[historyFrontIndex] !== undefined) {
+            historyFrontIndex++;
+        }
         historyFront[historyFrontIndex] = front.toJSON();
         historyFront.length = historyFrontIndex + 1;
     }
 
     if (historyBack[historyBackIndex] !== back.toJSON()) {
-        historyBackIndex++;
+if (historyBack[historyBackIndex] !== undefined) {
+            historyBackIndex++;
+        }
         historyBack[historyBackIndex] = back.toJSON();
         historyBack.length = historyBackIndex + 1;
     }
@@ -95,4 +102,28 @@ function saveStateLS() {
     localStorage.setItem("back", JSON.stringify(backState));
 }
 
-export { switchSides, flip, undo, redo, saveState };
+function getValues() {
+    return {
+        undoPossible: getUndoPossible(),
+        redoPossible: getRedoPossible()
+    };
+}
+
+function getUndoPossible() {
+    if (currentGroup === front) {
+        return historyFrontIndex > 0;
+    } else {
+        return historyBackIndex > 0;
+    }
+    return true;
+}
+
+function getRedoPossible() {
+    if (currentGroup === front) {
+        return historyFrontIndex < historyFront.length - 1;
+    } else {
+        return historyBackIndex < historyBack.length - 1;
+    }
+}
+
+export { switchSides, flip, undo, redo, saveState, getValues };

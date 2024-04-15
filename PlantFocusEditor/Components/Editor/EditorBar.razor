@@ -2,10 +2,10 @@
 
 <section class="editor-bar">
     <div class="undo-redo">
-        <button @onclick="Undo">
+        <button @onclick="Undo" disabled="@(!_undoPossible)">
             @((MarkupString)CustomIcons.Undo())
         </button>
-        <button @onclick="Redo">
+        <button @onclick="Redo" disabled="@(!_redoPossible)">
             @((MarkupString)CustomIcons.Redo())
         </button>
     </div>
@@ -26,21 +26,36 @@
 @code {
     private IJSObjectReference? _module;
     private bool _isFront = true;
+    private bool _undoPossible = false;
+    private bool _redoPossible = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/stateControls.js");
+            await getUndoRedoStates();
         }
     }
 
-    private void SwitchSides()
+    public async Task getUndoRedoStates()
     {
         if (_module != null)
         {
-            _module.InvokeVoidAsync("switchSides");
+            Dictionary<string, JsonElement> values = await _module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
+            _undoPossible = values["undoPossible"].GetBoolean();
+            _redoPossible = values["redoPossible"].GetBoolean();
+            StateHasChanged();
+        }
+    }
+
+    private async Task SwitchSides()
+    {
+        if (_module != null)
+        {
+            await _module.InvokeVoidAsync("switchSides");
             _isFront = !_isFront;
+            await getUndoRedoStates();
         }
     }
 
@@ -52,19 +67,21 @@
         }
     }
 
-    private void Undo()
+    private async Task Undo()
     {
         if (_module != null)
         {
-            _module.InvokeVoidAsync("undo");
+            await _module.InvokeVoidAsync("undo");
+            await getUndoRedoStates();
         }
     }
 
-    private void Redo()
+    private async Task Redo()
     {
         if (_module != null)
         {
-            _module.InvokeVoidAsync("redo");
+            await _module.InvokeVoidAsync("redo");
+            await getUndoRedoStates();
         }
     }
 }
