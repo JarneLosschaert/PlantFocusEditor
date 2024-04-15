@@ -4,6 +4,7 @@ import { deleteNodes } from "./styling/control.js";
 
 let x1, y1, x2, y2;
 let selecting = false;
+let hasSelected = false;
 
 function handleSelections() {
     tr.nodes([]);
@@ -66,14 +67,6 @@ function handleSelectionEnd(e) {
     selectionRectangle.visible(false);
 
     const box = selectionRectangle.getClientRect();
-    const groupPos = currentGroup.absolutePosition();
-    const groupWidth = currentGroup.width() * currentGroup.scaleX();
-    console.log(groupPos);
-    console.log(box);
-    box.x -= groupPos.x;
-    box.y -= groupPos.y;
-
-
     const shapes = currentGroup.find(
         (node) => node.attrs.name === "text" ||
             node.attrs.name === "image" ||
@@ -81,30 +74,23 @@ function handleSelectionEnd(e) {
             node.attrs.name === "qrcode" ||
             node.attrs.name === "element"
     );
-    console.log(shapes);
-    console.log(box);
-
 
     const selected = shapes.filter((shape) =>
         haveIntersection(shape.getClientRect(), box)
     );
-
     tr.nodes(selected);
+    hasSelected = true;
     ToggleTr();
 }
 
 function haveIntersection(rect1, rect2) {
-    console.log(rect1);
-    console.log(rect2);
-return (
+    return (
         rect1.x < rect2.x + rect2.width &&
         rect1.x + rect1.width > rect2.x &&
         rect1.y < rect2.y + rect2.height &&
         rect1.y + rect1.height > rect2.y
     );
 }
-
-
 
 function handleSelection(e) {
     tr.moveToTop();
@@ -114,8 +100,11 @@ function handleSelection(e) {
         return;
     }
     if (e.target === stage || e.target.attrs.name === "passepartout") {
-        tr.nodes([]);
-        return;
+        if (hasSelected) {
+            hasSelected = false;
+        } else {
+            tr.nodes([]);
+        }
     }
     if (
         !e.target.hasName("text") &&
