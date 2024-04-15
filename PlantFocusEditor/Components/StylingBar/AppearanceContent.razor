@@ -30,8 +30,8 @@
         if (Module != null)
         {
             Dictionary<string, JsonElement> values = await Module.InvokeAsync<Dictionary<string, JsonElement>>("getValues");
-            _opacity = values["opacity"].GetInt16() * 100;
-            _shadow = values["shadow"].GetInt16() * 100;
+            _opacity = (int) Math.Round(values["opacity"].GetDouble() * 100);
+            _shadow = (int) Math.Round(values["shadow"].GetDouble() * 100);
             StateHasChanged();
         }
     }
