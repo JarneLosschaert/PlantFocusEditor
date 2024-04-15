@@ -11,21 +11,21 @@
     </div>
     <div class="switch-sides">
         <button @onclick="SwitchSides">
-            Recto
+            @(_isFront ? "Front" : "Back")
             @((MarkupString)CustomIcons.Rotate())
         </button>
     </div>
-    
     <div class="flip">
         <button @onclick="Flip">
             @((MarkupString)CustomIcons.Flip())
         </button>
     </div>
-    
+
 </section>
 
 @code {
     private IJSObjectReference? _module;
+    private bool _isFront = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -40,6 +40,7 @@
         if (_module != null)
         {
             _module.InvokeVoidAsync("switchSides");
+            _isFront = !_isFront;
         }
     }
 
