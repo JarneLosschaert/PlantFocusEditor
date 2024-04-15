@@ -98,10 +98,14 @@ function getGroupJson(json) {
                 const src = child.attrs.src;
                 img.src = src;
                 child.image(img);
-
             } else if (child.attrs.name === "element") {
                 // not sure if this is needed
                 // child.sceneFunc(sceneFunc);
+            } else if (child.attrs.name === "qrcode" || child.attrs.name == "barcode") {
+                const img = new Image();
+                const src = child.attrs.src;
+                img.src = src;
+                child.image(img);
             }
             addHoverAnimation(child);
         }
