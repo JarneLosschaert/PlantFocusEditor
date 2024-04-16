@@ -125,7 +125,7 @@
         }
         public static string Elements()
         {
-            return "<svg viewBox=\"0 0 24.00 24.00\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"0\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke=\"#CCCCCC\" stroke-width=\"0\"></g><g id=\"SVGRepo_iconCarrier\"><path d=\"M8.135 12.736l-.764 1.058A6.297 6.297 0 1 1 13.281 5h-1.138a5.286 5.286 0 1 0-4.644 7.8 5.201 5.201 0 0 0 .636-.064zM11 6v6.923l1 1.385V7h10v10h-8.056l.723 1H23V6zm6.044 17H1.956L9.5 12.554zM9.5 14.262L3.911 22H15.09z\"></path><path fill=\"none\" d=\"M0 0h24v24H0z\"></path></g></svg>";
+            return "<svg viewBox=\"0 0 24.00 24.00\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"0.5\"><path d=\"M8.135 12.736l-.764 1.058A6.297 6.297 0 1 1 13.281 5h-1.138a5.286 5.286 0 1 0-4.644 7.8 5.201 5.201 0 0 0 .636-.064zM11 6v6.923l1 1.385V7h10v10h-8.056l.723 1H23V6zm6.044 17H1.956L9.5 12.554zM9.5 14.262L3.911 22H15.09z\"></path></g></svg>";
         }
         public static string Minus()
         {
