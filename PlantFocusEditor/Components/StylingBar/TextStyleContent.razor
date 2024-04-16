@@ -30,7 +30,7 @@
         <div>
             <h4>Size</h4>
             <div class="size-input">
-                <input type="number" @bind="_fontSize" @oninput="ChangeFontSize" max="72"/>
+                <input type="number" @bind="_fontSizeInput" @oninput="ChangeFontSize" min="@_minFontSize" max="@_maxFontSize" />
                 <div>
                     <p>pt</p>
                     <div class="dropdown">
@@ -90,6 +90,14 @@
     private string _align = "left";
     private string _fontColor = "#000000";
 
+    private int _minFontSize = 8;
+    private int _maxFontSize = 72;
+    private int _fontSizeInput
+    {
+        get => _fontSize;
+        set => _fontSize = Math.Clamp(value, _minFontSize, _maxFontSize);
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         if (Module != null)
@@ -111,10 +119,10 @@
             _fontColor = values["color"].GetString() == "black" ? "#000000" : values["color"].GetString() ?? "#000000";
             _fontSize = values["fontSize"].GetInt16();
             StateHasChanged();
-        }        
+        }
     }
 
-    
+
 
     private string GetFontStyle()
     {
@@ -203,7 +211,15 @@
     {
         if (int.TryParse(e.Value.ToString(), out int newFontSize))
         {
-            _fontSize = newFontSize;
+            if (newFontSize < _minFontSize)
+            {
+                newFontSize = _minFontSize;
+            }
+            if (newFontSize > _maxFontSize)
+            {
+                newFontSize = _maxFontSize;
+            }
+            _fontSizeInput = newFontSize;
             Module?.InvokeVoidAsync("handleFontSizeChange", newFontSize);
         }
     }
