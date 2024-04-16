@@ -192,10 +192,14 @@ namespace PlantFocusEditor.Services
             float textWidth = ((ParagraphRenderer) renderer).GetMinMaxWidth().GetMaxWidth();
             Console.WriteLine(textWidth);
 
-            if (align != TextAlignment.CENTER)
+            if (align == TextAlignment.RIGHT)
             {
                 // x minus 10 to account for padding
                 paragraph.SetFixedPosition(x - 10, y - textHeight, (float)child.attrs.width);
+            } else if (align == TextAlignment.LEFT)
+            {
+                // x plus 10 to account for padding
+                paragraph.SetFixedPosition(x + 10, y - textHeight, (float)child.attrs.width);
             } else
             {
                 paragraph.SetFixedPosition(x, y - textHeight, (float)child.attrs.width);
@@ -213,7 +217,7 @@ namespace PlantFocusEditor.Services
                 "center" => TextAlignment.CENTER,
                 "right" => TextAlignment.RIGHT,
                 "left" => TextAlignment.LEFT,
-                _ => TextAlignment.CENTER,
+                _ => TextAlignment.LEFT,
             };
             return alignment;
         }
@@ -452,7 +456,6 @@ namespace PlantFocusEditor.Services
 
         private RootObject ConvertFromJson(string jsonString)
         {
-            Console.WriteLine(jsonString);
             string json = RemoveBackslashesFromJson(jsonString);
             RootObject jsonObject = JsonSerializer.Deserialize<RootObject>(json);
             return jsonObject;

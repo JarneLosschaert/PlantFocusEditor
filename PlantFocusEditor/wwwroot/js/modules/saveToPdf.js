@@ -49,7 +49,6 @@ import { georgiaBoldItalic } from "../fonts/georgia-bold-italic.js";
 
 function getJsonToRender() {
     console.log(front);
-    console.log(front);
     return JSON.stringify(front);
 }
 

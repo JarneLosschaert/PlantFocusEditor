@@ -37,6 +37,7 @@
         if (_module != null)
         {
             string jsonToRender = await _module.InvokeAsync<string>("getJsonToRender");
+            Console.WriteLine(jsonToRender);
             float[] dimensions = await _module.InvokeAsync<float[]>("getDimensions");
             string fontsPath = await _module.InvokeAsync<string>("getFontsDirectory");
             byte[] pdfBytes = PDFConversionService.SaveToPdf(jsonToRender, dimensions, fontsPath);
