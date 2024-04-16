@@ -181,23 +181,27 @@ namespace PlantFocusEditor.Services
 
             TextAlignment align = HandleAlignment(child.attrs.align);
             Console.WriteLine(align.ToString());
-            Paragraph paragraph = new Paragraph(child.attrs.text)                
+            Paragraph paragraph = new Paragraph(child.attrs.text)
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize);
-
+                //.SetPadding((float)-child.attrs.padding);
+            HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.fontStyle);
             IRenderer renderer = paragraph.CreateRendererSubTree();
             LayoutResult result = renderer.SetParent(_document.GetRenderer()).Layout(new LayoutContext(new LayoutArea(1, new Rectangle(1000, 1000))));
-            float textHeight = result.GetOccupiedArea().GetBBox().GetHeight();
+            float textHeight = result.GetOccupiedArea().GetBBox().GetHeight();            
             float textWidth = ((ParagraphRenderer) renderer).GetMinMaxWidth().GetMaxWidth();
             Console.WriteLine(textWidth);
 
-            paragraph.SetFixedPosition(x, y - textHeight, (float) child.attrs.width)
-                .SetTextAlignment(align);
-            if (child.attrs.textDecoration.Contains("underline"))
+            if (align != TextAlignment.CENTER)
             {
-                paragraph.SetUnderline();
+                // x minus 10 to account for padding
+                paragraph.SetFixedPosition(x - 10, y - textHeight, (float)child.attrs.width);
+            } else
+            {
+                paragraph.SetFixedPosition(x, y - textHeight, (float)child.attrs.width);
             }
-            SetTextColor(paragraph, child.attrs.fill);
+            paragraph.SetTextAlignment(align);
+            SetTextColor(paragraph, child.attrs.fill);            
             _document.Add(paragraph);
         }
 
@@ -227,6 +231,28 @@ namespace PlantFocusEditor.Services
             else
             {
                 paragraph.SetFontColor(new DeviceRgb(0, 0, 0));
+            }
+        }
+
+        private static void HandleTextStyle(Paragraph paragraph, string? decoration, string? style)
+        {
+            if (decoration != null)
+            {
+                if (decoration.Contains("underline"))
+                {
+                    paragraph.SetUnderline();
+                }
+            }
+            if (style != null)
+            {
+                if (style.Contains("bold"))
+                {
+                    paragraph.SetBold();
+                }
+                if (style.Contains("italic"))
+                {
+                    paragraph.SetItalic();
+                }
             }
         }
 
