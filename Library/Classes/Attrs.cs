@@ -31,6 +31,7 @@
         public bool shadowForStrokeEnabled { get; set; }
         public int hitStrokeWidth { get; set; }
         public double fillLinearGradientEndPointX { get; set; }
+        public double fillLinearGradientEndPointY { get; set; }
         public List<object>? fillLinearGradientColorStops { get; set; }
     }
 }

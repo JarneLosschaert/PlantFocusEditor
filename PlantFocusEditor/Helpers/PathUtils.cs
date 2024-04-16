@@ -71,10 +71,10 @@ namespace PlantFocusEditor.Helpers
         public static string[] ParsePathData(string pathString)
         {
             // Regular expression to match commands in the path data
-            string pattern = @"[MLCZ][^MLCZ]*";
+            string pattern = @"[MLCZHVS][^MLCZHVS]*";
 
             // Extract commands from the path data
-            string[] matches = Regex.Matches(pathString, pattern)
+            string[] matches = Regex.Matches(pathString, pattern, RegexOptions.IgnoreCase)
                                     .Cast<Match>()
                                     .Select(m => m.Value)
                                     .ToArray();
