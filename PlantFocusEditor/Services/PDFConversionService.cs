@@ -166,9 +166,13 @@ namespace PlantFocusEditor.Services
             }
             if (child.attrs.strokeWidth != 0)
             {
+                _canvas.Rectangle((float)child.attrs.x + x, stageHeight - (float)(child.attrs.y + height + y + 10), width, height);
                 DeviceRgb color = HexToColor(child.attrs.stroke);
-                Border border = new SolidBorder(color, child.attrs.strokeWidth);
-                image.SetBorder(border);
+                _canvas.SetStrokeColor(color);
+                _canvas.SetLineWidth(child.attrs.strokeWidth);
+                _canvas.Stroke();
+                _canvas.SetStrokeColor(ColorConstants.BLACK);
+                _canvas.SetLineWidth(1);                
             }
             _document.Add(image);
         }
