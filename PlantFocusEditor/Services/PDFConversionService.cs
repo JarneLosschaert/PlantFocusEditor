@@ -54,6 +54,7 @@ namespace PlantFocusEditor.Services
                 {
                     string[] commands = PathUtils.ParsePathData(child.attrs.data);
                     AddPath(commands, child, x, y, dimensions[1]);
+                    _canvas.Clip();
                     _canvas.Stroke();
                 }
                 else if (child.className == "Text")
@@ -185,7 +186,7 @@ namespace PlantFocusEditor.Services
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize);
                 //.SetPadding((float)-child.attrs.padding);
-            HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.fontStyle);
+            HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.fontStyle, child.attrs.opacity);
             IRenderer renderer = paragraph.CreateRendererSubTree();
             LayoutResult result = renderer.SetParent(_document.GetRenderer()).Layout(new LayoutContext(new LayoutArea(1, new Rectangle(1000, 1000))));
             float textHeight = result.GetOccupiedArea().GetBBox().GetHeight();            
@@ -238,7 +239,7 @@ namespace PlantFocusEditor.Services
             }
         }
 
-        private static void HandleTextStyle(Paragraph paragraph, string? decoration, string? style)
+        private static void HandleTextStyle(Paragraph paragraph, string? decoration, string? style, double? opacity)
         {
             if (decoration != null)
             {
@@ -257,6 +258,10 @@ namespace PlantFocusEditor.Services
                 {
                     paragraph.SetItalic();
                 }
+            }
+            if (opacity != null)
+            {
+                paragraph.SetOpacity((float)opacity);
             }
         }
 
