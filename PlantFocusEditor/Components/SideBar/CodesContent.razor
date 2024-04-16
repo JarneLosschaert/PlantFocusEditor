@@ -6,7 +6,7 @@
         <input type="number" id="barcodeInput" @bind="_barcode" />
         <button type="submit">Generate barcode</button>
     </form>
-    <form @onsubmit="GenerateBarcode">
+    <form @onsubmit="GenerateQrCode">
         <h3>QR code</h3>
         <input type="text" id="qrcodeInput" @bind="_qrcode"/>
         <button type="submit">Generate QR code</button>

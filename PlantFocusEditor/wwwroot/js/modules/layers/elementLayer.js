@@ -1,12 +1,12 @@
 import { currentGroup } from "../constants.js";
 import { addHoverAnimation } from "../animations.js";
-import { findWidthPassePartout } from "../passePartout.js";
+import { findWidthPath } from "../passePartout.js";
 
 function addElement(svg) {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(svg, "text/xml");
     const path = xmlDoc.getElementsByTagName("path")[0];
-    const originalWidth = findWidthPassePartout(path.getAttribute("d"))
+    const originalWidth = findWidthPath(path.getAttribute("d"))
 
     const element = new Konva.Path({
         x: 50,
@@ -21,7 +21,6 @@ function addElement(svg) {
         shadowOpacity: 0,
         shadowForStrokeEnabled: false,
         hitStrokeWidth: 0,
-        locked: false,
         fillLinearGradientStartPoint: { x: 0, y: 0 },
         fillLinearGradientEndPoint: { x: originalWidth, y: 0 },
         fillLinearGradientColorStops: [0, "#45ac34", 0.5, "#45ac34", 1, "#c6d300"],

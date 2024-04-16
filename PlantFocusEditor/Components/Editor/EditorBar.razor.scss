@@ -68,7 +68,7 @@
                 transition: $transition;
             }
 
-            &:hover {
+            &:hover:not([disabled]) {
                 background: $neutral;
             }
 

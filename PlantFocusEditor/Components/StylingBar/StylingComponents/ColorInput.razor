@@ -1,28 +1,54 @@
-﻿<div class="color-input">
-    <input type="text" @bind="fontColor" @oninput="HandleColorInput" maxlength="7" />
-    <input type="color" @bind="fontColor" @oninput="HandleColorInput" />
+﻿@using System.Text.RegularExpressions
+
+<div class="color-input">
+    <input type="text" @bind="_fontColorText" @oninput="HandleColorTextInput" maxlength="7" />
+    <input type="color" @bind="fontColor" @oninput="(e) => HandleColorInput(e.Value.ToString())" />
 </div>
 
 @code {
     [Parameter]
-    public string fontColor { get; set; }
+    public string fontColor { get; set; } = "#000000";
 
     [Parameter]
     public EventCallback<string> handleColor { get; set; }
-    
-    [Parameter]
-    public bool withLinearGradient { get; set; }
 
-    private void HandleColorInput(ChangeEventArgs e)
+    private string _fontColorText = "#000000";
+
+    protected override void OnParametersSet()
     {
-        string input = e.Value?.ToString()?.TrimStart('#').ToUpper();
+        _fontColorText = fontColor;
+    }
 
-        if (!input.StartsWith("#"))
+    private void HandleColorInput(string color)
+    {
+        if (isColor(color))
         {
-            input = "#" + input;
+            fontColor = color;
+            _fontColorText = color;
+            handleColor.InvokeAsync(color);
         }
+        StateHasChanged();
+    }
 
-        fontColor = input;
-        handleColor.InvokeAsync(fontColor);
+    private void HandleColorTextInput(ChangeEventArgs e)
+    {
+        string color = e.Value.ToString();
+        _fontColorText = toHexColor(color);
+        HandleColorInput(color);
+    }
+
+    private string toHexColor(string color)
+    {
+        color = Regex.Replace(color, "[^A-Fa-f0-9]", "");
+        if (!color.StartsWith("#"))
+        {
+            color = "#" + color;
+        }
+        return color;
+    }
+
+    private bool isColor(string color)
+    {
+        return Regex.IsMatch(color, "^#([A-Fa-f0-9]{6})$");
     }
 }

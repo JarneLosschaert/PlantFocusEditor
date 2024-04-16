@@ -1,9 +1,9 @@
-import { changeTr, changeHoverTr, changeSelectionRectangle, front, setFront, back, setBack, currentGroup, setCurrentGroup, tr } from "./constants.js";
+import { changeTr, changeHoverTr, changeSelectionRectangle, setFront, setBack, currentGroup, setCurrentGroup, tr } from "./constants.js";
 import { handleTextEventListeners } from "./layers/textLayer.js";
 import { sceneFunc } from "./layers/elementLayer.js";
 import { addHoverAnimation } from "./animations.js";
 import { handleSelections } from "./selectionHandling.js";
-import { createClipFunc, findHeightPassePartout, findWidthPassePartout, getScaledCommands } from "./passePartout.js";
+import { createClipFunc, findHeightPath, findWidthPath, getScaledCommands } from "./passePartout.js";
 import { convertToSVGPath } from "./helpers.js";
 import { saveState } from "./stateControls.js";
 
@@ -27,132 +27,137 @@ function init() {
 function initKonva() {
     stage.add(layer);
     stage.draw();
-    loadState(getStateLS());
 }
 
 function handleEventListeners() {
     document.addEventListener("click", saveState);
 }
 
-function loadState(json) {
-    if (json) {
-        json = JSON.parse(json);
-        console.log(json);
-        layer.destroyChildren();
-        json.children.forEach(child => {
-            const node = Konva.Node.create(child);
-            layer.add(node);
-            if (node.getClassName() === "Group") {
-                setFront(node);
-                setCurrentGroup(node);
-                let pathData;
-                node.children.forEach(childNode => {
-                    if (childNode.getClassName() === "Path") {
-                        pathData = childNode.attrs.data;
-                    } else if (childNode.attrs.name === "barcode") {
-                        const img = new Image();
-                        img.src = childNode.attrs.src;
-                        childNode.image(img);
-                        addHoverAnimation(childNode);
-                    } else if (childNode.getClassName() === "Image") {
-                        const src = childNode.attrs.src;
-                        const img = new Image();
-                        img.src = src;
-                        childNode.image(img);
-                        addHoverAnimation(childNode);
-                    } else if (childNode.getClassName() === "Text") {
-                        handleTextEventListeners(childNode);
-                        addHoverAnimation(childNode);
-                    } else if (childNode.getClassName() === "Shape") {
-                        childNode.sceneFunc(sceneFunc);
-                        addHoverAnimation(childNode);
-                    }
-                });
-                const clipFuncWithParam = createClipFunc(pathData);
-                node.clipFunc(clipFuncWithParam);
-            } else if (node.attrs.name === "tr") {
-                changeTr(node);
-            } else if (node.attrs.name === "hoverTr") {
-                changeHoverTr(node);
-            } else if (node.attrs.name === "selectionRectangle") {
-                changeSelectionRectangle(node);
-            }
-        });
-    }
+function loadTemplate(json) {
+    json = JSON.parse(json);
+    const front = getGroupJson(json[0]);
+    const back = getGroupJson(json[1]);
+    loadGroup(back, false);
+    loadGroup(front);
+    saveState();
 }
 
-function loadStateFromTemplate(json) {
-    json = JSON.parse(json);
-
+function loadGroup(group, isFront = true) {
     layer.children.forEach(child => {
         if (child.getClassName() === "Group") {
             child.remove();
         }
     });
 
-    const firstGroup = loadGroupFromJson(json[0]);
-    setFront(firstGroup);
-    setCurrentGroup(firstGroup);
-    layer.add(front);
-    front.moveToBottom();
-    setBack(loadGroupFromJson(json[1]));
+    if (isFront) {
+        setFront(group);
+    } else {
+        setBack(group);
+    }
+    setCurrentGroup(isFront);
+    layer.add(currentGroup);
+    currentGroup.moveToBottom();
+    tr.nodes([]);
 }
 
-function loadGroupFromJson(json) {
-    const node = Konva.Node.create(json.Group);
-    node.attrs.name = "passepartout";
-
-    let pathData;
-    let offsetX;
+function getGroupJson(json) {
+    const group = new Konva.Group();
     let scale;
+    let offsetX;
+    let offsetY;
+    let commands;
 
-    node.children.forEach(child => {
-        if (child.getClassName() === "Path") {
-            scale = stage.height() / findHeightPassePartout(child.data());
-            const commands = getScaledCommands(child.data());
-            pathData = convertToSVGPath(commands);
-            child.data(pathData);
-            
-            offsetX = stage.width() / 2 - findWidthPassePartout(pathData) / 2;
-        } else if (child.getClassName() === "Image") {
-            const src = child.attrs.src;
-            const img = new Image();
-            img.src = src;
-            child.image(img);           
-            addHoverAnimation(child);
-        } else if (child.getClassName() === "Text") {
-            handleTextEventListeners(child);
-            addHoverAnimation(child);
-        } else if (child.getClassName() === "Shape") {
-            child.sceneFunc(sceneFunc);
+    if (!json.children) {
+        const jsonGroup = Konva.Node.create(json.Group);
+        const jsonString = jsonGroup.toJSON();
+        json = JSON.parse(jsonString);
+    }
+
+    json.children.forEach(child => {
+        child = Konva.Node.create(child);
+
+        if (child.attrs.name === "passepartout") {
+            const marginY = 10;
+            const originalHeight = findHeightPath(child.attrs.data);
+            const height = stage.height() - marginY * 2;
+            const originalWidth = findWidthPath(child.attrs.data);
+            const width = stage.width();
+            scale = height / originalHeight;
+            offsetX = (width - originalWidth * scale) / 2;
+            offsetY = marginY;
+
+            commands = getScaledCommands(child.attrs.data, scale);
+            const pathData = convertToSVGPath(commands);
+            child.attrs.data = pathData;
+        } else {
+
+            if (child.attrs.name === "text") {
+                handleTextEventListeners(child);
+
+            } else if (child.attrs.name === "image") {
+                const img = new Image();
+                const src = child.attrs.src;
+                img.src = src;
+                child.image(img);
+            } else if (child.attrs.name === "element") {
+                // not sure if this is needed
+                // child.sceneFunc(sceneFunc);
+            } else if (child.attrs.name === "qrcode" || child.attrs.name == "barcode") {
+                const img = new Image();
+                const src = child.attrs.src;
+                img.src = src;
+                child.image(img);
+            }
             addHoverAnimation(child);
         }
+        group.add(child);
     });
-    node.children.forEach(child => {
-        if (child.getClassName() !== "Path") {
-            child.scale({ x: scale, y: scale });
-            child.x(child.x() * scale);
-            child.y(child.y() * scale);
+
+    group.children.forEach(child => {
+        if (child.attrs.name !== "passepartout") {
+            if (child.attrs.name === "text") {
+                const newFontSize = Math.round(child.fontSize() * scale);
+                child.fontSize(newFontSize);
+            } else {
+                const oldScaleX = child.scaleX();
+                const oldScaleY = child.scaleY();
+                child.scaleX(oldScaleX * scale);
+                child.scaleY(oldScaleY * scale);
+            }
+
+            const oldX = child.x();
+            const oldY = child.y();
+            const oldOffsetX = child.offsetX();
+            const oldOffsetY = child.offsetY();
+            const oldWidth = child.width();
+            const oldHeight = child.height();
+            child.x(oldX * scale);
+            child.y(oldY * scale);
+            child.offsetX(oldOffsetX * scale);
+            child.offsetY(oldOffsetY * scale); $
+            child.width(oldWidth * scale);
+            child.height(oldHeight * scale);
         }
     })
-    node.x(offsetX);
-    const clipFuncWithParam = createClipFunc(pathData);
-    node.clipFunc(clipFuncWithParam);
-    node.on("click tap", () => tr.nodes([]));
-    console.log(node);
-    return node;
+
+    const clipFunction = createClipFunc(commands);
+    group.clipFunc(clipFunction);
+    group.x(offsetX);
+    group.y(offsetY);
+
+    return group;
 }
 
-function getStateLS() {
+function getFrontState() {
     if (localStorage.getItem("front")) {
         return JSON.parse(localStorage.getItem("front"));
     }
 }
 
-function getBacksideState() {
+function getBackState() {
     if (localStorage.getItem("back")) {
         return JSON.parse(localStorage.getItem("back"));
     }
 }
 
-export { stage, layer, init, getBacksideState, loadState, getStateLS, loadStateFromTemplate };
+export { stage, layer, init, loadTemplate, getGroupJson, loadGroup };

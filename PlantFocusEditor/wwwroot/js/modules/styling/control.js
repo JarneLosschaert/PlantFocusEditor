@@ -1,5 +1,6 @@
 import { tr, selectionRectangle, hoverTr, currentGroup } from "../constants.js";
 import { addHoverAnimation } from "../animations.js";
+import { toggleLock } from "../selectionHandling.js";
 
 function deleteNodes() {
     const selectedNodes = tr.nodes();
@@ -50,18 +51,16 @@ function cloneNode() {
 function lockNode() {
     const selectedNodes = tr.nodes();
     selectedNodes.forEach(node => {
-        node.attrs.locked = !node.attrs.locked;
-        node.draggable(!node.draggable());
+        const locked = node.draggable();
+        node.draggable(!locked);
     });
-    const locked = selectedNodes.every(node => node.attrs.locked);
-    tr.rotateEnabled(!locked);
-    tr.resizeEnabled(!locked);
+    toggleLock();
 }
 
 function getValues() {
     const selectedNodes = tr.nodes();
     return {
-        locked: selectedNodes.every(node => node.attrs.locked)
+        locked: selectedNodes.some(node => !node.draggable()),
     };
 
 }

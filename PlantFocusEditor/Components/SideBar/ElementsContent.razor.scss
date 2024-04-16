@@ -15,13 +15,14 @@
             text-align: center;
             padding: 0 1rem 0.5rem 1rem;
             cursor: pointer;
+
+            @media (max-width: $lxl) {
+                padding: 0 0.5rem 0.5rem 0.5rem;
+            }
         }
 
         .selected {
             border-bottom: 1px solid $text;
-        }
-
-        :not(.selected) {
         }
     }
 
@@ -39,26 +40,22 @@
                 border-radius: $border-radius-s;
                 cursor: pointer;
 
-                ::deep svg {
+                ::deep svg, img {
                     height: 100%;
                     width: 100%;
-                }
-
-                img {
-                    height: 4rem;
                 }
 
                 &:hover {
                     background: $neutral-dark;
                     transform: translateX(0);
 
-                    img {
+                    ::deep svg, img {
                         transform: scale(1.05);
                     }
+                }
 
-                    ::deep svg {
-                        transform: scale(1.05);
-                    }
+                @media (max-width: $lxl) {
+                    flex: 0 0 calc(50% - 0.5rem);
                 }
             }
         }

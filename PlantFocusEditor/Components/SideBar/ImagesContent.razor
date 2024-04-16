@@ -24,8 +24,6 @@
     </di>
 </article>
 
-
-
 @code {
     private IJSObjectReference? _module;
     private List<string> _images = new List<string>();
@@ -57,9 +55,20 @@
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
-
         foreach (var file in e.GetMultipleFiles())
         {
+            if (file.Size > 1 * 1024 * 1024)
+            {
+                await JS.InvokeVoidAsync("alert", "The selected image is too big. Please select an image smaller than 1MB.");
+                continue;
+            }
+
+            if (!file.ContentType.Contains("image/png") && !file.ContentType.Contains("image/jpeg"))
+            {
+                await JS.InvokeVoidAsync("alert", "The selected file type is not supported. Please select a PNG or JPG image.");
+                continue;
+            }
+
             var buffer = new byte[file.Size];
             await file.OpenReadStream().ReadAsync(buffer);
             var imageData = Convert.ToBase64String(buffer);
@@ -68,9 +77,9 @@
         }
     }
 
-    public async Task AddImage(string src)
-    {
-        string base64 = await ImagesService.ConvertImageUrlToBase64(src);
-        _module?.InvokeVoidAsync("addImage", base64);
+
+    public void AddImage(string src)
+    {        
+        _module?.InvokeVoidAsync("addImage", src);
     }
 }

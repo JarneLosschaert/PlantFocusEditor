@@ -60,7 +60,7 @@
   width: 1.25rem;
   transition: all 0.2s ease-in-out;
 }
-.editor-bar .undo-redo button:hover {
+.editor-bar .undo-redo button:hover:not([disabled]) {
   background: #f0f0f0;
 }
 .editor-bar .undo-redo button:first-child {

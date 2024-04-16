@@ -57,15 +57,13 @@ button.selected ::deep svg {
   border: 1px solid #dbd9d9;
   border-radius: 6px;
   transition: all 0.2s ease-in-out;
-  /*&[type="number"] {
-      -webkit-appearance: none;
-      -moz-appearance: textfield;
-
-      &::-webkit-outer-spin-button,
-      &::-webkit-inner-spin-button {
-          -webkit-appearance: none;
-      }
-  }*/
+}
+.codes-content form input[type=number] {
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
+.codes-content form input[type=number]::-webkit-outer-spin-button, .codes-content form input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
 }
 .codes-content form input:focus {
   border-color: #009e4d;
