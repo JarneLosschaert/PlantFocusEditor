@@ -17,6 +17,7 @@
         public double height { get; set; }
         public double padding { get; set; }
         public string? align { get; set; }
+        public string? textDecoration { get; set; }
         public string? shadowColor { get; set; }
         public double? opacity { get; set; }
         public int shadowBlur { get; set; }

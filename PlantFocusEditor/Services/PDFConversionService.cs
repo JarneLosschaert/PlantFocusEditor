@@ -37,23 +37,19 @@ namespace PlantFocusEditor.Services
         private Document _document;
         private PdfCanvas _canvas;
 
-        public PDFConversionService()
+        public byte[] SaveToPdf(string jsonString, float[] dimensions, string fontsDir)
         {
             _memoryStream = new MemoryStream();
             _writer = new PdfWriter(_memoryStream);
             _pdf = new PdfDocument(_writer);
-            _document = new Document(_pdf);  
-        }
-
-        public byte[] SaveToPdf(string jsonString, float[] dimensions, string fontsDir)
-        {
+            _document = new Document(_pdf);
             _fontsDirectory = fontsDir;
             RootObject root = ConvertFromJson(jsonString);
             _canvas = new PdfCanvas(_pdf.AddNewPage(new PageSize(dimensions[0], dimensions[1])));
-            float x = (float) root.attrs.x;
-            float y = (float) root.attrs.y;
+            float x = (float)root.attrs.x;
+            float y = (float)root.attrs.y;
             foreach (Child child in root.children)
-            {                
+            {
                 if (child.attrs.name == "passepartout")
                 {
                     string[] commands = PathUtils.ParsePathData(child.attrs.data);
@@ -62,12 +58,12 @@ namespace PlantFocusEditor.Services
                 }
                 else if (child.className == "Text")
                 {
-                    AddText(child, (float) child.attrs.x, dimensions[1] - ((float) child.attrs.y + y));
+                    AddText(child, (float)child.attrs.x + x, dimensions[1] - ((float)child.attrs.y + y));
                 }
                 else if (child.className == "Path")
-                {                                       
+                {
                     string[] commands = PathUtils.ParsePathData(child.attrs.data);
-                    Rectangle bbox = AddPath(commands, child, x, y, dimensions[1]);                    
+                    Rectangle bbox = AddPath(commands, child, x, y, dimensions[1]);
                     if (child.attrs.fillLinearGradientColorStops.Count() >= 2)
                     {
                         SetCanvasLinearGradient(child, bbox);
@@ -76,7 +72,7 @@ namespace PlantFocusEditor.Services
                 }
                 else if (child.className == "Image")
                 {
-                    AddImage(child);
+                    AddImage(child, x, y, dimensions[1]);
                 }
             }
             return GetPdfBytes();
@@ -112,24 +108,26 @@ namespace PlantFocusEditor.Services
         }*/
 
         private void SetCanvasLinearGradient(Child child, Rectangle bbox)
-        {                       
+        {
             List<string> relativePoints = [];
-            List<string> colors = [];
+            List<Color> colors = [];
             foreach (object el in child.attrs.fillLinearGradientColorStops)
             {
                 if (el.ToString().StartsWith('#'))
                 {
-                    colors.Add(el.ToString());
-                } else
+                    Color rgb = HexToColor(el.ToString());
+                    colors.Add(rgb);
+                }
+                else
                 {
                     relativePoints.Add(el.ToString());
                 }
             }
-            AbstractLinearGradientBuilder gradientBuilder = new StrategyBasedLinearGradientBuilder();
-            foreach (string color in colors)
+            AbstractLinearGradientBuilder gradientBuilder = new LinearGradientBuilder()
+                .SetGradientVector(bbox.GetX(), bbox.GetY(), bbox.GetRight(), bbox.GetY());
+            foreach (Color color in colors)
             {
-                Color Rgb = HexToColor(color);
-                gradientBuilder.AddColorStop(new GradientColorStop(Rgb.GetColorValue()));
+                gradientBuilder.AddColorStop(new GradientColorStop(color.GetColorValue()));
             }
             Color gradient = gradientBuilder.BuildColor(bbox, null, _pdf);
             _canvas.SetFillColor(gradient);
@@ -141,16 +139,26 @@ namespace PlantFocusEditor.Services
             return _memoryStream.ToArray();
         }
 
-        private void AddImage(Child child)
+        private void AddImage(Child child, float x, float y, float stageHeight)
         {
             string base64 = child.attrs.src.Substring(child.attrs.src.IndexOf(",") + 1);
             byte[] data = Convert.FromBase64String(base64);
             ImageData imgData = ImageDataFactory.Create(data);
             Image image = new(imgData);            
-            image                
-                .SetWidth((float) (child.attrs.width * child.attrs.scaleX))
-                .SetHeight((float) (child.attrs.height * child.attrs.scaleY))
-                .SetFixedPosition((float) child.attrs.x, (float) (child.attrs.y - (child.attrs.height * child.attrs.scaleY)));
+            float width = (float)child.attrs.width;
+            if (child.attrs.scaleX != 0)
+            {
+                width *= (float)child.attrs.scaleX;
+            }
+            float height = (float)child.attrs.height;
+            if (child.attrs.scaleY != 0)
+            {
+                height *= (float)child.attrs.scaleY;
+            }
+            image
+                .SetWidth(width)
+                .SetHeight(height)
+                .SetFixedPosition((float)child.attrs.x + x, stageHeight - (float)(child.attrs.y + height + y + 10));
             if (child.attrs.opacity != null)
             {
                 image.SetOpacity((float)child.attrs.opacity);
@@ -171,43 +179,55 @@ namespace PlantFocusEditor.Services
             //PdfFont font = PdfFontFactory.CreateFont(path);
             PdfFont font = PdfFontFactory.CreateFont();
 
-            TextAlignment align;
-            switch (child.attrs.align)
-            {
-                case "center":
-                    align = TextAlignment.CENTER; break;
-                case "right":
-                    align = TextAlignment.RIGHT; break;
-                case "left":
-                    align = TextAlignment.LEFT; break;
-                default:
-                    align = TextAlignment.CENTER; break;
-            }
-            Paragraph text = new Paragraph(child.attrs.text)
-                .SetTextAlignment(align)
+            TextAlignment align = HandleAlignment(child.attrs.align);
+            Console.WriteLine(align.ToString());
+            Paragraph paragraph = new Paragraph(child.attrs.text)                
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize);
 
-            IRenderer renderer = text.CreateRendererSubTree();
+            IRenderer renderer = paragraph.CreateRendererSubTree();
             LayoutResult result = renderer.SetParent(_document.GetRenderer()).Layout(new LayoutContext(new LayoutArea(1, new Rectangle(1000, 1000))));
             float textHeight = result.GetOccupiedArea().GetBBox().GetHeight();
-            float textWidth = result.GetOccupiedArea().GetBBox().GetWidth();
+            float textWidth = ((ParagraphRenderer) renderer).GetMinMaxWidth().GetMaxWidth();
             Console.WriteLine(textWidth);
 
-            text.SetFixedPosition(x, y - textHeight, textWidth);
-
-            if (child.attrs.fill != null)
+            paragraph.SetFixedPosition(x, y - textHeight, (float) child.attrs.width)
+                .SetTextAlignment(align);
+            if (child.attrs.textDecoration.Contains("underline"))
             {
-                if (child.attrs.fill.StartsWith("#"))
-                {
-                    DeviceRgb color = HexToColor(child.attrs.fill);
-                    text.SetFontColor(color);
-                } else
-                {
-                    text.SetFontColor(new DeviceRgb(0, 0, 0));
-                }
+                paragraph.SetUnderline();
             }
-            _document.Add(text);
+            SetTextColor(paragraph, child.attrs.fill);
+            _document.Add(paragraph);
+        }
+
+        private static TextAlignment HandleAlignment(string align)
+        {
+            Console.WriteLine(align);
+            var alignment = align switch
+            {
+                "center" => TextAlignment.CENTER,
+                "right" => TextAlignment.RIGHT,
+                "left" => TextAlignment.LEFT,
+                _ => TextAlignment.CENTER,
+            };
+            return alignment;
+        }
+
+        private static void SetTextColor(Paragraph paragraph, string? hex)
+        {
+            if (hex != null)
+            {
+                if (hex.StartsWith("#"))
+                {
+                    DeviceRgb color = HexToColor(hex);
+                    paragraph.SetFontColor(color);
+                }                
+            }
+            else
+            {
+                paragraph.SetFontColor(new DeviceRgb(0, 0, 0));
+            }
         }
 
         private Rectangle AddPath(string[] commands, Child child, float x, float y, float stageHeight)
@@ -225,10 +245,10 @@ namespace PlantFocusEditor.Services
                 char firstChar = command[0];
                 firstChar = char.ToUpper(firstChar);
                 float[] coords = null;
-                
+
                 if (char.ToUpper(firstChar) != 'Z')
                 {
-                    coords = TransformCoords(command, (float) child.attrs.x + x, (float) child.attrs.y + y + 10, stageHeight, child);
+                    coords = TransformCoords(command, (float)child.attrs.x + x, (float)child.attrs.y + y + 10, stageHeight, child);
                     DrawPathFromCommands(command, coords, prevX, prevY, ref minX, ref maxX, ref minY, ref maxY);
                     if (firstChar == 'M' || firstChar == 'L')
                     {
@@ -261,14 +281,11 @@ namespace PlantFocusEditor.Services
                     {
                         prevY = coords[0];
                     }
-                }                
+                }
             }
             float width = maxX - minX;
             float height = maxY - minY;
-            Console.WriteLine($"width: {width}");
-            Console.WriteLine($"height: {height}");
-            Console.WriteLine(minX);
-            Console.WriteLine(minY);
+            _canvas.ClosePath();
             return new Rectangle(minX, minY, width, height).SetBbox(minX, minY, maxX, maxY);
         }
 
@@ -283,7 +300,7 @@ namespace PlantFocusEditor.Services
             else if (stringCoords.Contains(' '))
             {
                 coords = Array.ConvertAll(stringCoords.Split(' '), float.Parse);
-            }            
+            }
             else
             {
                 coords = [float.Parse(stringCoords)];
@@ -317,7 +334,7 @@ namespace PlantFocusEditor.Services
             }
             return coords;
         }
-        
+
         private float[] TransformCoords(float[] coords, Child child, float x, float y, float stageHeight)
         {
             for (int i = 0; i < coords.Length; i++)
@@ -359,7 +376,7 @@ namespace PlantFocusEditor.Services
 
         private void DrawPathFromCommands(string command, float[] coords, float prevX, float prevY, ref float minX, ref float maxX, ref float minY, ref float maxY)
         {
-            
+
             char firstChar = char.ToUpper(command[0]);
             if (firstChar == 'M')
             {
@@ -367,47 +384,45 @@ namespace PlantFocusEditor.Services
                 UpdateBoundingBox(coords[0], coords[1], ref minX, ref maxX, ref minY, ref maxY);
             }
             else if (firstChar == 'L')
-            {
+            {                
                 _canvas.LineTo(coords[0], coords[1]);
                 UpdateBoundingBox(coords[0], coords[1], ref minX, ref maxX, ref minY, ref maxY);
             }
-            else if (firstChar == 'C')
+            else if (firstChar == 'C' || firstChar == 'S')
             {
-                _canvas.CurveTo(coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);
-                UpdateBoundingBox(coords[0], coords[1], ref minX, ref maxX, ref minY, ref maxY);
-                UpdateBoundingBox(coords[2], coords[3], ref minX, ref maxX, ref minY, ref maxY);
-                UpdateBoundingBox(coords[4], coords[5], ref minX, ref maxX, ref minY, ref maxY);
-            }
-            else if (firstChar == 'S')
-            {                
-                _canvas.CurveFromTo(coords[0], coords[1], coords[2], coords[3]);
-                UpdateBoundingBox(coords[0], coords[1], ref minX, ref maxX, ref minY, ref maxY);
-                UpdateBoundingBox(coords[2], coords[3], ref minX, ref maxX, ref minY, ref maxY);
-                if (coords.Length == 8)
+                if (coords.Length == 6)
                 {
-                    _canvas.CurveFromTo(coords[2], coords[3], coords[4], coords[5]);
-                    _canvas.CurveFromTo(coords[4], coords[5], coords[6], coords[7]);
+                    _canvas.CurveTo(coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);
+                    UpdateBoundingBox(coords[0], coords[1], ref minX, ref maxX, ref minY, ref maxY);
+                    UpdateBoundingBox(coords[2], coords[3], ref minX, ref maxX, ref minY, ref maxY);
                     UpdateBoundingBox(coords[4], coords[5], ref minX, ref maxX, ref minY, ref maxY);
-                    UpdateBoundingBox(coords[6], coords[7], ref minX, ref maxX, ref minY, ref maxY);
                 }
+                else
+                {
+                    for (int i = 0; i < coords.Length - 3; i += 4)
+                    {
+                        _canvas.CurveTo(coords[i], coords[i + 1], coords[i + 2], coords[i + 3]);
+                        UpdateBoundingBox(coords[i], coords[i + 1], ref minX, ref maxX, ref minY, ref maxY);
+                        UpdateBoundingBox(coords[i + 2], coords[i + 3], ref minX, ref maxX, ref minY, ref maxY);
+                    }
+                }
+                
             }
             else if (firstChar == 'H')
             {
-                Console.WriteLine($"H x: {coords[0]}, y: {prevY}");
                 _canvas.LineTo(coords[0], prevY);
                 UpdateBoundingBox(coords[0], prevY, ref minX, ref maxX, ref minY, ref maxY);
             }
             else if (firstChar == 'V')
             {
-                Console.WriteLine($"V x: {prevX}, y: {coords[0]}");
                 _canvas.LineTo(prevX, coords[0]);
                 UpdateBoundingBox(prevX, coords[0], ref minX, ref maxX, ref minY, ref maxY);
             }
             else if (firstChar == 'Z')
             {
                 _canvas.ClosePath();
-            }            
-        }        
+            }
+        }
 
         private RootObject ConvertFromJson(string jsonString)
         {
@@ -436,6 +451,6 @@ namespace PlantFocusEditor.Services
 
             // Create a new iText7 Color object
             return new DeviceRgb(r, g, b);
-        }     
+        }
     }
 }
