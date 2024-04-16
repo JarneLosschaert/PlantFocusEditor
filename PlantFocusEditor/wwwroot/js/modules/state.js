@@ -73,6 +73,8 @@ function getGroupJson(json) {
         json = JSON.parse(jsonString);
     }
 
+    console.log(json);
+
     json.children.forEach(child => {
         child = Konva.Node.create(child);
 
