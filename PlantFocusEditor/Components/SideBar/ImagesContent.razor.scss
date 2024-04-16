@@ -66,6 +66,10 @@
                     border: 1px solid $neutral-dark;
                     border-radius: $border-radius-s;
                 }
+
+                @media (max-width: $lxl) {
+                    flex: 0 0 100%;
+                }
             }
         }
     }
