@@ -2,7 +2,7 @@
 
 <section class="editor">
     <EditorBar @ref="_editorBar" />
-    <div id="konva-container" @onclick="OnKonvaClicked"></div>
+    <div id="konva-container" @onclick="OnKonvaClicked"  @ontouchend="OnKonvaClicked"></div>
     <button @onclick="Save">Save to pdf</button>
 </section>
 
