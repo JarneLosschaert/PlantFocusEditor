@@ -62,6 +62,7 @@ function addProperty(src, texts) {
             text: text,
             x: margin + imageSize + margin + borderThickness,
             y: spaceBetweenTexts * index + margin / 2,
+            width: rowWidth - margin - imageSize - margin - borderThickness,
             fontSize: fontSize,
             fontFamily: 'Arial',
             fill: borderColor,
