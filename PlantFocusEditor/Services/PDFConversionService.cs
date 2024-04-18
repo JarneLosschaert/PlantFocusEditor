@@ -156,10 +156,13 @@ namespace PlantFocusEditor.Services
             {
                 height *= (float)child.attrs.scaleY;
             }
+            float left = (float)child.attrs.x + x;
+            float bottom = stageHeight - (float)(child.attrs.y + height + y + 10);
             image
                 .SetWidth(width)
                 .SetHeight(height)
-                .SetFixedPosition((float)child.attrs.x + x, stageHeight - (float)(child.attrs.y + height + y + 10));
+                .SetFixedPosition(left, bottom);
+            //HandleImageRotation(child, image);
             if (child.attrs.opacity != null)
             {
                 image.SetOpacity((float)child.attrs.opacity);
@@ -177,6 +180,20 @@ namespace PlantFocusEditor.Services
             _document.Add(image);
         }
 
+        private static void HandleImageRotation(Child child, Image image)
+        {
+            if (child.attrs.rotation != 0)
+            {
+                float angleRadians = (float)(child.attrs.rotation / Math.PI * 180);
+                image.SetRotationAngle(angleRadians);
+            }
+        }
+
+        private static Point GetImageCenter(float x, float y, float height, float width)
+        {
+            return new Point(x + x + width / 2, y + height / 2);
+        }
+
         private void AddText(Child child, float x, float y)
         {
             //string fontName = FontUtils.GetFontFileName(child.attrs.fontFamily, child.attrs.fontStyle);
@@ -188,7 +205,8 @@ namespace PlantFocusEditor.Services
             Console.WriteLine(align.ToString());
             Paragraph paragraph = new Paragraph(child.attrs.text)
                 .SetFont(font)
-                .SetFontSize(child.attrs.fontSize);
+                .SetFontSize(child.attrs.fontSize)
+                .SetWidth((float)child.attrs.width);
                 //.SetPadding((float)-child.attrs.padding);
             HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.fontStyle, child.attrs.opacity);
             IRenderer renderer = paragraph.CreateRendererSubTree();

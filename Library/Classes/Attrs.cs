@@ -20,6 +20,7 @@
         public string? textDecoration { get; set; }
         public string? shadowColor { get; set; }
         public double? opacity { get; set; }
+        public double rotation { get; set; }
         public int shadowBlur { get; set; }
         public int shadowOffsetX { get; set; }
         public int shadowOffsetY { get; set; }
