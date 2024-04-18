@@ -1,4 +1,5 @@
-﻿@inject IJSRuntime JS;
+﻿@using System.Text
+@inject IJSRuntime JS;
 @inject PDFConversionService PDFConversionService
 
 <section class="editor">
@@ -39,8 +40,7 @@
             string jsonToRender = await _module.InvokeAsync<string>("getJsonToRender");
             Console.WriteLine(jsonToRender);
             float[] dimensions = await _module.InvokeAsync<float[]>("getDimensions");
-            string fontsPath = await _module.InvokeAsync<string>("getFontsDirectory");
-            byte[] pdfBytes = PDFConversionService.SaveToPdf(jsonToRender, dimensions, fontsPath);
+            byte[] pdfBytes = await PDFConversionService.SaveToPdf(jsonToRender, dimensions);
             string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssffff");
             string fileName = $"{timeStamp}.pdf";
             string fileType = "application/pdf";

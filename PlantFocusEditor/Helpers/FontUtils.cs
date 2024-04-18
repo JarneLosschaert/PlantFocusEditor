@@ -1,12 +1,17 @@
-﻿using iText.IO.Font;
-using iText.Kernel.Font;
-using Library.Classes;
+﻿using Microsoft.JSInterop;
 
 namespace PlantFocusEditor.Helpers
 {
     public class FontUtils
     {
-        public static string GetFontFileName(string? fontFamily, string? fontStyle)
+        private readonly IJSRuntime _runtime;
+        public FontUtils(IJSRuntime runtime) 
+        {
+            _runtime = runtime;            
+        }
+
+
+        public async Task<string> GetFontFileName(string? fontFamily, string? fontStyle)
         {
             string font;
             if (fontFamily != null)
@@ -32,7 +37,7 @@ namespace PlantFocusEditor.Helpers
             {
                 font = CreateFont("Arial", false, false);
             }
-            return font;
+            return await _runtime.InvokeAsync<string>("getFont", font);
         }
 
         private static string CreateFont(string fontName, bool isBold, bool isItalic)

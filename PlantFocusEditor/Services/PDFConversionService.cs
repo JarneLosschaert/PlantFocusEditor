@@ -25,25 +25,31 @@ using iText.Kernel.Colors.Gradients;
 using Org.BouncyCastle.Asn1.Ocsp;
 using iText.Kernel.Pdf.Xobject;
 using System.Xml;
+using System.Text;
+using Microsoft.JSInterop;
 
 namespace PlantFocusEditor.Services
 {
     public class PDFConversionService
     {
-        private string _fontsDirectory;
+        private readonly IJSRuntime _runtime;
         private MemoryStream _memoryStream;
         private PdfWriter _writer;
         private PdfDocument _pdf;
         private Document _document;
         private PdfCanvas _canvas;
 
-        public byte[] SaveToPdf(string jsonString, float[] dimensions, string fontsDir)
+        public PDFConversionService(IJSRuntime runtime)
+        {
+            _runtime = runtime;
+        }
+
+        public async Task<byte[]> SaveToPdf(string jsonString, float[] dimensions)
         {
             _memoryStream = new MemoryStream();
             _writer = new PdfWriter(_memoryStream);
             _pdf = new PdfDocument(_writer);
             _document = new Document(_pdf);
-            _fontsDirectory = fontsDir;
             RootObject root = ConvertFromJson(jsonString);
             _canvas = new PdfCanvas(_pdf.AddNewPage(new PageSize(dimensions[0], dimensions[1])));
             float x = (float)root.attrs.x;
@@ -58,8 +64,9 @@ namespace PlantFocusEditor.Services
                     _canvas.Stroke();
                 }
                 else if (child.className == "Text")
-                {
-                    AddText(child, (float)child.attrs.x + x, dimensions[1] - ((float)child.attrs.y + y));
+                {                    
+                    byte[] fontBytes = await GetFont(child.attrs.fontFamily, child.attrs.fontStyle);                    
+                    AddText(child, (float)child.attrs.x + x, dimensions[1] - ((float)child.attrs.y + y), fontBytes);
                 }
                 else if (child.className == "Path")
                 {
@@ -73,10 +80,54 @@ namespace PlantFocusEditor.Services
                 }
                 else if (child.className == "Image")
                 {
+                    Console.WriteLine(child.attrs.width);
                     AddImage(child, x, y, dimensions[1]);
                 }
             }
             return GetPdfBytes();
+        }
+
+        public async Task<byte[]> GetFont(string? fontFamily, string? fontStyle)
+        {
+            string font;
+            if (fontFamily != null)
+            {
+                if (fontStyle != null)
+                {
+                    bool isBold = fontStyle.Contains("bold");
+                    bool isItalic = fontStyle.Contains("italic");
+                    font = GetFontFileName(fontFamily, isBold, isItalic);
+                }
+                else
+                {
+                    font = GetFontFileName(fontFamily, false, false);
+                }
+            }
+            else if (fontStyle != null)
+            {
+                bool isBold = fontStyle.Contains("bold");
+                bool isItalic = fontStyle.Contains("italic");
+                font = GetFontFileName("Arial", isBold, isItalic);
+            }
+            else
+            {
+                font = GetFontFileName("Arial", false, false);
+            }
+            return await _runtime.InvokeAsync<byte[]>("getFont", font);
+        }
+
+        private static string GetFontFileName(string fontName, bool isBold, bool isItalic)
+        {
+            fontName = fontName.Replace(" ", "");
+            if (isBold)
+            {
+                fontName = $"{fontName}Bold";
+            }
+            if (isItalic)
+            {
+                fontName = $"{fontName}Italic";
+            }
+            return $"{fontName}.ttf";
         }
 
         /*private void AddSvg(string pathData)
@@ -158,16 +209,18 @@ namespace PlantFocusEditor.Services
             }
             float left = (float)child.attrs.x + x;
             float bottom = stageHeight - (float)(child.attrs.y + height + y + 10);
+            Console.WriteLine($"Left: {left}, bottom: {bottom}, width: {width}, height: {height}");
             image
                 .SetWidth(width)
                 .SetHeight(height)
                 .SetFixedPosition(left, bottom);
             /*if (child.attrs.rotation != 0)
             {
-                Point rotated = GetRotatedPoint(left, bottom, child.attrs.rotation);
-                image.SetFixedPosition((float)rotated.GetX(), (float)rotated.GetY());
-                HandleImageRotation(child, image);
-                image.SetFixedPosition(left, bottom);
+                Point center = GetImageCenter(x, child.attrs.y + y, height, width);
+                Point beforeRotation = GetPointBeforeRotation(center.GetX(), center.GetY(), left, bottom, child.attrs.rotation);
+                Console.WriteLine($"x: {beforeRotation.GetX()}, y: {beforeRotation.GetY()}");
+                image.SetFixedPosition((float)beforeRotation.GetX(), (float)beforeRotation.GetY());
+                
             }*/
             if (child.attrs.opacity != null)
             {
@@ -183,35 +236,69 @@ namespace PlantFocusEditor.Services
                 _canvas.SetStrokeColor(ColorConstants.BLACK);
                 _canvas.SetLineWidth(1);
             }
-            _document.Add(image);
+            
+            _document.Add(image);            
         }
 
-        private static void HandleImageRotation(Child child, Image image)
+        private void HandleImageRotation(Image image, double rotation)
+        {
+            double angleRadians = rotation * (Math.PI / 180);
+            image.SetRotationAngle(angleRadians);
+        }
+
+        private void RotateImageAroundCenter(Child child, float left, float bottom, double width, double height, ImageData data)
         {
             float angleRadians = (float)(child.attrs.rotation * (Math.PI / 180));
-            image.SetRotationAngle(-angleRadians);
+            // Draw image as if the previous image was rotated around its center
+            // Image starts out being 1x1 with origin in lower left
+            // Move origin to center of image
+            AffineTransform A = AffineTransform.GetTranslateInstance(-0.5, -0.5);
+            // Stretch it to its dimensions
+            AffineTransform B = AffineTransform.GetScaleInstance(width, height);
+            // Rotate it
+            AffineTransform C = AffineTransform.GetRotateInstance(angleRadians);
+            // Move it to have the same center as above
+            AffineTransform D = AffineTransform.GetTranslateInstance(left + width / 2, bottom + height / 2);
+            // Concatenate
+            AffineTransform M = A.Clone();
+            M.PreConcatenate(B);
+            M.PreConcatenate(C);
+            M.PreConcatenate(D);
+            _canvas.ConcatMatrix(M);
+            _canvas.AddImageAt(data, left, bottom, false);
         }        
 
-        private static Point GetImageCenter(float x, float y, float height, float width)
+        private static Point GetImageCenter(double x, double y, double height, double width)
         {
             return new Point(x + x + width / 2, y + height / 2);
         }
 
-        private static Point GetRotatedPoint(float x, float y, double degrees)
-        {
-            float angleRadians = (float)(degrees * (Math.PI / 180));
-            double rotX = x * Math.Cos(angleRadians) - y * Math.Sin(angleRadians);
-            double rotY = y * Math.Cos(angleRadians) + x * Math.Sin(angleRadians);
-            return new Point(rotX, rotY);
+        private static Point GetPointBeforeRotation(double centerX, double centerY, float rotatedX, float rotatedY, double degrees)
+        {           
+            double rotationAngleRadians = degrees * (Math.PI / 180);
+
+            // Calculate distance from center to point after rotation
+            double distance = Math.Sqrt(Math.Pow(rotatedX - centerX, 2) + Math.Pow(rotatedY - centerY, 2));
+
+            // Calculate angle between center and point after rotation
+            double angleAfterRotationRadians = Math.Atan2(rotatedY - centerY, rotatedX - centerX);
+
+            // Subtract rotation angle to get angle before rotation
+            double angleBeforeRotationRadians = angleAfterRotationRadians - rotationAngleRadians;
+
+            // Calculate coordinates of point before rotation
+            double beforeRotationX = centerX + distance * (float)Math.Cos(angleBeforeRotationRadians);
+            double beforeRotationY = centerY + distance * (float)Math.Sin(angleBeforeRotationRadians);
+            return new Point(beforeRotationX, beforeRotationY);
         }
 
-        private void AddText(Child child, float x, float y)
+        private void AddText(Child child, float x, float y, byte[] fontBytes)
         {
             //string fontName = FontUtils.GetFontFileName(child.attrs.fontFamily, child.attrs.fontStyle);
             //string path = $"{_fontsDirectory}/{fontName}";
             //PdfFont font = PdfFontFactory.CreateFont(path);
-            PdfFont font = PdfFontFactory.CreateFont();
-
+            FontProgram fontProgram = FontProgramFactory.CreateFont(fontBytes);
+            PdfFont font = PdfFontFactory.CreateFont(fontProgram);
             TextAlignment align = HandleAlignment(child.attrs.align);
             Console.WriteLine(align.ToString());
             Paragraph paragraph = new Paragraph(child.attrs.text)
@@ -283,7 +370,7 @@ namespace PlantFocusEditor.Services
                     paragraph.SetUnderline();
                 }
             }
-            if (style != null)
+            /*if (style != null)
             {
                 if (style.Contains("bold"))
                 {
@@ -293,7 +380,7 @@ namespace PlantFocusEditor.Services
                 {
                     paragraph.SetItalic();
                 }
-            }
+            }*/
             if (opacity != null)
             {
                 paragraph.SetOpacity((float)opacity);
@@ -302,7 +389,7 @@ namespace PlantFocusEditor.Services
 
         private Rectangle AddPath(string[] commands, Child child, float x, float y, float stageHeight)
         {
-            _canvas.SetLineWidth(1f);
+            _canvas.SetLineWidth(0.5f);
             float prevX = 0.0F;
             float prevY = 0.0F;
             float minX = float.MaxValue;

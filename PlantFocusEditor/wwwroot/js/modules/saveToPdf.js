@@ -52,6 +52,13 @@ function getJsonToRender() {
     return JSON.stringify(front);
 }
 
+window.getFont = async (fontName) => {
+    const res = await fetch(`/fonts/${fontName}`);
+    const fontArrayBuffer = await res.arrayBuffer();
+    const fontBytes = new Uint8Array(fontArrayBuffer);
+    return fontBytes;
+}
+
 function getDimensions() {
     return [stage.width(), stage.height()];
 }
