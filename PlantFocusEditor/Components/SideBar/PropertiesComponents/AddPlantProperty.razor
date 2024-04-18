@@ -1,4 +1,4 @@
-﻿<button class="add-plant-property">
+﻿<button class="add-plant-property" @onclick="OnPropertyAdd">
     <div>
         <img src="https://plantfocus.blob.core.windows.net/icons/toepassing.png" />
         <p>Flowering period</p>
@@ -7,5 +7,6 @@
 </button>
 
 @code {
-
+    [Parameter]
+    public EventCallback OnPropertyAdd { get; set; }
 }

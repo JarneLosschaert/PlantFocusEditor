@@ -18,6 +18,11 @@ let front = new Konva.Group();
 let back = new Konva.Group();
 let currentGroup = front;
 
+let propertiesGroup = new Konva.Group({
+    name: "propertiesGroup",
+    draggable: true,
+});
+
 function changeTr(newTr) {
     tr = newTr;
 }
@@ -46,4 +51,8 @@ function setCurrentGroup(isFront = true) {
     }
 }
 
-export { tr, changeTr, hoverTr, front, setFront, back, setBack, changeHoverTr, selectionRectangle, changeSelectionRectangle, currentGroup, setCurrentGroup };
+function setPropertiesGroup(newPropertiesGroup) {
+    propertiesGroup = newPropertiesGroup;
+}
+
+export { tr, changeTr, hoverTr, front, setFront, back, setBack, changeHoverTr, selectionRectangle, changeSelectionRectangle, currentGroup, setCurrentGroup, propertiesGroup, setPropertiesGroup };

@@ -72,7 +72,8 @@ function handleSelectionEnd(e) {
             node.attrs.name === "image" ||
             node.attrs.name === "barcode" ||
             node.attrs.name === "qrcode" ||
-            node.attrs.name === "element"
+            node.attrs.name === "element" ||
+            node.attrs.name === "propertiesGroup"
     );
 
     const selected = shapes.filter((shape) =>
@@ -105,6 +106,11 @@ function handleSelection(e) {
         } else {
             tr.nodes([]);
         }
+    }
+    if (e.target !== stage && e.target.getParent().attrs.name === "rowGroup") {
+        tr.nodes([e.target.getParent().getParent()]);
+        ToggleTr();
+        return;
     }
     if (
         !e.target.hasName("text") &&

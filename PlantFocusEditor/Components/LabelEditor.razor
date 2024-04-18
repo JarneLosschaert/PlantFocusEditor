@@ -1,16 +1,18 @@
-﻿@inject IJSRuntime JS
+﻿@inject TemplatesService TemplatesService
+@inject ApiConnectorService API
+@inject IJSRuntime JS
 
 <CascadingValue Value="this">
     <div class="label-editor">
         <SideBar SelectTab="SelectTab" />
         <SideBarContent />
         <Editor KonvaClicked="HandleKonvaContainerClicked" />
-        <StylingBar @ref="_stylingBar"  />
+        <StylingBar @ref="_stylingBar" />
     </div>
 </CascadingValue>
 
 @code {
-    public SideBarTabs _SelectedTab { get; set; } = SideBarTabs.Templates;
+    public SideBarTabs _SelectedTab { get; set; } = SideBarTabs.Text;
     private IJSObjectReference? _module;
     private StylingBar.StylingBar? _stylingBar;
 
@@ -19,7 +21,7 @@
         _SelectedTab = tab;
     }
 
-    protected override async void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
@@ -27,6 +29,20 @@
             if (_module is not null)
             {
                 await _module.InvokeVoidAsync("init");
+                await LoadTemplate();
+            }
+        }
+    }
+
+    private async Task LoadTemplate()
+    {
+        List<Template> templates = await API.GetTemplatesAsync(null, null) ?? new List<Template>();
+        if (templates.Count() > 0)
+        {
+            Template template = templates[14];
+            if (_module is not null)
+            {
+                await _module.InvokeVoidAsync("loadTemplate", template.JsonToRender);
             }
         }
     }

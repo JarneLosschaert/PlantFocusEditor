@@ -122,5 +122,9 @@
   {
     "outputFile": "Components/Loader.razor.css",
     "inputFile": "Components/Loader.razor.scss"
+  },
+  {
+    "outputFile": "Components/StylingBar/PropertiesStyleContent.razor.css",
+    "inputFile": "Components/StylingBar/PropertiesStyleContent.razor.scss"
   }
 ]

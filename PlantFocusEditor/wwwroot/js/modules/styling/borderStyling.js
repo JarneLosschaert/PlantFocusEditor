@@ -17,8 +17,8 @@ function handleBorderWidthChange(width) {
 function getValues() {
     const firstNode = tr.nodes()[0];
     return {
+        borderColor: firstNode.stroke(),
         borderWidth: Math.round(firstNode.strokeWidth() * firstNode.scaleX()),
-        borderColor: firstNode.stroke()
     };
 }
 
