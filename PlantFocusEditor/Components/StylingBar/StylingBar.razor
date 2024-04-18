@@ -36,6 +36,10 @@
                 <BorderContent Module="_borderModule" />
                 <ControlContent Module="_controlsModule" />
                 break;
+            case "Properties":
+                <TextStyleContent Module="_propertiesModule" />
+                <BorderContent Module="_propertiesModule" />
+                break;
             case "Selecting":
                 <AppearanceContent Module="_appearanceModule" />
                 <ControlContent Module="_controlsModule" />
@@ -57,6 +61,7 @@
     private IJSObjectReference? _borderModule;
     private IJSObjectReference? _appearanceModule;
     private IJSObjectReference? _controlsModule;
+    private IJSObjectReference? _propertiesModule;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -70,6 +75,7 @@
             _borderModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/borderStyling.js");
             _appearanceModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/appearanceStyling.js");
             _controlsModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/control.js");
+            _propertiesModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/styling/propertiesStyling.js");
         }
     }
 
