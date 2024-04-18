@@ -70,7 +70,7 @@ button {
             border-radius: $border-radius-s;
             transition: $transition;
 
-            /*&[type="number"] {
+            &[type="number"] {
                 -webkit-appearance: none;
                 -moz-appearance: textfield;
 
@@ -78,7 +78,7 @@ button {
                 &::-webkit-inner-spin-button {
                     -webkit-appearance: none;
                 }
-            }*/
+            }
 
             &:focus {
                 border-color: $primary;

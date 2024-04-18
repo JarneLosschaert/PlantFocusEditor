@@ -1,8 +1,8 @@
 ﻿@inject IJSRuntime JS;
 
 <section class="editor">
-    <EditorBar />
-    <div id="konva-container" @onclick="OnKonvaClicked"></div>
+    <EditorBar @ref="_editorBar" />
+    <div id="konva-container" @onclick="OnKonvaClicked"  @ontouchend="OnKonvaClicked"></div>
     <button @onclick="Save">Save to pdf</button>
 </section>
 
@@ -11,6 +11,7 @@
     public Action KonvaClicked { get; set; }
 
     private IJSObjectReference? _module;
+    private EditorBar? _editorBar;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -30,6 +31,7 @@
 
     private void OnKonvaClicked()
     {
+        _editorBar?.getUndoRedoStates();
         InvokeAsync(KonvaClicked);
     }
 }

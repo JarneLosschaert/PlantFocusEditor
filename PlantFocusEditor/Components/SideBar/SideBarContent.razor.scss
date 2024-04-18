@@ -25,4 +25,8 @@
         overflow-x: hidden;
         scrollbar-width: thin;
     }
+
+    @media (max-width: $lxl) {
+        width: 10rem;
+    }
 }

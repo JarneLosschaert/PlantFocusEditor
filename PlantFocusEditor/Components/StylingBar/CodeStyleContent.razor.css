@@ -28,15 +28,13 @@
   border: 1px solid #dbd9d9;
   border-radius: 6px;
   transition: all 0.2s ease-in-out;
-  /*&[type="number"] {
-      -webkit-appearance: none;
-      -moz-appearance: textfield;
-
-      &::-webkit-outer-spin-button,
-      &::-webkit-inner-spin-button {
-          -webkit-appearance: none;
-      }
-  }*/
+}
+.code-style-content > div > div input[type=number] {
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
+.code-style-content > div > div input[type=number]::-webkit-outer-spin-button, .code-style-content > div > div input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
 }
 .code-style-content > div > div input:focus {
   border-color: #009e4d;

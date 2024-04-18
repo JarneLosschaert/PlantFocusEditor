@@ -33,15 +33,16 @@
                 border: 1px solid $neutral-dark;
                 border-radius: $border-radius-s;
                 transition: $transition;
-                /*&[type="number"] {
-                -webkit-appearance: none;
-                -moz-appearance: textfield;
 
-                &::-webkit-outer-spin-button,
-                &::-webkit-inner-spin-button {
+                &[type="number"] {
                     -webkit-appearance: none;
+                    -moz-appearance: textfield;
+
+                    &::-webkit-outer-spin-button,
+                    &::-webkit-inner-spin-button {
+                        -webkit-appearance: none;
+                    }
                 }
-            }*/
 
                 &:focus {
                     border-color: $primary;

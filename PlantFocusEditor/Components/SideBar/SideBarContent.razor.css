@@ -20,3 +20,8 @@
   overflow-x: hidden;
   scrollbar-width: thin;
 }
+@media (max-width: 1100px) {
+  #side-bar-content {
+    width: 10rem;
+  }
+}
