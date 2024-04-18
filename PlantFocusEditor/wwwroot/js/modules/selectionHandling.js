@@ -94,7 +94,6 @@ function haveIntersection(rect1, rect2) {
 }
 
 function handleSelection(e) {
-    console.log(e.target);
     tr.moveToTop();
     selectionRectangle.moveToTop();
     hoverTr.moveToTop();
@@ -108,14 +107,11 @@ function handleSelection(e) {
             tr.nodes([]);
         }
     }
-    console.log(e.target.getParent());
-
-    if (e.target.getParent().attrs.name === "rowGroup") {
+    if (e.target !== stage && e.target.getParent().attrs.name === "rowGroup") {
         tr.nodes([e.target.getParent().getParent()]);
         ToggleTr();
         return;
     }
-
     if (
         !e.target.hasName("text") &&
         !e.target.hasName("image") &&

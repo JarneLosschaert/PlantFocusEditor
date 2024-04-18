@@ -63,7 +63,7 @@ function handleAlignmentChange(alignment) {
 
 function handleBorderColorChange(color) {
     const group = tr.nodes()[0];
-    const borders = group.find(".propertyBorder");
+    const borders = group.find(".propertyBorder, .propertyMiddleBorder");
     borders.forEach((node) => {
         node.fill(color);
     });
@@ -73,6 +73,12 @@ function handleBorderWidthChange(width) {
     const group = tr.nodes()[0];
     const borders = group.find(".propertyBorder");
     borders.forEach((node) => {
+        const value = parseFloat(width);
+        const scale = group.scaleX();
+        node.height(value / scale);
+    });
+    const middleBorders = group.find(".propertyMiddleBorder");
+    middleBorders.forEach((node) => {
         const value = parseFloat(width);
         const scale = group.scaleX();
         node.width(value / scale);
@@ -91,7 +97,7 @@ function getValues() {
         textDecoration: firstText.textDecoration(),
         align: firstText.align(),
         borderColor: firstBorder.fill(),
-        borderWidth: Math.round(firstBorder.width() * properties.scaleX()),
+        borderWidth: Math.round(firstBorder.height() * properties.scaleX()),
     };
 }
 

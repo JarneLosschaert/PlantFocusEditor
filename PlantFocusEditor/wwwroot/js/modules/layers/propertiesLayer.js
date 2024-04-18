@@ -1,12 +1,7 @@
 import { addHoverAnimation } from "../animations.js";
 import { tr, currentGroup } from "../constants.js";
+import { propertiesGroup } from "../constants.js";
 
-const propertiesGroup = new Konva.Group({
-    name: "propertiesGroup",
-    draggable: true,
-});
-
-let numRows = 0;
 const rowHeight = 75;
 const rowWidth = 200;
 const borderThickness = 1;
@@ -17,7 +12,13 @@ const borderColor = '#000000';
 const backgroundColor = 'rgba(0, 0, 0, 0)';
 
 function addProperty(src, texts) {
-    tr.nodes([]);
+    let numRows = propertiesGroup.children.length;
+
+    if (numRows === 0) {
+        currentGroup.add(propertiesGroup);
+        addHoverAnimation(propertiesGroup);
+    }
+
     const rowGroup = new Konva.Group({
         y: numRows * rowHeight + borderThickness,
         name: "rowGroup",
@@ -36,6 +37,7 @@ function addProperty(src, texts) {
     img.src = src;
     img.onload = function () {
         const image = new Konva.Image({
+            name: "propertyImage",
             x: margin,
             y: rowHeight / 2 - (imageSize / 2),
             image: img,
@@ -46,7 +48,7 @@ function addProperty(src, texts) {
     };
 
     const middleBorder = new Konva.Rect({
-        name: "propertyBorder",
+        name: "propertyMiddleBorder",
         x: margin + imageSize + margin / 2,
         y: 0,
         width: borderThickness,
@@ -55,13 +57,14 @@ function addProperty(src, texts) {
     });
     rowGroup.add(middleBorder);
 
-    const spaceBetweenTexts = (rowHeight - margin) / texts.length;
+    const spaceText = rowHeight / texts.length;
     texts.forEach((text, index) => {
+        const middle = spaceText * index + (spaceText / 2) - (fontSize / 2);
         const textNode = new Konva.Text({
             name: "propertyText",
             text: text,
             x: margin + imageSize + margin + borderThickness,
-            y: spaceBetweenTexts * index + margin / 2,
+            y: middle,
             width: rowWidth - margin - imageSize - margin - borderThickness,
             fontSize: fontSize,
             fontFamily: 'Arial',
@@ -69,7 +72,6 @@ function addProperty(src, texts) {
         });
         rowGroup.add(textNode);
     });
-
 
     const bottomBorder = new Konva.Rect({
         name: "propertyBorder",
@@ -94,12 +96,7 @@ function addProperty(src, texts) {
     }
 
     propertiesGroup.add(rowGroup);
-
-    // other place
-    currentGroup.add(propertiesGroup);
-    addHoverAnimation(propertiesGroup);
-
-    numRows++;
+    tr.nodes([]);
 }
 
 export { addProperty };

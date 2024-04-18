@@ -1,4 +1,4 @@
-import { changeTr, changeHoverTr, changeSelectionRectangle, setFront, setBack, currentGroup, setCurrentGroup, tr } from "./constants.js";
+import { setFront, setBack, currentGroup, setCurrentGroup, setPropertiesGroup, tr } from "./constants.js";
 import { handleTextEventListeners } from "./layers/textLayer.js";
 import { sceneFunc } from "./layers/elementLayer.js";
 import { addHoverAnimation } from "./animations.js";
@@ -109,6 +109,8 @@ function getGroupJson(json) {
                 const src = child.attrs.src;
                 img.src = src;
                 child.image(img);
+            } else if (child.attrs.name === "propertiesGroup") {
+                setPropertiesGroup(child);
             }
             addHoverAnimation(child);
         }
