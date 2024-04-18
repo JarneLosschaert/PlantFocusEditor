@@ -27,7 +27,7 @@
         public int shadowOpacity { get; set; }
         public bool locked { get; set; }
         public string? stroke { get; set; }
-        public int strokeWidth { get; set; }
+        public double strokeWidth { get; set; }
         public double scaleX { get; set; }
         public double scaleY { get; set; }
         public bool shadowForStrokeEnabled { get; set; }

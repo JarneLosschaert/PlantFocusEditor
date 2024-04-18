@@ -145,7 +145,7 @@ namespace PlantFocusEditor.Services
             string base64 = child.attrs.src.Substring(child.attrs.src.IndexOf(",") + 1);
             byte[] data = Convert.FromBase64String(base64);
             ImageData imgData = ImageDataFactory.Create(data);
-            Image image = new(imgData);            
+            Image image = new(imgData);
             float width = (float)child.attrs.width;
             if (child.attrs.scaleX != 0)
             {
@@ -162,36 +162,47 @@ namespace PlantFocusEditor.Services
                 .SetWidth(width)
                 .SetHeight(height)
                 .SetFixedPosition(left, bottom);
-            //HandleImageRotation(child, image);
+            /*if (child.attrs.rotation != 0)
+            {
+                Point rotated = GetRotatedPoint(left, bottom, child.attrs.rotation);
+                image.SetFixedPosition((float)rotated.GetX(), (float)rotated.GetY());
+                HandleImageRotation(child, image);
+                image.SetFixedPosition(left, bottom);
+            }*/
             if (child.attrs.opacity != null)
             {
                 image.SetOpacity((float)child.attrs.opacity);
             }
             if (child.attrs.strokeWidth != 0)
             {
-                _canvas.Rectangle((float)child.attrs.x + x, stageHeight - (float)(child.attrs.y + height + y + 10), width, height);
+                _canvas.Rectangle(left, bottom, width, height);
                 DeviceRgb color = HexToColor(child.attrs.stroke);
                 _canvas.SetStrokeColor(color);
-                _canvas.SetLineWidth(child.attrs.strokeWidth);
+                _canvas.SetLineWidth((float)child.attrs.strokeWidth);
                 _canvas.Stroke();
                 _canvas.SetStrokeColor(ColorConstants.BLACK);
-                _canvas.SetLineWidth(1);                
+                _canvas.SetLineWidth(1);
             }
             _document.Add(image);
         }
 
         private static void HandleImageRotation(Child child, Image image)
         {
-            if (child.attrs.rotation != 0)
-            {
-                float angleRadians = (float)(child.attrs.rotation / Math.PI * 180);
-                image.SetRotationAngle(angleRadians);
-            }
-        }
+            float angleRadians = (float)(child.attrs.rotation * (Math.PI / 180));
+            image.SetRotationAngle(-angleRadians);
+        }        
 
         private static Point GetImageCenter(float x, float y, float height, float width)
         {
             return new Point(x + x + width / 2, y + height / 2);
+        }
+
+        private static Point GetRotatedPoint(float x, float y, double degrees)
+        {
+            float angleRadians = (float)(degrees * (Math.PI / 180));
+            double rotX = x * Math.Cos(angleRadians) - y * Math.Sin(angleRadians);
+            double rotY = y * Math.Cos(angleRadians) + x * Math.Sin(angleRadians);
+            return new Point(rotX, rotY);
         }
 
         private void AddText(Child child, float x, float y)
@@ -207,28 +218,30 @@ namespace PlantFocusEditor.Services
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize)
                 .SetWidth((float)child.attrs.width);
-                //.SetPadding((float)-child.attrs.padding);
+            //.SetPadding((float)-child.attrs.padding);
             HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.fontStyle, child.attrs.opacity);
             IRenderer renderer = paragraph.CreateRendererSubTree();
             LayoutResult result = renderer.SetParent(_document.GetRenderer()).Layout(new LayoutContext(new LayoutArea(1, new Rectangle(1000, 1000))));
-            float textHeight = result.GetOccupiedArea().GetBBox().GetHeight();            
-            float textWidth = ((ParagraphRenderer) renderer).GetMinMaxWidth().GetMaxWidth();
+            float textHeight = result.GetOccupiedArea().GetBBox().GetHeight();
+            float textWidth = ((ParagraphRenderer)renderer).GetMinMaxWidth().GetMaxWidth();
             Console.WriteLine(textWidth);
 
             if (align == TextAlignment.RIGHT)
             {
                 // x minus 10 to account for padding
                 paragraph.SetFixedPosition(x - 10, y - textHeight, (float)child.attrs.width);
-            } else if (align == TextAlignment.LEFT)
+            }
+            else if (align == TextAlignment.LEFT)
             {
                 // x plus 10 to account for padding
                 paragraph.SetFixedPosition(x + 10, y - textHeight, (float)child.attrs.width);
-            } else
+            }
+            else
             {
                 paragraph.SetFixedPosition(x, y - textHeight, (float)child.attrs.width);
             }
             paragraph.SetTextAlignment(align);
-            SetTextColor(paragraph, child.attrs.fill);            
+            SetTextColor(paragraph, child.attrs.fill);
             _document.Add(paragraph);
         }
 
@@ -253,7 +266,7 @@ namespace PlantFocusEditor.Services
                 {
                     DeviceRgb color = HexToColor(hex);
                     paragraph.SetFontColor(color);
-                }                
+                }
             }
             else
             {
@@ -441,7 +454,7 @@ namespace PlantFocusEditor.Services
                 UpdateBoundingBox(coords[0], coords[1], ref minX, ref maxX, ref minY, ref maxY);
             }
             else if (firstChar == 'L')
-            {                
+            {
                 _canvas.LineTo(coords[0], coords[1]);
                 UpdateBoundingBox(coords[0], coords[1], ref minX, ref maxX, ref minY, ref maxY);
             }
@@ -463,7 +476,7 @@ namespace PlantFocusEditor.Services
                         UpdateBoundingBox(coords[i + 2], coords[i + 3], ref minX, ref maxX, ref minY, ref maxY);
                     }
                 }
-                
+
             }
             else if (firstChar == 'H')
             {
