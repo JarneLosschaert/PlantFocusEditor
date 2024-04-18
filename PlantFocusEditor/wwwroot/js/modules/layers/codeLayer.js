@@ -9,9 +9,11 @@ function addBarcode(value) {
         format: "CODE128"
     });
 
-    const img = new Image();
+    const img = new Image(
+        canvas.width,
+        canvas.height
+    );
     img.src = canvas.toDataURL("image/png");
-
     img.onload = function () {
         const barcodeImg = new Konva.Image({
             x: 0,
@@ -40,7 +42,6 @@ function addQRCode(src, value) {
 
     const img = new Image();
     img.src = src;
-
     img.onload = function () {
         const kimg = new Konva.Image({
             name: "qrcode",
