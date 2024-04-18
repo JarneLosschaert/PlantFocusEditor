@@ -11,7 +11,8 @@ function addBarcode(value) {
 
     const img = new Image();
     img.src = canvas.toDataURL("image/png");
-
+    console.log(`img width: ${img.width}`);
+    console.log(`img height: ${img.height}`);
     img.onload = function () {
         const barcodeImg = new Konva.Image({
             x: 0,
