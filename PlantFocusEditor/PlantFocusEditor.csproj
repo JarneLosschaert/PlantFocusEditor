@@ -413,7 +413,6 @@
   </ItemGroup>
 
   <ItemGroup>
-	<Folder Include="wwwroot\fonts" />
 	<Folder Include="wwwroot\node_modules\%40babel\" />
     <Folder Include="wwwroot\node_modules\%40types\" />
     <Folder Include="wwwroot\node_modules\.bin\" />

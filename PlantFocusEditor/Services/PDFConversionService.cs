@@ -14,18 +14,7 @@ using iText.Kernel.Font;
 using iText.IO.Font;
 using iText.Layout.Layout;
 using iText.IO.Image;
-using iText.Layout.Borders;
-using iText.Svg.Processors;
-using iText.Svg.Processors.Impl;
-using iText.Svg.Converter;
-using Path = iText.Kernel.Geom.Path;
-using iText.Kernel.Pdf.Colorspace;
-using iText.Kernel.Pdf.Function;
 using iText.Kernel.Colors.Gradients;
-using Org.BouncyCastle.Asn1.Ocsp;
-using iText.Kernel.Pdf.Xobject;
-using System.Xml;
-using System.Text;
 using Microsoft.JSInterop;
 
 namespace PlantFocusEditor.Services
@@ -113,6 +102,7 @@ namespace PlantFocusEditor.Services
             {
                 font = GetFontFileName("Arial", false, false);
             }
+            Console.WriteLine(font);
             return await _runtime.InvokeAsync<byte[]>("getFont", font);
         }
 
@@ -293,10 +283,7 @@ namespace PlantFocusEditor.Services
         }
 
         private void AddText(Child child, float x, float y, byte[] fontBytes)
-        {
-            //string fontName = FontUtils.GetFontFileName(child.attrs.fontFamily, child.attrs.fontStyle);
-            //string path = $"{_fontsDirectory}/{fontName}";
-            //PdfFont font = PdfFontFactory.CreateFont(path);
+        {            
             FontProgram fontProgram = FontProgramFactory.CreateFont(fontBytes);
             PdfFont font = PdfFontFactory.CreateFont(fontProgram);
             TextAlignment align = HandleAlignment(child.attrs.align);
@@ -305,7 +292,7 @@ namespace PlantFocusEditor.Services
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize)
                 .SetWidth((float)child.attrs.width);
-            //.SetPadding((float)-child.attrs.padding);
+
             HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.fontStyle, child.attrs.opacity);
             IRenderer renderer = paragraph.CreateRendererSubTree();
             LayoutResult result = renderer.SetParent(_document.GetRenderer()).Layout(new LayoutContext(new LayoutArea(1, new Rectangle(1000, 1000))));
@@ -369,18 +356,7 @@ namespace PlantFocusEditor.Services
                 {
                     paragraph.SetUnderline();
                 }
-            }
-            /*if (style != null)
-            {
-                if (style.Contains("bold"))
-                {
-                    paragraph.SetBold();
-                }
-                if (style.Contains("italic"))
-                {
-                    paragraph.SetItalic();
-                }
-            }*/
+            }            
             if (opacity != null)
             {
                 paragraph.SetOpacity((float)opacity);
