@@ -1,12 +1,15 @@
-﻿<button class="add-plant-property" @onclick="OnPropertyAdd">
+﻿<button class="add-plant-property" @onclick="() => OnPropertyAdd.InvokeAsync(PlantProperty)">
     <div>
-        <img src="https://plantfocus.blob.core.windows.net/icons/toepassing.png" />
-        <p>Flowering period</p>
+        <img src="@PlantProperty.Icon" />
+        <p>@PlantProperty.Name</p>
     </div>
     @((MarkupString)CustomIcons.Plus())
 </button>
 
 @code {
     [Parameter]
-    public EventCallback OnPropertyAdd { get; set; }
+    public EventCallback<PlantProperty> OnPropertyAdd { get; set; }
+
+    [Parameter]
+    public PlantProperty PlantProperty { get; set; }
 }

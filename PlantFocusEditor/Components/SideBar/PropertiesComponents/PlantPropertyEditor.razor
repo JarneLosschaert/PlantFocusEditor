@@ -1,0 +1,82 @@
+﻿<div class="property">
+    <div class="property-info">
+        <div class="property-container">
+            <div class="property-image-container">
+                <img src="@PlantProperty.Icon" />
+            </div>
+            <div class="property-content-container">
+                <h4>@PlantProperty.Name</h4>
+                <ul>
+                    @foreach (Translation translation in PlantProperty.Translations)
+                    {
+                        <li><span class="property-language">@translation.Language:</span><span class="property-text">@translation.Text</span></li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="property-buttons">
+            @if (_isEditing)
+            {
+                <button @onclick="ToggleEdit" class="save">
+                    @((MarkupString)CustomIcons.Save())
+                </button>
+            }
+            else
+            {
+                <button @onclick="ToggleEdit">
+                    @((MarkupString)CustomIcons.Pencil())
+                </button>
+                <button @onclick="DeleteProperty">
+                    @((MarkupString)CustomIcons.Trash())
+                </button>
+            }
+        </div>
+    </div>
+
+    @if (_isEditing)
+    {
+        <div class="property-edit">
+            @foreach (Translation translation in PlantProperty.Translations)
+            {
+                <div>
+                    <img class="flag" src="@($"/flags/{translation.Language}.svg")" />
+                    <input type="text" @bind="@translation.Text" />
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public PlantProperty PlantProperty { get; set; }
+
+    [Parameter]
+    public EventCallback<PlantProperty> OnPropertyDelete { get; set; }
+
+    [Parameter]
+    public EventCallback AddProperties { get; set; }
+
+    private bool _isEditing = false;
+
+    private void ToggleEdit()
+    {
+        _isEditing = !_isEditing;
+
+        if (!_isEditing)
+        {
+            OnPropertyChange();
+        }
+    }
+
+    private void DeleteProperty()
+    {
+        OnPropertyDelete.InvokeAsync(PlantProperty);
+    }
+
+    private void OnPropertyChange()
+    {
+        AddProperties.InvokeAsync();
+    }
+}

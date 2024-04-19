@@ -6,9 +6,11 @@
   transition: all 0.2s ease-in-out;
 }
 .property .property-info .property-container {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  overflow: hidden;
 }
 .property .property-info .property-container .property-image-container {
   width: 3rem;
@@ -17,7 +19,9 @@
   width: 100%;
 }
 .property .property-info .property-container .property-content-container {
+  max-width: 65%;
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 0.25rem;
   margin-right: 1rem;
@@ -26,10 +30,19 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .property .property-info .property-container .property-content-container ul li {
+  height: 1rem;
+  display: flex;
+  gap: 0.25rem;
   font-size: 0.9rem;
   color: #919191;
+  overflow: hidden;
+}
+.property .property-info .property-container .property-content-container ul li .property-language {
+  text-transform: uppercase;
 }
 .property .property-info .property-buttons {
   display: flex;
