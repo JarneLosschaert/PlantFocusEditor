@@ -4,6 +4,7 @@
     {
         public double x { get; set; }
         public double y { get; set; }
+        public double[]? points { get; set; }
         public string? name { get; set; }
         public string? data { get; set; }
         public string? src { get; set; }

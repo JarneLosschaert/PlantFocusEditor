@@ -82,7 +82,14 @@ namespace PlantFocusEditor.Services
             }
             else if (child.className == "Rect")
             {
-                AddRectangle(child, x, y, stageHeight);
+                if (child.attrs.strokeWidth > 0)
+                {
+                    AddRectangle(child, x, y, stageHeight);
+                }
+            }
+            else if (child.className == "Line")
+            {
+                AddLine(child, x, y + 10, stageHeight);
             }
             else if (child.className == "Group")
             {
@@ -210,7 +217,31 @@ namespace PlantFocusEditor.Services
                 Color rgb = HexToColor(child.attrs.fill);
                 _canvas.SetFillColor(rgb);
             }
+            _canvas.SetLineWidth((float)child.attrs.strokeWidth);
             _canvas.Rectangle(rect);
+            _canvas.Stroke();
+            _canvas.SetLineWidth(1);
+            
+        }
+
+        private void AddLine(Child child, float x, float y, float stageHeight)
+        {
+            Console.WriteLine(y);
+            float width = (float)child.attrs.strokeWidth;
+            Color stroke = ColorConstants.BLACK;
+            if (child.attrs.stroke.Contains('#'))
+            {
+                stroke = HexToColor(child.attrs.stroke);
+            }
+            DrawLine(child.attrs.points, width, x, y, stageHeight, stroke);
+        }
+
+        private void DrawLine(double[] points, float width, float x, float y, float stageHeight, Color strokeColor)
+        {
+            _canvas.SetLineWidth(width);
+            _canvas.SetStrokeColor(strokeColor);
+            _canvas.MoveTo(points[0] + x, stageHeight - (points[1] + y));
+            _canvas.LineTo(points[2] + x, stageHeight - (points[3] + y));
             _canvas.Stroke();
         }
 
