@@ -12,7 +12,7 @@
             <h4>Width</h4>
             <Slider value="@width"
                     unit="px"
-                    max="30"
+                    max="MaxWidth"
                     handleValue="@changeWidth" />
         </div>
     </div>
@@ -21,6 +21,10 @@
 @code {
     [Parameter]
     public IJSObjectReference? Module { get; set; }
+
+    [Parameter]
+    public int MaxWidth { get; set; } = 30;
+
     private int width = 0;
     private string borderColor = "#000000";
 
