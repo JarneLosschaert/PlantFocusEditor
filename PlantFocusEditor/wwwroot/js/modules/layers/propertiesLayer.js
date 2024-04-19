@@ -54,6 +54,7 @@ function addProperties(json) {
         img.onload = function () {
             const image = new Konva.Image({
                 name: "propertyImage",
+                src: img.src,
                 x: margin,
                 y: rowHeight / 2 - (imageSize / 2),
                 image: img,
