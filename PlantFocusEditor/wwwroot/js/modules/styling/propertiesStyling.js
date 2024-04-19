@@ -65,23 +65,16 @@ function handleBorderColorChange(color) {
     const group = tr.nodes()[0];
     const borders = group.find(".propertyBorder, .propertyMiddleBorder");
     borders.forEach((node) => {
-        node.fill(color);
+        node.stroke(color);
     });
 }
 
 function handleBorderWidthChange(width) {
     const group = tr.nodes()[0];
-    const borders = group.find(".propertyBorder");
+    const borders = group.find(".propertyBorder, .propertyMiddleBorder");
     borders.forEach((node) => {
         const value = parseFloat(width);
-        const scale = group.scaleX();
-        node.height(value / scale);
-    });
-    const middleBorders = group.find(".propertyMiddleBorder");
-    middleBorders.forEach((node) => {
-        const value = parseFloat(width);
-        const scale = group.scaleX();
-        node.width(value / scale);
+        node.strokeWidth(value);
     });
 }
 
@@ -96,8 +89,8 @@ function getValues() {
         fontStyle: firstText.fontStyle(),
         textDecoration: firstText.textDecoration(),
         align: firstText.align(),
-        borderColor: firstBorder.fill(),
-        borderWidth: Math.round(firstBorder.height() * properties.scaleX()),
+        borderColor: firstBorder.stroke(),
+        borderWidth: Math.round(firstBorder.strokeWidth() * properties.scaleX()),
     };
 }
 
