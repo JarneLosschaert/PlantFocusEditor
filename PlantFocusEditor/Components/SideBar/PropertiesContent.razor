@@ -4,34 +4,120 @@
     <div>
         <h3>Properties on the label</h3>
         <div class="properties">
-            <div>
-                <PlantProperty />
-            </div>
-            <div>
-                <PlantProperty />
-            </div>
-            <div>
-                <PlantProperty />
-            </div>
+            @foreach (var plantProperty in _plantPropertiesLabel)
+            {
+                <div>
+                    <PlantPropertyEditor PlantProperty="plantProperty" OnPropertyDelete="OnPropertyDelete" AddProperties="AddProperties" />
+                </div>
+            }
         </div>
     </div>
-    <div>
-        <h3>Choose a known property</h3>
-        <div class="add-known-properties">
-            <AddPlantProperty OnPropertyAdd="OnPropertyAdd" />
-            <AddPlantProperty />
-            <AddPlantProperty />
-            <AddPlantProperty />
+    @if (_plantPropertiesLabel.Count < _maxproperties)
+    {
+        <div>
+            <h3>Choose a known property</h3>
+            <div class="add-known-properties">
+                @foreach (var plantProperty in _plantPropertiesKnown)
+                {
+                    <AddPlantProperty PlantProperty="plantProperty" OnPropertyAdd="OnPropertyAdd" />
+                }
+            </div>
         </div>
-    </div>
-    <div>
-        <h3>Add a new property</h3>
-        <NewPlantProperty />
-    </div>
+        <div>
+            <h3>Add a new property</h3>
+            <NewPlantProperty />
+        </div>
+    }
 </article>
 
 @code {
     private IJSObjectReference? _module;
+    private List<PlantProperty> _plantPropertiesLabel = new List<PlantProperty>();
+    private List<PlantProperty> _plantPropertiesKnown = new List<PlantProperty>();
+    private int _maxproperties = 4;
+
+    protected override void OnInitialized()
+    {
+        _plantPropertiesLabel.Add(new PlantProperty
+            {
+                Name = "Color",
+                Translations = new List<Translation>
+        {
+            new Translation { Language = "nl", Text = "Kleur" },
+            new Translation { Language = "fr", Text = "Couleur" },
+            new Translation { Language = "en", Text = "Color" },
+            new Translation { Language = "de", Text = "Farbe" }
+        }
+            });
+        _plantPropertiesLabel.Add(new PlantProperty
+            {
+                Name = "Height",
+                Translations = new List<Translation>
+        {
+            new Translation { Language = "nl", Text = "Hoogte" },
+            new Translation { Language = "fr", Text = "Hauteur" },
+            new Translation { Language = "en", Text = "Height" },
+            new Translation { Language = "de", Text = "Höhe" }
+        }
+            });
+        _plantPropertiesLabel.Add(new PlantProperty
+            {
+                Name = "Width",
+                Translations = new List<Translation>
+                {
+            new Translation { Language = "nl", Text = "Breedte" },
+            new Translation { Language = "fr", Text = "Largeur" },
+            new Translation { Language = "en", Text = "Width" },
+            new Translation { Language = "de", Text = "Breite" }
+                }
+            });
+
+        _plantPropertiesKnown.Add(new PlantProperty
+            {
+                Name = "Weight",
+                Translations = new List<Translation>
+        {
+            new Translation { Language = "nl", Text = "Gewicht" },
+            new Translation { Language = "fr", Text = "Poids" },
+            new Translation { Language = "en", Text = "Weight" },
+            new Translation { Language = "de", Text = "Gewicht" }
+        }
+            });
+        _plantPropertiesKnown.Add(new PlantProperty
+            {
+                Name = "Sunlight",
+                Translations = new List<Translation>
+        {
+            new Translation { Language = "nl", Text = "Zonlicht" },
+            new Translation { Language = "fr", Text = "Lumière du soleil" },
+            new Translation { Language = "en", Text = "Sunlight" },
+            new Translation { Language = "de", Text = "Sonnenlicht" }
+        }
+            });
+        _plantPropertiesKnown.Add(new PlantProperty
+            {
+                Name = "Watering",
+                Translations = new List<Translation>
+        {
+            new Translation { Language = "nl", Text = "Water geven" },
+            new Translation { Language = "fr", Text = "Arrosage" },
+            new Translation { Language = "en", Text = "Watering" },
+            new Translation { Language = "de", Text = "Bewässerung" }
+        }
+            });
+        _plantPropertiesKnown.Add(new PlantProperty
+            {
+                Name = "Soil Type",
+                Translations = new List<Translation>
+        {
+            new Translation { Language = "nl", Text = "Grondsoort" },
+            new Translation { Language = "fr", Text = "Type de sol" },
+            new Translation { Language = "en", Text = "Soil Type" },
+            new Translation { Language = "de", Text = "Bodentyp" }
+        }
+            });
+
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -42,14 +128,24 @@
         }
     }
 
-    public void OnPropertyAdd()
+    private void OnPropertyAdd(PlantProperty plantProperty)
+    {
+        _plantPropertiesLabel.Add(plantProperty);
+        AddProperties();
+    }
+
+    private void OnPropertyDelete(PlantProperty plantProperty)
+    {
+        _plantPropertiesLabel.Remove(plantProperty);
+        AddProperties();
+    }
+
+    private void AddProperties()
     {
         if (_module != null)
         {
-            Console.WriteLine("Property added");
-
-            List<string> listOfTexts = new List<string> { "Property", "Property", "Property" };
-            _module.InvokeVoidAsync("addProperty", "https://plantfocus.blob.core.windows.net/icons/toepassing.png", listOfTexts);
+            string json = JsonSerializer.Serialize(_plantPropertiesLabel);
+            _module.InvokeVoidAsync("addProperties", json);
         }
     }
 }

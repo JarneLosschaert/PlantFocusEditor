@@ -65,7 +65,6 @@
     {
         if (_module == null) return;
         var layersJson = await _module.InvokeAsync<string>("getLayers");
-        Console.WriteLine(layersJson);
         var layers = JsonSerializer.Deserialize<List<Layer>>(layersJson) ?? new List<Layer>();
         _layers = layers.Reverse<Layer>().ToList();
         StateHasChanged();
