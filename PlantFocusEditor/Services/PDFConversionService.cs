@@ -46,35 +46,51 @@ namespace PlantFocusEditor.Services
             float y = (float)root.attrs.y;
             foreach (Child child in root.children)
             {
-                if (child.attrs.name == "passepartout")
-                {
-                    string[] commands = PathUtils.ParsePathData(child.attrs.data);
-                    AddPath(commands, child, x, y, dimensions[1]);
-                    _canvas.Clip();
-                    _canvas.Stroke();
-                }
-                else if (child.className == "Text")
-                {
-                    byte[] fontBytes = await GetFont(child.attrs.fontFamily, child.attrs.fontStyle);
-                    AddText(child, (float)child.attrs.x + x, dimensions[1] - ((float)child.attrs.y + y), fontBytes);
-                }
-                else if (child.className == "Path")
-                {
-                    /*string[] commands = PathUtils.ParsePathData(child.attrs.data);
-                    Rectangle bbox = AddPath(commands, child, x, y, dimensions[1]);
-                    if (child.attrs.fillLinearGradientColorStops.Count() >= 2)
-                    {
-                        SetCanvasLinearGradient(child, bbox);
-                    }
-                    _canvas.FillStroke();*/
-                    AddImage(child, x, y, dimensions[1]);
-                }
-                else if (child.className == "Image")
-                {
-                    AddImage(child, x, y, dimensions[1]);
-                }
+                await AddNode(child, x, y, dimensions[1]);
             }
             return GetPdfBytes();
+        }
+
+        private async Task AddNode(Child child, float x, float y, float stageHeight)
+        {
+            if (child.attrs.name == "passepartout")
+            {
+                string[] commands = PathUtils.ParsePathData(child.attrs.data);
+                AddPath(commands, child, x, y, stageHeight);
+                _canvas.Clip();
+                _canvas.Stroke();
+            }
+            else if (child.className == "Text")
+            {
+                byte[] fontBytes = await GetFont(child.attrs.fontFamily, child.attrs.fontStyle);
+                AddText(child, (float)child.attrs.x + x, stageHeight - ((float)child.attrs.y + y), fontBytes);
+            }
+            else if (child.className == "Path")
+            {
+                /*string[] commands = PathUtils.ParsePathData(child.attrs.data);
+                Rectangle bbox = AddPath(commands, child, x, y, dimensions[1]);
+                if (child.attrs.fillLinearGradientColorStops.Count() >= 2)
+                {
+                    SetCanvasLinearGradient(child, bbox);
+                }
+                _canvas.FillStroke();*/
+                AddImage(child, x, y, stageHeight);
+            }
+            else if (child.className == "Image")
+            {
+                //AddImage(child, x, y, dimensions[1]);
+            }
+            else if (child.className == "Rect")
+            {
+                AddRectangle(child, x, y, stageHeight);
+            }
+            else if (child.className == "Group")
+            {
+                foreach (Child childNode in child.children)
+                {
+                    await AddNode(childNode, (float)child.attrs.x + x, (float)child.attrs.y + y, stageHeight);
+                }
+            }
         }
 
         private async Task<byte[]> GetFont(string? fontFamily, string? fontStyle)
@@ -181,6 +197,23 @@ namespace PlantFocusEditor.Services
             return _memoryStream.ToArray();
         }
 
+        private void AddRectangle(Child child, float x, float y, float stageHeight)
+        {
+            float[] widthHeight = GetNodeWidthHeight(child);
+            float width, height;
+            (width, height) = (widthHeight[0], widthHeight[1]);
+            float left = (float)child.attrs.x + x;
+            float bottom = stageHeight - ((float)child.attrs.y + y + height);
+            Rectangle rect = new(left, bottom, width, height);
+            if (child.attrs.fill.Contains("#"))
+            {
+                Color rgb = HexToColor(child.attrs.fill);
+                _canvas.SetFillColor(rgb);
+            }
+            _canvas.Rectangle(rect);
+            _canvas.Stroke();
+        }
+
         private void AddImage(Child child, float x, float y, float stageHeight)
         {
             string base64 = child.attrs.src.Substring(child.attrs.src.IndexOf(",") + 1);
@@ -188,7 +221,7 @@ namespace PlantFocusEditor.Services
             ImageData imgData = ImageDataFactory.Create(data);
             Image image = new(imgData);
 
-            float[] widthHeight = GetWidthHeightImage(child);
+            float[] widthHeight = GetNodeWidthHeight(child);
             float width, height;
             (width, height) = (widthHeight[0], widthHeight[1]);
 
@@ -236,7 +269,7 @@ namespace PlantFocusEditor.Services
             _document.Add(image);
         }
 
-        private float[] GetWidthHeightImage(Child child)
+        private float[] GetNodeWidthHeight(Child child)
         {
             float width = (float)child.attrs.width;
             float height = (float)child.attrs.height;
