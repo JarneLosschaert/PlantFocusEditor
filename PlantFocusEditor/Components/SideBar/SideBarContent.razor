@@ -7,8 +7,8 @@
     <div class="content">
         @switch (LabelEditor._SelectedTab)
         {
-            case SideBarTabs.Templates:
-                <TemplatesContent />
+            case SideBarTabs.Layers:
+                <LayersContent @ref="_layersContent" EditorClicked="HandleEditorClicked" />
                 break;
             case SideBarTabs.Text:
                 <TextContent />
@@ -33,4 +33,16 @@
 @code {
     [CascadingParameter]
     public LabelEditor? LabelEditor { get; set; }
+
+    private LayersContent? _layersContent;
+
+    public void onEditorClicked()
+    {
+        _layersContent?.GetLayers();
+    }
+
+    public void HandleEditorClicked()
+    {
+        LabelEditor?.HandleEditorClicked();
+    }
 }

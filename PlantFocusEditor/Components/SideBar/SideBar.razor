@@ -2,6 +2,10 @@
 
 <div id="side-bar">
     <ul>
+        <li @onclick="() => SelectTabAsync(SideBarTabs.Layers)" class="@GetSelectedClass(SideBarTabs.Layers)">
+            @((MarkupString)CustomIcons.Layers())
+            Layers
+        </li>
         <li @onclick="() => SelectTabAsync(SideBarTabs.Text)" class="@GetSelectedClass(SideBarTabs.Text)">
             @((MarkupString)CustomIcons.Text())
             Text

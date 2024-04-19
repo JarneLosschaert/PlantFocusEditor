@@ -1,0 +1,73 @@
+@import "../../wwwroot/css/colors.scss";
+@import "../../wwwroot/css/config.scss";
+
+.layers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .layer {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        cursor: pointer;
+        padding: 0 0.5rem;
+        border-radius: $border-radius-s;
+        border: 1px solid $white;
+
+        &:hover {
+            border: 1px solid $neutral-dark;
+        }
+
+        .layer-info {
+            width: 75%;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            span {
+                width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            ::deep svg {
+                height: 1rem;
+                width: 1rem;
+                color: $text-lighter;
+            }
+        }
+
+        .layer-buttons {
+            display: flex;
+            align-items: center;
+
+            button {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 0.25rem;
+                transition: $transition;
+                border-radius: $border-radius;
+
+                &:hover {
+                    background: $neutral;
+                }
+
+                ::deep svg {
+                    height: 1.25rem;
+                    width: 1.25rem;
+                    color: $text-lighter;
+                }
+            }
+        }
+    }
+
+    .no-layers {
+        text-align: center;
+        span {
+            color: $text-lighter;
+            font-weight: 700;
+        }
+    }
+}

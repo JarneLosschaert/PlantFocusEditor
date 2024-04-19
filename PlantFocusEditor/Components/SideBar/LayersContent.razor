@@ -1,0 +1,123 @@
+﻿@using System.Collections.Generic
+@using Microsoft.JSInterop
+@using System.Text.Json.Serialization
+@inject IJSRuntime JS
+
+<div class="layers">
+    @foreach (var layer in _layers)
+    {
+        <div class="layer" @onclick="() => onLayerClick(layer)" @onmouseover="() => onLayerHover(layer)" @onmouseout="() => onLayerUnhover(layer)">
+            <div class="layer-info">
+                @if (layer.Type == "Image")
+                {
+                    @((MarkupString)CustomIcons.Image())
+                }
+                else if (layer.Type == "Text")
+                {
+                    @((MarkupString)CustomIcons.Text())
+                }
+                else if (layer.Type == "Group")
+                {
+                    @((MarkupString)CustomIcons.Properties())
+                }
+                else if (layer.Type == "Path")
+                {
+                    @((MarkupString)CustomIcons.Elements())
+                }
+                else if (layer.Type == "Code")
+                {
+                    @((MarkupString)CustomIcons.Codes())
+                }
+                <span>@layer.Value</span>
+            </div>
+            <div class="layer-buttons">
+                <button @onclick="()=> MoveUp(layer)">@((MarkupString)CustomIcons.ChevronUp())</button>
+                <button @onclick="()=> MoveDown(layer)">@((MarkupString)CustomIcons.ChevronDown())</button>
+            </div>
+        </div>
+    }
+    @if (_layers.Count == 0)
+    {
+        <div class="no-layers">
+            <span>No layers yet</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Action EditorClicked { get; set; }
+
+    private IJSObjectReference? _module;
+    private List<Layer> _layers = new List<Layer>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/layers/layers.js");
+            await GetLayers();
+            StateHasChanged();
+        }
+    }
+
+    public async Task GetLayers()
+    {
+        if (_module == null) return;
+        var layersJson = await _module.InvokeAsync<string>("getLayers");
+        Console.WriteLine(layersJson);
+        var layers = JsonSerializer.Deserialize<List<Layer>>(layersJson) ?? new List<Layer>();
+        _layers = layers.Reverse<Layer>().ToList();
+        StateHasChanged();
+    }
+
+    private void MoveUp(Layer layer)
+    {
+        var index = _layers.IndexOf(layer);
+        if (index > 0)
+        {
+            _layers.RemoveAt(index);
+            _layers.Insert(index - 1, layer);
+            _module?.InvokeVoidAsync("moveLayerUp", layer.Id);
+        }
+    }
+
+    private void MoveDown(Layer layer)
+    {
+        var index = _layers.IndexOf(layer);
+        if (index < _layers.Count - 1)
+        {
+            _layers.RemoveAt(index);
+            _layers.Insert(index + 1, layer);
+            _module?.InvokeVoidAsync("moveLayerDown", layer.Id);
+        }
+    }
+
+    private void onLayerClick(Layer layer)
+    {
+        _module?.InvokeVoidAsync("selectLayer", layer.Id);
+        EditorClicked?.Invoke();
+    }
+
+    private void onLayerHover(Layer layer)
+    {
+        _module?.InvokeVoidAsync("hoverLayer", layer.Id);
+    }
+
+    private void onLayerUnhover(Layer layer)
+    {
+        _module?.InvokeVoidAsync("hoverOutLayer", layer.Id);
+    }
+
+    private class Layer
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; } = -1;
+
+        [JsonPropertyName("type")]
+        public string Type { get; set; } = "";
+
+        [JsonPropertyName("value")]
+        public string Value { get; set; } = "";
+    }
+}
