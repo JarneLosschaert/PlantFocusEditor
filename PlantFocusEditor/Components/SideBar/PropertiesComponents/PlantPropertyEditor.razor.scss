@@ -10,9 +10,11 @@
         transition: $transition;
 
         .property-container {
+            width: 100%;
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            overflow: hidden;
 
             .property-image-container {
                 width: 3rem;
@@ -23,7 +25,9 @@
             }
 
             .property-content-container {
+                max-width: 65%;
                 display: flex;
+                flex: 1;
                 flex-direction: column;
                 gap: 0.25rem;
                 margin-right: 1rem;
@@ -32,10 +36,20 @@
                     display: flex;
                     flex-wrap: wrap;
                     gap: 0 0.5rem;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
 
                     li {
+                        height: 1rem;
+                        display: flex;
+                        gap: 0.25rem;
                         font-size: 0.9rem;
                         color: $text-lighter;
+                        overflow: hidden;
+
+                        .property-language {
+                            text-transform: uppercase;
+                        }
                     }
                 }
             }

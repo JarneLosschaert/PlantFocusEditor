@@ -130,5 +130,9 @@
   {
     "outputFile": "Components/SideBar/LayersContent.razor.css",
     "inputFile": "Components/SideBar/LayersContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/PropertiesComponents/PlantPropertyEditor.razor.css",
+    "inputFile": "Components/SideBar/PropertiesComponents/PlantPropertyEditor.razor.scss"
   }
 ]
