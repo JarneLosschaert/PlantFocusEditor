@@ -2,7 +2,7 @@
 {
     public enum SideBarTabs
     {
-        Templates,
+        Layers,
         Text,
         Images,
         Elements,

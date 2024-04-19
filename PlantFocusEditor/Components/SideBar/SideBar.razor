@@ -2,9 +2,9 @@
 
 <div id="side-bar">
     <ul>
-        <li @onclick="() => SelectTabAsync(SideBarTabs.Templates)" class="@GetSelectedClass(SideBarTabs.Templates)">
-            @((MarkupString)CustomIcons.Templates())
-            Templates
+        <li @onclick="() => SelectTabAsync(SideBarTabs.Layers)" class="@GetSelectedClass(SideBarTabs.Layers)">
+            @((MarkupString)CustomIcons.Layers())
+            Layers
         </li>
         <li @onclick="() => SelectTabAsync(SideBarTabs.Text)" class="@GetSelectedClass(SideBarTabs.Text)">
             @((MarkupString)CustomIcons.Text())
@@ -33,6 +33,7 @@
 @code {
     [CascadingParameter]
     public LabelEditor LabelEditor { get; set; }
+
     [Parameter]
     public EventCallback<SideBarTabs> SelectTab { get; set; }
 

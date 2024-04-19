@@ -18,6 +18,9 @@ function getSelectedItemType() {
     if (isSelected && selected.every(el => el.attrs.name === "qrcode")) {
         return "QR code";
     }
+    if (isSelected && selected.every(el => el.attrs.name === "propertiesGroup")) {
+        return "Properties";
+    }
     if (isSelected) {
         return "Selecting";
     }

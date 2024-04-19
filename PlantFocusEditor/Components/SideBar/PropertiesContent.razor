@@ -1,4 +1,6 @@
-﻿<article class="properties-content">
+﻿@inject IJSRuntime JS
+
+<article class="properties-content">
     <div>
         <h3>Properties on the label</h3>
         <div class="properties">
@@ -16,7 +18,7 @@
     <div>
         <h3>Choose a known property</h3>
         <div class="add-known-properties">
-            <AddPlantProperty />
+            <AddPlantProperty OnPropertyAdd="OnPropertyAdd" />
             <AddPlantProperty />
             <AddPlantProperty />
             <AddPlantProperty />
@@ -29,5 +31,25 @@
 </article>
 
 @code {
+    private IJSObjectReference? _module;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/layers/propertiesLayer.js");
+            StateHasChanged();
+        }
+    }
+
+    public void OnPropertyAdd()
+    {
+        if (_module != null)
+        {
+            Console.WriteLine("Property added");
+
+            List<string> listOfTexts = new List<string> { "Property", "Property", "Property" };
+            _module.InvokeVoidAsync("addProperty", "https://plantfocus.blob.core.windows.net/icons/toepassing.png", listOfTexts);
+        }
+    }
 }

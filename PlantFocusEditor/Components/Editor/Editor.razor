@@ -4,14 +4,14 @@
 
 <section class="editor">
     <EditorBar @ref="_editorBar" />
-    <div id="konva-container" @onclick="OnKonvaClicked"  @ontouchend="OnKonvaClicked"></div>
+    <div id="konva-container" @onclick="onEditorClicked"  @ontouchend="onEditorClicked"></div>
     <button @onclick="Save">Save to pdf</button>
     <button @onclick="SaveToPdf">Save to pdf iText</button>
 </section>
 
 @code {
     [Parameter]
-    public Action KonvaClicked { get; set; }
+    public Action EditorClicked { get; set; }
 
     private IJSObjectReference? _module;
     private EditorBar? _editorBar;
@@ -48,9 +48,9 @@
         }
     }
 
-    private void OnKonvaClicked()
+    private void onEditorClicked()
     {
         _editorBar?.getUndoRedoStates();
-        InvokeAsync(KonvaClicked);
+        InvokeAsync(EditorClicked);
     }
 }
