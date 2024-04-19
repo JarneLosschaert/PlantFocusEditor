@@ -1,16 +1,19 @@
 import { currentGroup } from "../constants.js";
 import { addHoverAnimation } from "../animations.js";
-import { findWidthPath } from "../passePartout.js";
+import { findWidthPath, findHeightPath } from "../passePartout.js";
 
 function addElement(svg) {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(svg, "text/xml");
     const path = xmlDoc.getElementsByTagName("path")[0];
-    const originalWidth = findWidthPath(path.getAttribute("d"))
+    const originalWidth = findWidthPath(path.getAttribute("d"));
+    const originalHeight = findHeightPath(path.getAttribute("d"));
 
     const element = new Konva.Path({
         x: 50,
         y: 50,
+        width: originalWidth,
+        height: originalHeight,
         name: "element",
         data: path.getAttribute("d"),
         stroke: "#000000",

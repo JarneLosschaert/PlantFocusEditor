@@ -59,24 +59,24 @@ namespace PlantFocusEditor.Services
                 }
                 else if (child.className == "Path")
                 {
-                    string[] commands = PathUtils.ParsePathData(child.attrs.data);
+                    /*string[] commands = PathUtils.ParsePathData(child.attrs.data);
                     Rectangle bbox = AddPath(commands, child, x, y, dimensions[1]);
                     if (child.attrs.fillLinearGradientColorStops.Count() >= 2)
                     {
                         SetCanvasLinearGradient(child, bbox);
                     }
-                    _canvas.FillStroke();
+                    _canvas.FillStroke();*/
+                    AddImage(child, x, y, dimensions[1]);
                 }
                 else if (child.className == "Image")
                 {
-                    Console.WriteLine(child.attrs.width);
                     AddImage(child, x, y, dimensions[1]);
                 }
             }
             return GetPdfBytes();
         }
 
-        public async Task<byte[]> GetFont(string? fontFamily, string? fontStyle)
+        private async Task<byte[]> GetFont(string? fontFamily, string? fontStyle)
         {
             string font;
             if (fontFamily != null)
@@ -102,7 +102,6 @@ namespace PlantFocusEditor.Services
             {
                 font = GetFontFileName("Arial", false, false);
             }
-            Console.WriteLine(font);
             return await _runtime.InvokeAsync<byte[]>("getFont", font);
         }
 
@@ -179,7 +178,7 @@ namespace PlantFocusEditor.Services
         {
             _pdf.Close();
             return _memoryStream.ToArray();
-        }
+        }        
 
         private void AddImage(Child child, float x, float y, float stageHeight)
         {
@@ -187,16 +186,11 @@ namespace PlantFocusEditor.Services
             byte[] data = Convert.FromBase64String(base64);
             ImageData imgData = ImageDataFactory.Create(data);
             Image image = new(imgData);
-            float width = (float)child.attrs.width;
-            if (child.attrs.scaleX != 0)
-            {
-                width *= (float)child.attrs.scaleX;
-            }
-            float height = (float)child.attrs.height;
-            if (child.attrs.scaleY != 0)
-            {
-                height *= (float)child.attrs.scaleY;
-            }
+
+            float[] widthHeight = GetWidthHeightImage(child);
+            float width, height;
+            (width, height) = (widthHeight[0], widthHeight[1]);
+
             float left = (float)child.attrs.x + x;
             float bottom = stageHeight - (float)(child.attrs.y + height + y + 10);
             Console.WriteLine($"Left: {left}, bottom: {bottom}, width: {width}, height: {height}");
@@ -204,14 +198,14 @@ namespace PlantFocusEditor.Services
                 .SetWidth(width)
                 .SetHeight(height)
                 .SetFixedPosition(left, bottom);
-            /*if (child.attrs.rotation != 0)
+            if (child.attrs.rotation != 0)
             {
-                Point center = GetImageCenter(x, child.attrs.y + y, height, width);
-                Point beforeRotation = GetPointBeforeRotation(center.GetX(), center.GetY(), left, bottom, child.attrs.rotation);
-                Console.WriteLine($"x: {beforeRotation.GetX()}, y: {beforeRotation.GetY()}");
-                image.SetFixedPosition((float)beforeRotation.GetX(), (float)beforeRotation.GetY());
-                
-            }*/
+                Point beforeRotation = GetCenterBeforeRotation(width, height, left, bottom, child.attrs.rotation);
+                image.SetFixedPosition((float)beforeRotation.GetX(), (float)beforeRotation.GetY());                
+            } else
+            {
+                Console.WriteLine($"actual centerX: {left + width/2}, actual centerY: {bottom + height/2}");
+            }
             if (child.attrs.opacity != null)
             {
                 image.SetOpacity((float)child.attrs.opacity);
@@ -228,6 +222,22 @@ namespace PlantFocusEditor.Services
             }
             
             _document.Add(image);            
+        }
+
+        private float[] GetWidthHeightImage(Child child)
+        {
+            float width = (float)child.attrs.width;
+            float height = (float)child.attrs.height;
+            
+            if (child.attrs.scaleX != 0)
+            {
+                width *= (float)child.attrs.scaleX;
+            }
+            if (child.attrs.scaleY != 0)
+            {
+                height *= (float)child.attrs.scaleY;
+            }
+            return [width, height];
         }
 
         private void HandleImageRotation(Image image, double rotation)
@@ -263,23 +273,16 @@ namespace PlantFocusEditor.Services
             return new Point(x + x + width / 2, y + height / 2);
         }
 
-        private static Point GetPointBeforeRotation(double centerX, double centerY, float rotatedX, float rotatedY, double degrees)
+        private static Point GetCenterBeforeRotation(double width, double height, double rotatedX, double rotatedY, double degrees)
         {           
             double rotationAngleRadians = degrees * (Math.PI / 180);
 
-            // Calculate distance from center to point after rotation
-            double distance = Math.Sqrt(Math.Pow(rotatedX - centerX, 2) + Math.Pow(rotatedY - centerY, 2));
+            // Calculate the center of the rotated node
+            double centerX = rotatedX + (width / 2) * Math.Cos(rotationAngleRadians) - (height / 2) * Math.Sin(rotationAngleRadians);
+            double centerY = rotatedY + height - (width / 2) * Math.Sin(rotationAngleRadians) - (height / 2) * Math.Cos(rotationAngleRadians);
 
-            // Calculate angle between center and point after rotation
-            double angleAfterRotationRadians = Math.Atan2(rotatedY - centerY, rotatedX - centerX);
-
-            // Subtract rotation angle to get angle before rotation
-            double angleBeforeRotationRadians = angleAfterRotationRadians - rotationAngleRadians;
-
-            // Calculate coordinates of point before rotation
-            double beforeRotationX = centerX + distance * (float)Math.Cos(angleBeforeRotationRadians);
-            double beforeRotationY = centerY + distance * (float)Math.Sin(angleBeforeRotationRadians);
-            return new Point(beforeRotationX, beforeRotationY);
+            Console.WriteLine($"center x: {centerX}, center y: {centerY}");
+            return new Point(centerX, centerY);
         }
 
         private void AddText(Child child, float x, float y, byte[] fontBytes)
@@ -287,7 +290,6 @@ namespace PlantFocusEditor.Services
             FontProgram fontProgram = FontProgramFactory.CreateFont(fontBytes);
             PdfFont font = PdfFontFactory.CreateFont(fontProgram);
             TextAlignment align = HandleAlignment(child.attrs.align);
-            Console.WriteLine(align.ToString());
             Paragraph paragraph = new Paragraph(child.attrs.text)
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize)
@@ -298,7 +300,6 @@ namespace PlantFocusEditor.Services
             LayoutResult result = renderer.SetParent(_document.GetRenderer()).Layout(new LayoutContext(new LayoutArea(1, new Rectangle(1000, 1000))));
             float textHeight = result.GetOccupiedArea().GetBBox().GetHeight();
             float textWidth = ((ParagraphRenderer)renderer).GetMinMaxWidth().GetMaxWidth();
-            Console.WriteLine(textWidth);
 
             if (align == TextAlignment.RIGHT)
             {
@@ -321,7 +322,6 @@ namespace PlantFocusEditor.Services
 
         private static TextAlignment HandleAlignment(string align)
         {
-            Console.WriteLine(align);
             var alignment = align switch
             {
                 "center" => TextAlignment.CENTER,
