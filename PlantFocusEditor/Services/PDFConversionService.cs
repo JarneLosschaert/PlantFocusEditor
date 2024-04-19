@@ -16,6 +16,7 @@ using iText.Layout.Layout;
 using iText.IO.Image;
 using iText.Kernel.Colors.Gradients;
 using Microsoft.JSInterop;
+using iText.Layout.Borders;
 
 namespace PlantFocusEditor.Services
 {
@@ -53,8 +54,8 @@ namespace PlantFocusEditor.Services
                     _canvas.Stroke();
                 }
                 else if (child.className == "Text")
-                {                    
-                    byte[] fontBytes = await GetFont(child.attrs.fontFamily, child.attrs.fontStyle);                    
+                {
+                    byte[] fontBytes = await GetFont(child.attrs.fontFamily, child.attrs.fontStyle);
                     AddText(child, (float)child.attrs.x + x, dimensions[1] - ((float)child.attrs.y + y), fontBytes);
                 }
                 else if (child.className == "Path")
@@ -178,7 +179,7 @@ namespace PlantFocusEditor.Services
         {
             _pdf.Close();
             return _memoryStream.ToArray();
-        }        
+        }
 
         private void AddImage(Child child, float x, float y, float stageHeight)
         {
@@ -193,47 +194,53 @@ namespace PlantFocusEditor.Services
 
             float left = (float)child.attrs.x + x;
             float bottom = stageHeight - (float)(child.attrs.y + height + y + 10);
-            Console.WriteLine($"Left: {left}, bottom: {bottom}, width: {width}, height: {height}");
             image
                 .SetWidth(width)
-                .SetHeight(height)
-                .SetFixedPosition(left, bottom);
-            if (child.attrs.rotation != 0)
-            {
-                Point center = GetCenterOfRotatedObject(width, height, left, bottom, child.attrs.rotation);
-                left = (float)center.GetX() - width / 2;
-                bottom = (float)center.GetY() - height / 2;
-                Point corner = new(left, bottom);
-                Point actualBottomLeft = GetRotatedCornerCoords(center, corner, child.attrs.rotation);
-                image.SetFixedPosition((float)actualBottomLeft.GetX(), (float)actualBottomLeft.GetY());
-                image.SetRotationAngle(-child.attrs.rotation * (Math.PI / 180));
-            } else
-            {
-                Console.WriteLine($"actual centerX: {left + width/2}, actual centerY: {bottom + height/2}");
-            }
+                .SetHeight(height);
             if (child.attrs.opacity != null)
             {
                 image.SetOpacity((float)child.attrs.opacity);
             }
+            if (child.attrs.rotation != 0)
+            {
+                Point center = GetCenterOfRotatedObjectFromLeftBottom(width, height, left, bottom, child.attrs.rotation);
+                Point corner = new(center.GetX() - width / 2, center.GetY() - height / 2);
+                Point actualBottomLeft = GetRotatedCornerCoords(center, corner, child.attrs.rotation);
+                left = (float)actualBottomLeft.GetX();
+                bottom = (float)actualBottomLeft.GetY();
+                Console.WriteLine($"left rot: {left}, bottom rot: {bottom}");
+                image.SetRotationAngle(-child.attrs.rotation * (Math.PI / 180));
+            }
+            else
+            {
+                Console.WriteLine($"bottom left: {left}, {bottom}");
+                Console.WriteLine($"upper right: {child.attrs.x + x}, {stageHeight - (child.attrs.y + y)}");
+            }
+            image.SetFixedPosition(left, bottom);
             if (child.attrs.strokeWidth != 0)
             {
-                _canvas.Rectangle(left, bottom, width, height);
                 DeviceRgb color = HexToColor(child.attrs.stroke);
+                if (child.attrs.rotation != 0)
+                {
+                    AffineTransform transform = AffineTransform.GetRotateInstance(child.attrs.rotation * (Math.PI / 180));
+                    _canvas.ConcatMatrix(transform);
+                }
+                _canvas.Rectangle(left, bottom, width, height);
                 _canvas.SetStrokeColor(color);
                 _canvas.SetLineWidth((float)child.attrs.strokeWidth);
                 _canvas.Stroke();
                 _canvas.SetStrokeColor(ColorConstants.BLACK);
                 _canvas.SetLineWidth(1);
             }
-            
-            _document.Add(image);            
+
+            _document.Add(image);
         }
 
         private float[] GetWidthHeightImage(Child child)
         {
             float width = (float)child.attrs.width;
             float height = (float)child.attrs.height;
-            
+
             if (child.attrs.scaleX != 0)
             {
                 width *= (float)child.attrs.scaleX;
@@ -243,59 +250,36 @@ namespace PlantFocusEditor.Services
                 height *= (float)child.attrs.scaleY;
             }
             return [width, height];
-        }        
-
-        private void RotateImageAroundCenter(Child child, float left, float bottom, double width, double height, ImageData data)
-        {
-            float angleRadians = (float)(child.attrs.rotation * (Math.PI / 180));
-            // Draw image as if the previous image was rotated around its center
-            // Image starts out being 1x1 with origin in lower left
-            // Move origin to center of image
-            AffineTransform A = AffineTransform.GetTranslateInstance(-0.5, -0.5);
-            // Stretch it to its dimensions
-            AffineTransform B = AffineTransform.GetScaleInstance(width, height);
-            // Rotate it
-            AffineTransform C = AffineTransform.GetRotateInstance(angleRadians);
-            // Move it to have the same center as above
-            AffineTransform D = AffineTransform.GetTranslateInstance(left + width / 2, bottom + height / 2);
-            // Concatenate
-            AffineTransform M = A.Clone();
-            M.PreConcatenate(B);
-            M.PreConcatenate(C);
-            M.PreConcatenate(D);
-            _canvas.ConcatMatrix(M);
-            _canvas.AddImageAt(data, left, bottom, false);
-        }        
-
-        private static Point GetImageCenter(double x, double y, double height, double width)
-        {
-            return new Point(x + x + width / 2, y + height / 2);
         }
 
-        private static Point GetCenterOfRotatedObject(double width, double height, double rotatedX, double rotatedY, double degrees)
-        {           
-            double rotationAngleRadians = degrees * (Math.PI / 180);
+        private static Point GetCenterOfRotatedObjectFromLeftBottom(double width, double height, double rotatedX, double rotatedY, double degrees)
+        {
+            double rotationAngleRadians = DegreesToRadians(degrees);
 
             // Calculate the center of the rotated node
             double centerX = rotatedX + (width / 2) * Math.Cos(rotationAngleRadians) - (height / 2) * Math.Sin(rotationAngleRadians);
             double centerY = rotatedY + height - (width / 2) * Math.Sin(rotationAngleRadians) - (height / 2) * Math.Cos(rotationAngleRadians);
 
-            Console.WriteLine($"center x: {centerX}, center y: {centerY}");
             return new Point(centerX, centerY);
+        }
+
+        private static double DegreesToRadians(double degrees)
+        {
+            return degrees * (Math.PI / 180);
         }
 
         private static Point GetRotatedCornerCoords(Point center, Point point, double rotationAngle)
         {
             double angleRadians = -rotationAngle * (Math.PI / 180);
-            point.SetLocation(point.GetX() - center.GetX(), point.GetY() -  center.GetY());
-            double xNew = point.GetX() * Math.Cos(angleRadians) - point.GetY() * Math.Sin(angleRadians);
-            double yNew = point.GetX() * Math.Sin(angleRadians) + point.GetY() * Math.Cos(angleRadians);
-            point.SetLocation(xNew + center.GetX(), yNew + center.GetY());
-            return point;
+            Point p = new(point.GetX() - center.GetX(), point.GetY() - center.GetY());
+            double xNew = p.GetX() * Math.Cos(angleRadians) - p.GetY() * Math.Sin(angleRadians);
+            double yNew = p.GetX() * Math.Sin(angleRadians) + p.GetY() * Math.Cos(angleRadians);
+            p.SetLocation(xNew + center.GetX(), yNew + center.GetY());
+            return p;
         }
 
         private void AddText(Child child, float x, float y, byte[] fontBytes)
-        {            
+        {
             FontProgram fontProgram = FontProgramFactory.CreateFont(fontBytes);
             PdfFont font = PdfFontFactory.CreateFont(fontProgram);
             TextAlignment align = HandleAlignment(child.attrs.align);
@@ -365,7 +349,7 @@ namespace PlantFocusEditor.Services
                 {
                     paragraph.SetUnderline();
                 }
-            }            
+            }
             if (opacity != null)
             {
                 paragraph.SetOpacity((float)opacity);
