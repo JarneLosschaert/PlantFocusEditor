@@ -200,8 +200,13 @@ namespace PlantFocusEditor.Services
                 .SetFixedPosition(left, bottom);
             if (child.attrs.rotation != 0)
             {
-                Point beforeRotation = GetCenterBeforeRotation(width, height, left, bottom, child.attrs.rotation);
-                image.SetFixedPosition((float)beforeRotation.GetX(), (float)beforeRotation.GetY());                
+                Point center = GetCenterOfRotatedObject(width, height, left, bottom, child.attrs.rotation);
+                left = (float)center.GetX() - width / 2;
+                bottom = (float)center.GetY() - height / 2;
+                Point corner = new(left, bottom);
+                Point actualBottomLeft = GetRotatedCornerCoords(center, corner, child.attrs.rotation);
+                image.SetFixedPosition((float)actualBottomLeft.GetX(), (float)actualBottomLeft.GetY());
+                image.SetRotationAngle(-child.attrs.rotation * (Math.PI / 180));
             } else
             {
                 Console.WriteLine($"actual centerX: {left + width/2}, actual centerY: {bottom + height/2}");
@@ -238,13 +243,7 @@ namespace PlantFocusEditor.Services
                 height *= (float)child.attrs.scaleY;
             }
             return [width, height];
-        }
-
-        private void HandleImageRotation(Image image, double rotation)
-        {
-            double angleRadians = rotation * (Math.PI / 180);
-            image.SetRotationAngle(angleRadians);
-        }
+        }        
 
         private void RotateImageAroundCenter(Child child, float left, float bottom, double width, double height, ImageData data)
         {
@@ -273,7 +272,7 @@ namespace PlantFocusEditor.Services
             return new Point(x + x + width / 2, y + height / 2);
         }
 
-        private static Point GetCenterBeforeRotation(double width, double height, double rotatedX, double rotatedY, double degrees)
+        private static Point GetCenterOfRotatedObject(double width, double height, double rotatedX, double rotatedY, double degrees)
         {           
             double rotationAngleRadians = degrees * (Math.PI / 180);
 
@@ -283,6 +282,16 @@ namespace PlantFocusEditor.Services
 
             Console.WriteLine($"center x: {centerX}, center y: {centerY}");
             return new Point(centerX, centerY);
+        }
+
+        private static Point GetRotatedCornerCoords(Point center, Point point, double rotationAngle)
+        {
+            double angleRadians = -rotationAngle * (Math.PI / 180);
+            point.SetLocation(point.GetX() - center.GetX(), point.GetY() -  center.GetY());
+            double xNew = point.GetX() * Math.Cos(angleRadians) - point.GetY() * Math.Sin(angleRadians);
+            double yNew = point.GetX() * Math.Sin(angleRadians) + point.GetY() * Math.Cos(angleRadians);
+            point.SetLocation(xNew + center.GetX(), yNew + center.GetY());
+            return point;
         }
 
         private void AddText(Child child, float x, float y, byte[] fontBytes)
