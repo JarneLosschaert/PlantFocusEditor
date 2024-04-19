@@ -41,6 +41,7 @@
         if (templates.Count() > 0)
         {
             Template template = templates[14];
+            Console.WriteLine(template.JsonToRender);
             if (_module is not null)
             {
                 await _module.InvokeVoidAsync("loadTemplate", template.JsonToRender);

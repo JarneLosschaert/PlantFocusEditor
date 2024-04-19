@@ -22,6 +22,7 @@ function switchSides() {
 }
 
 function flip() {
+    console.log(currentGroup.toJSON());
     const height = findHeightPath(currentGroup.children[0].data());
     if (currentGroup.offsetY() === 0) {
         currentGroup.offsetY(height);
