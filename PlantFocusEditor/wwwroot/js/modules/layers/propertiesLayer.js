@@ -2,14 +2,14 @@ import { addHoverAnimation } from "../animations.js";
 import { tr, currentGroup } from "../constants.js";
 import { propertiesGroup } from "../constants.js";
 
-const rowHeight = 75;
-const rowWidth = 200;
+const rowHeight = 85;
+let rowWidth = 200;
 const margin = 10;
-const imageSize = 50;
+const imageSize = 60;
 let font = 'Arial';
 let style = 'normal';
 let decoration = 'none';
-let fontSize = 15;
+let fontSize = 14;
 let fontColor = '#000000';
 let align = 'left';
 let borderThickness = 1;
@@ -31,6 +31,15 @@ function addProperties(json) {
         borderColor = firstRow.findOne(".propertyBorder").stroke();
         backgroundColor = firstRow.findOne(".propertyImage").fill();
     }
+
+    properties.forEach(property => {
+        property.Translations.forEach(translation => {
+            const textWidth = translation.Text.length * (fontSize / 1.5);
+            if (textWidth > rowWidth) {
+                rowWidth = textWidth;
+            }
+        });
+    });
 
     propertiesGroup.removeChildren();
 
@@ -73,9 +82,9 @@ function addProperties(json) {
 
         rowGroup.add(middleBorder);
 
-        const spaceText = rowHeight / property.Translations.length;
+        const spaceText = (rowHeight - (margin / 2)) / property.Translations.length;
         property.Translations.forEach((translation, index) => {
-            const middle = spaceText * index + (spaceText / 2) - (fontSize / 2);
+            const middle = spaceText * index + (spaceText / 2) - (fontSize / 2) + (margin / 2);
             const textNode = new Konva.Text({
                 name: "propertyText",
                 text: translation.Text,
