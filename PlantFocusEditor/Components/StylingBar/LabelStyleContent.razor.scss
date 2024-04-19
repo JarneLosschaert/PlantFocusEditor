@@ -1,2 +1,11 @@
-p {
+@import "../../wwwroot/css/colors.scss";
+@import "../../wwwroot/css/config.scss";
+
+.label-style-content {
+    text-align: center;
+
+    span {
+        color: $text-lighter;
+        font-weight: 700;
+    }
 }

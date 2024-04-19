@@ -126,5 +126,9 @@
   {
     "outputFile": "Components/StylingBar/PropertiesStyleContent.razor.css",
     "inputFile": "Components/StylingBar/PropertiesStyleContent.razor.scss"
+  },
+  {
+    "outputFile": "Components/SideBar/LayersContent.razor.css",
+    "inputFile": "Components/SideBar/LayersContent.razor.scss"
   }
 ]

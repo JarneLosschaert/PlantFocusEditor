@@ -5,16 +5,17 @@
 <CascadingValue Value="this">
     <div class="label-editor">
         <SideBar SelectTab="SelectTab" />
-        <SideBarContent />
-        <Editor KonvaClicked="HandleKonvaContainerClicked" />
+        <SideBarContent @ref="_sideBarContent" />
+        <Editor EditorClicked="HandleEditorClicked" />
         <StylingBar @ref="_stylingBar" />
     </div>
 </CascadingValue>
 
 @code {
-    public SideBarTabs _SelectedTab { get; set; } = SideBarTabs.Text;
+    public SideBarTabs _SelectedTab { get; set; } = SideBarTabs.Layers;
     private IJSObjectReference? _module;
     private StylingBar.StylingBar? _stylingBar;
+    private SideBarContent? _sideBarContent;
 
     public void SelectTab(SideBarTabs tab)
     {
@@ -45,10 +46,12 @@
                 await _module.InvokeVoidAsync("loadTemplate", template.JsonToRender);
             }
         }
+        _sideBarContent?.onEditorClicked();
     }
 
-    private void HandleKonvaContainerClicked()
+    public void HandleEditorClicked()
     {
         _stylingBar?.SetSelectedItem();
+        _sideBarContent?.onEditorClicked();
     }
 }
