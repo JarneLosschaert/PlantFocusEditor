@@ -14,7 +14,7 @@ let fontColor = '#000000';
 let align = 'left';
 let borderThickness = 1;
 let borderColor = '#000000';
-let backgroundColor = 'rgba(0, 0, 0, 0)';
+let backgroundColor = '#00000000';
 
 function addProperties(json) {
     const properties = JSON.parse(json);
@@ -27,8 +27,8 @@ function addProperties(json) {
         fontSize = firstRow.findOne(".propertyText").fontSize();
         fontColor = firstRow.findOne(".propertyText").fill();
         align = firstRow.findOne(".propertyText").align();
-        borderThickness = firstRow.findOne(".propertyBorder").height();
-        borderColor = firstRow.findOne(".propertyBorder").fill();
+        borderThickness = firstRow.findOne(".propertyMiddleBorder").strokeWidth();
+        borderColor = firstRow.findOne(".propertyBorder").stroke();
         backgroundColor = firstRow.findOne(".propertyImage").fill();
     }
 
@@ -64,14 +64,13 @@ function addProperties(json) {
             rowGroup.add(image);
         };
 
-        const middleBorder = new Konva.Rect({
+        const middleBorder = new Konva.Line({
             name: "propertyMiddleBorder",
-            x: margin + imageSize + margin / 2,
-            y: 0,
-            width: borderThickness,
-            height: rowHeight,
-            fill: borderColor,
+            points: [margin + imageSize, 0, margin + imageSize, rowHeight],
+            stroke: borderColor,
+            strokeWidth: borderThickness,
         });
+
         rowGroup.add(middleBorder);
 
         const spaceText = rowHeight / property.Translations.length;
@@ -93,24 +92,20 @@ function addProperties(json) {
             rowGroup.add(textNode);
         });
 
-        const bottomBorder = new Konva.Rect({
+        const bottomBorder = new Konva.Line({
             name: "propertyBorder",
-            x: 0,
-            y: 0 + rowHeight - borderThickness,
-            width: rowWidth,
-            height: borderThickness,
-            fill: borderColor,
+            points: [0, rowHeight, rowWidth, rowHeight],
+            stroke: borderColor,
+            strokeWidth: borderThickness,
         });
         rowGroup.add(bottomBorder);
 
         if (index === 0) {
-            const topBorder = new Konva.Rect({
+            const topBorder = new Konva.Line({
                 name: "propertyBorder",
-                x: 0,
-                y: 0,
-                width: rowWidth,
-                height: borderThickness,
-                fill: borderColor,
+                points: [0, 0, rowWidth, 0],
+                stroke: borderColor,
+                strokeWidth: borderThickness,
             });
             rowGroup.add(topBorder);
         }
