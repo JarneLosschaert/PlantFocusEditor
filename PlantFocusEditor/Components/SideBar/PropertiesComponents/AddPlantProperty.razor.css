@@ -24,6 +24,15 @@
   gap: 0.5rem;
   height: 100%;
 }
+.add-plant-property div p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .add-plant-property div img {
   height: 100%;
+}
+@media (max-width: 1100px) {
+  .add-plant-property div img {
+    display: none;
+  }
 }

@@ -28,4 +28,8 @@
         overflow-y: auto;
         scrollbar-width: thin;
     }
+
+    @media (max-width: $lxl) {
+        width: 15rem;
+    }
 }

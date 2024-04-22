@@ -2,9 +2,20 @@
   display: flex;
   justify-content: space-between;
 }
+@media (max-width: 1100px) {
+  .add-new-property {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
 .add-new-property .select-container {
   width: 70%;
   position: relative;
+}
+@media (max-width: 1100px) {
+  .add-new-property .select-container {
+    width: 100%;
+  }
 }
 .add-new-property .select-container select {
   width: 100%;
@@ -26,6 +37,11 @@
   right: 0.5rem;
   transform: translateY(-50%);
 }
+@media (max-width: 1100px) {
+  .add-new-property .select-container select ~ .icon {
+    display: none;
+  }
+}
 .add-new-property .select-container select ~ .icon ::deep svg {
   width: 1.5rem;
   height: 1.5rem;
@@ -39,6 +55,11 @@
   border: 1px solid #dbd9d9;
   border-radius: 6px;
   transition: all 0.2s ease-in-out;
+}
+@media (max-width: 1100px) {
+  .add-new-property button {
+    width: 50%;
+  }
 }
 .add-new-property button ::deep svg {
   height: 1.25rem;
