@@ -34,6 +34,7 @@ function handleEventListeners() {
 }
 
 function loadTemplate(json) {
+    console.log(json);
     json = JSON.parse(json);
     const front = getGroupJson(json[0]);
     const back = getGroupJson(json[1]);
@@ -159,18 +160,6 @@ function getGroupJson(json) {
     console.log(group);
 
     return group;
-}
-
-function getFrontState() {
-    if (localStorage.getItem("front")) {
-        return JSON.parse(localStorage.getItem("front"));
-    }
-}
-
-function getBackState() {
-    if (localStorage.getItem("back")) {
-        return JSON.parse(localStorage.getItem("back"));
-    }
 }
 
 export { stage, layer, init, loadTemplate, getGroupJson, loadGroup };

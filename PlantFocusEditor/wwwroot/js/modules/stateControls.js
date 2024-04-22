@@ -22,7 +22,6 @@ function switchSides() {
 }
 
 function flip() {
-    console.log(currentGroup.toJSON());
     const height = findHeightPath(currentGroup.children[0].data());
     if (currentGroup.offsetY() === 0) {
         currentGroup.offsetY(height);
@@ -77,7 +76,7 @@ function saveState(e) {
             return;
         }
     }
-    
+
     if (historyFront[historyFrontIndex] !== front.toJSON()) {
         if (historyFront[historyFrontIndex] !== undefined) {
             historyFrontIndex++;
@@ -87,20 +86,20 @@ function saveState(e) {
     }
 
     if (historyBack[historyBackIndex] !== back.toJSON()) {
-if (historyBack[historyBackIndex] !== undefined) {
+        if (historyBack[historyBackIndex] !== undefined) {
             historyBackIndex++;
         }
         historyBack[historyBackIndex] = back.toJSON();
         historyBack.length = historyBackIndex + 1;
     }
-    //saveStateLS();
+    saveStateLS();
 }
 
 function saveStateLS() {
-    const frontState = historyFront[historyFrontIndex];
-    const backState = historyBack[historyBackIndex];
-    localStorage.setItem("front", JSON.stringify(frontState));
-    localStorage.setItem("back", JSON.stringify(backState));
+    const frontState = { "Group": front.toJSON() };
+    const backState = { "Group": back.toJSON() };
+    const stateJson = [frontState, backState];
+    localStorage.setItem("state", JSON.stringify(stateJson));
 }
 
 function getValues() {
