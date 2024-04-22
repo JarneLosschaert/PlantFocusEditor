@@ -19,7 +19,7 @@
   width: 100%;
 }
 .property .property-info .property-container .property-content-container {
-  max-width: 65%;
+  max-width: 60%;
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -28,10 +28,7 @@
 }
 .property .property-info .property-container .property-content-container ul {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0 0.5rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex-direction: column;
 }
 .property .property-info .property-container .property-content-container ul li {
   height: 1rem;
@@ -39,10 +36,14 @@
   gap: 0.25rem;
   font-size: 0.9rem;
   color: #919191;
-  overflow: hidden;
 }
 .property .property-info .property-container .property-content-container ul li .property-language {
   text-transform: uppercase;
+}
+.property .property-info .property-container .property-content-container ul li .property-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .property .property-info .property-buttons {
   display: flex;

@@ -25,7 +25,7 @@
             }
 
             .property-content-container {
-                max-width: 65%;
+                max-width: 60%;
                 display: flex;
                 flex: 1;
                 flex-direction: column;
@@ -34,10 +34,7 @@
 
                 ul {
                     display: flex;
-                    flex-wrap: wrap;
-                    gap: 0 0.5rem;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
+                    flex-direction: column;
 
                     li {
                         height: 1rem;
@@ -45,10 +42,15 @@
                         gap: 0.25rem;
                         font-size: 0.9rem;
                         color: $text-lighter;
-                        overflow: hidden;
 
                         .property-language {
                             text-transform: uppercase;
+                        }
+
+                        .property-text {
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
                         }
                     }
                 }

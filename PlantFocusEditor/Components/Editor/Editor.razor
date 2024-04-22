@@ -1,7 +1,7 @@
 ﻿@inject IJSRuntime JS;
 
 <section class="editor">
-    <EditorBar @ref="_editorBar" />
+    <EditorBar EditorClicked="EditorClicked" @ref="_editorBar" />
     <div id="konva-container" @onclick="onEditorClicked"  @ontouchend="onEditorClicked"></div>
     <button @onclick="Save">Save to pdf</button>
 </section>
