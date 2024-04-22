@@ -34,7 +34,7 @@ function addProperties(json) {
 
     properties.forEach(property => {
         property.Translations.forEach(translation => {
-            const textWidth = translation.Text.length * (fontSize / 1.5);
+            const textWidth = translation.Text.length * (fontSize / 1.25);
             if (textWidth > rowWidth) {
                 rowWidth = textWidth;
             }

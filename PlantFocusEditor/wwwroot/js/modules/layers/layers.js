@@ -37,6 +37,7 @@ function moveLayerUp(id) {
     if (index > 0) {
         currentGroup.children[index].moveUp();
     }
+    tr.nodes([]);
 }
 
 function moveLayerDown(id) {
@@ -44,6 +45,7 @@ function moveLayerDown(id) {
     if (index < currentGroup.children.length) {
         currentGroup.children[index].moveDown();
     }
+    tr.nodes([]);
 }
 
 function hoverLayer(id) {
