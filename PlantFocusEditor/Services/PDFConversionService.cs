@@ -17,6 +17,9 @@ using iText.IO.Image;
 using iText.Kernel.Colors.Gradients;
 using Microsoft.JSInterop;
 using Org.BouncyCastle.Asn1.Ocsp;
+using static System.Net.Mime.MediaTypeNames;
+using Image = iText.Layout.Element.Image;
+using Text = iText.Layout.Element.Text;
 
 namespace PlantFocusEditor.Services
 {
@@ -171,36 +174,7 @@ namespace PlantFocusEditor.Services
                 fontName = $"{fontName}Italic";
             }
             return $"{fontName}.ttf";
-        }
-
-        /*private void AddSvg(string pathData)
-        {
-            string svg = CreateSvgFromPathCommands(pathData);
-            SvgConverter.DrawOnCanvas(svg, _canvas);
-        }
-
-        static string CreateSvgFromPathCommands(string pathCommands)
-        {
-            // Create an XmlDocument and append an SVG element with the path data
-            XmlDocument doc = new XmlDocument();
-            XmlElement svgElement = doc.CreateElement("svg");
-            //svgElement.SetAttribute("xmlns", "http://www.w3.org/2000/svg");
-            svgElement.SetAttribute("viewBox", "0 0 24 24");
-            XmlElement pathElement = doc.CreateElement("path");
-            pathElement.SetAttribute("d", pathCommands);
-            svgElement.AppendChild(pathElement);
-            doc.AppendChild(svgElement);
-
-            // Convert XmlDocument to string
-            using (StringWriter sw = new StringWriter())
-            {
-                using (XmlTextWriter tw = new XmlTextWriter(sw))
-                {
-                    doc.WriteTo(tw);
-                    return sw.ToString();
-                }
-            }
-        }*/
+        }      
 
         private void SetCanvasLinearGradient(Child child, Rectangle bbox)
         {
@@ -309,18 +283,15 @@ namespace PlantFocusEditor.Services
             }
             if (child.attrs.rotation != 0)
             {
-                Point center = GetCenterOfRotatedObjectFromLeftBottom(width, height, left, bottom, child.attrs.rotation);
-                Point corner = new(center.GetX() - width / 2, center.GetY() - height / 2);
-                Point actualBottomLeft = GetRotatedCornerCoords(center, corner, child.attrs.rotation);
-                left = (float)actualBottomLeft.GetX();
-                bottom = (float)actualBottomLeft.GetY();
-                Console.WriteLine($"left rot: {left}, bottom rot: {bottom}");
-                image.SetRotationAngle(-child.attrs.rotation * (Math.PI / 180));
+                Point corner = Rotate(child, image, width, height, left, bottom);
+                left = (float)corner.GetX();
+                bottom = (float)corner.GetY();
+                image.SetRotationAngle(DegreesToRadians(-child.attrs.rotation));
+
             }
             else
             {
-                Console.WriteLine($"bottom left: {left}, {bottom}");
-                Console.WriteLine($"upper right: {child.attrs.x + x}, {stageHeight - (child.attrs.y + y)}");
+                Console.WriteLine($"left: {left}, bottom {bottom}");
             }
             image.SetFixedPosition(left, bottom);
             if (child.attrs.strokeWidth != 0)
@@ -340,6 +311,18 @@ namespace PlantFocusEditor.Services
             }
 
             _document.Add(image);
+        }
+
+        private Point Rotate(Child child, Image image, float width, float height, float left, float bottom)
+        {
+            Point center = GetCenterOfRotatedObjectFromLeftBottom(width, height, left, bottom, child.attrs.rotation);
+            Point corner = new(center.GetX() - width / 2, center.GetY() - height / 2);
+            Point actualBottomLeft = GetRotatedCornerCoords(center, corner, child.attrs.rotation);
+            left = (float)actualBottomLeft.GetX();
+            bottom = (float)actualBottomLeft.GetY();
+            Console.WriteLine($"left rot: {left}, bottom rot: {bottom}");
+            image.SetRotationAngle(-child.attrs.rotation * (Math.PI / 180));
+            return new Point(left, bottom);
         }
 
         private async Task<ImageData?> GetImageDataByUrl(string url)
