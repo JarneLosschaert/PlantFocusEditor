@@ -2,13 +2,22 @@
 
 <section class="editor">
     <EditorBar EditorClicked="EditorClicked" @ref="_editorBar" />
-    <div id="konva-container" @onclick="onEditorClicked"  @ontouchend="onEditorClicked"></div>
+    <div id="konva-container" @onclick="onEditorClicked" @ontouchend="onEditorClicked"></div>
     <button @onclick="Save">Save to pdf</button>
+    @if (Loading)
+    {
+        <div class="loader">
+            <Loader></Loader>
+        </div>
+    }
 </section>
 
 @code {
     [Parameter]
     public Action EditorClicked { get; set; }
+
+    [Parameter]
+    public bool Loading { get; set; }
 
     private IJSObjectReference? _module;
     private EditorBar? _editorBar;
