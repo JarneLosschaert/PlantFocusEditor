@@ -5,6 +5,12 @@
   padding: 0.75rem;
   transition: all 0.2s ease-in-out;
 }
+@media (max-width: 1100px) {
+  .property .property-info {
+    flex-direction: column;
+    align-items: end;
+  }
+}
 .property .property-info .property-container {
   width: 100%;
   display: flex;
@@ -18,6 +24,11 @@
 .property .property-info .property-container .property-image-container img {
   width: 100%;
 }
+@media (max-width: 1100px) {
+  .property .property-info .property-container .property-image-container {
+    display: none;
+  }
+}
 .property .property-info .property-container .property-content-container {
   max-width: 60%;
   display: flex;
@@ -25,6 +36,11 @@
   flex-direction: column;
   gap: 0.25rem;
   margin-right: 1rem;
+}
+@media (max-width: 1100px) {
+  .property .property-info .property-container .property-content-container {
+    max-width: 100%;
+  }
 }
 .property .property-info .property-container .property-content-container ul {
   display: flex;
@@ -72,6 +88,11 @@
   transition: all 0.2s ease-in-out;
   border-bottom: 1px solid #dbd9d9;
 }
+@media (max-width: 1100px) {
+  .property .property-edit {
+    padding: 0 0.5rem 0.5rem 0.5rem;
+  }
+}
 .property .property-edit > div {
   display: flex;
   align-items: center;
@@ -81,12 +102,22 @@
   width: 10%;
   border-radius: 4px;
 }
+@media (max-width: 1100px) {
+  .property .property-edit > div img {
+    display: none;
+  }
+}
 .property .property-edit > div input {
   width: 85%;
   background: #fff;
   border: 1px solid #dbd9d9;
   border-radius: 6px;
   padding: 0.25rem 0.5rem;
+}
+@media (max-width: 1100px) {
+  .property .property-edit > div input {
+    width: 100%;
+  }
 }
 .property .property-edit > div input:focus {
   outline: none;

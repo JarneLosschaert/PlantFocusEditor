@@ -29,8 +29,17 @@
         gap: 0.5rem;
         height: 100%;
 
+        p {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         img {
             height: 100%;
+
+            @media (max-width: $lxl) {
+                display: none;
+            }
         }
     }
 }

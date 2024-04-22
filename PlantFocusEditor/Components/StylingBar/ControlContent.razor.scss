@@ -55,6 +55,11 @@ button {
         .controls {
             display: flex;
             justify-content: space-between;
+
+            @media (max-width: $lxl) {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
         }
 
         .position {

@@ -11,7 +11,7 @@
         display: flex;
         justify-content: space-between;
         cursor: pointer;
-        padding: 0 0.5rem;
+        padding: 0.25rem 0.5rem;
         border-radius: $border-radius-s;
         border: 1px solid $white;
 
@@ -30,6 +30,7 @@
                 width: 100%;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                white-space: nowrap;
             }
 
             ::deep svg {
@@ -61,11 +62,16 @@
                     color: $text-lighter;
                 }
             }
+
+            @media (max-width: $lxl) {
+                display: none;
+            }
         }
     }
 
     .no-layers {
         text-align: center;
+
         span {
             color: $text-lighter;
             font-weight: 700;
