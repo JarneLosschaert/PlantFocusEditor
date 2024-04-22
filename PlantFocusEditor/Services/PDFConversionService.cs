@@ -16,7 +16,6 @@ using iText.Layout.Layout;
 using iText.IO.Image;
 using iText.Kernel.Colors.Gradients;
 using Microsoft.JSInterop;
-using iText.Layout.Borders;
 
 namespace PlantFocusEditor.Services
 {
@@ -28,10 +27,12 @@ namespace PlantFocusEditor.Services
         private PdfDocument _pdf;
         private Document _document;
         private PdfCanvas _canvas;
+        private ApiConnectorService _apiService;
 
-        public PDFConversionService(IJSRuntime runtime)
+        public PDFConversionService(IJSRuntime runtime, ApiConnectorService service)
         {
             _runtime = runtime;
+            _apiService = service;
         }
 
         public async Task<byte[]> SaveToPdf(string jsonString, float[] dimensions)
@@ -74,11 +75,11 @@ namespace PlantFocusEditor.Services
                     SetCanvasLinearGradient(child, bbox);
                 }
                 _canvas.FillStroke();*/
-                AddImage(child, x, y, stageHeight);
+                await AddImage(child, x, y, stageHeight);
             }
             else if (child.className == "Image")
             {
-                //AddImage(child, x, y, dimensions[1]);
+                await AddImage(child, x, y, stageHeight);
             }
             else if (child.className == "Rect")
             {
@@ -245,11 +246,23 @@ namespace PlantFocusEditor.Services
             _canvas.Stroke();
         }
 
-        private void AddImage(Child child, float x, float y, float stageHeight)
+        private async Task AddImage(Child child, float x, float y, float stageHeight)
         {
-            string base64 = child.attrs.src.Substring(child.attrs.src.IndexOf(",") + 1);
-            byte[] data = Convert.FromBase64String(base64);
-            ImageData imgData = ImageDataFactory.Create(data);
+            ImageData imgData;
+            if (child.attrs.src.Contains("http"))
+            {
+                imgData = await GetImageDataByUrl(child.attrs.src);
+            } else
+            {
+                string base64 = child.attrs.src.Substring(child.attrs.src.IndexOf(",") + 1);
+                byte[] data = Convert.FromBase64String(base64);
+                imgData = ImageDataFactory.Create(data);
+            }
+            if (imgData == null)
+            {
+                Console.WriteLine("image data is null");
+                return;
+            }
             Image image = new(imgData);
 
             float[] widthHeight = GetNodeWidthHeight(child);
@@ -298,6 +311,17 @@ namespace PlantFocusEditor.Services
             }
 
             _document.Add(image);
+        }
+
+        private async Task<ImageData?> GetImageDataByUrl(string url)
+        {
+            Stream stream = await _apiService.GetImageAsync(url);
+            using (var memoryStream = new MemoryStream())
+            {
+                await stream.CopyToAsync(memoryStream);
+                byte[] data = memoryStream.ToArray();
+                return ImageDataFactory.Create(data);
+            }
         }
 
         private float[] GetNodeWidthHeight(Child child)
