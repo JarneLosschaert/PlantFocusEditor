@@ -37,7 +37,7 @@
         }
         <div>
             <h3>Add a new property</h3>
-            <NewPlantProperty />
+            <NewPlantProperty OnPropertyAdd="OnNewPropertyAdded" />
         </div>
     }
 </article>
@@ -149,6 +149,22 @@
     private void OnPropertyDelete(PlantProperty plantProperty)
     {
         _plantPropertiesLabel.Remove(plantProperty);
+        AddProperties();
+    }
+
+    public void OnNewPropertyAdded(string property)
+    {
+        _plantPropertiesLabel.Add(new PlantProperty
+        {
+            Name = property,
+            Translations = new List<Translation>
+        {
+            new Translation { Language = "nl", Text = "" },
+            new Translation { Language = "fr", Text = "" },
+            new Translation { Language = "en", Text = "" },
+            new Translation { Language = "de", Text = "" }
+        }
+        });
         AddProperties();
     }
 

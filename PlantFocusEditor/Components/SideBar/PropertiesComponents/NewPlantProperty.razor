@@ -1,31 +1,43 @@
 ﻿<div class="add-new-property">
     <div class="select-container">
-        <select>
-            <option>Choose a property</option>
-            <option>Flower colour</option>
-            <option>Flowering period</option>
-            <option>Height</option>
-            <option>Width</option>
-            <option>Soil type</option>
-            <option>Water need</option>
-            <option>Light need</option>
-            <option>Pruning</option>
-            <option>Winter hardiness</option>
-            <option>Use</option>
-            <option>Planting distance</option>
-            <option>Planting depth</option>
-            <option>Planting period</option>
+        <select @bind="_selectedProperty">
+            <option value="">Choose a property</option>
+            <option value="Flower colour">Flower colour</option>
+            <option value="Flowering period">Flowering period</option>
+            <option value="Height">Height</option>
+            <option value="Width">Width</option>
+            <option value="Soil type">Soil type</option>
+            <option value="Water need">Water need</option>
+            <option value="Light need">Light need</option>
+            <option value="Pruning">Pruning</option>
+            <option value="Winter hardiness">Winter hardiness</option>
+            <option value="Use">Use</option>
+            <option value="Planting distance">Planting distance</option>
+            <option value="Planting depth">Planting depth</option>
+            <option value="Planting period">Planting period</option>
         </select>
         <div class="icon">
             @((MarkupString)CustomIcons.ChevronDown())
         </div>
     </div>
-    <button>
+    <button @onclick="AddProperty">
         @((MarkupString)CustomIcons.Plus())
         Add
     </button>
 </div>
 
 @code {
+    [Parameter]
+    public EventCallback<string> OnPropertyAdd { get; set; }
 
+    private string _selectedProperty = "";
+
+    private async Task AddProperty()
+    {
+        if (!string.IsNullOrWhiteSpace(_selectedProperty))
+        {
+            await OnPropertyAdd.InvokeAsync(_selectedProperty);
+            _selectedProperty = "";
+        }
+    }
 }
