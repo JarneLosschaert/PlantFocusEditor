@@ -16,6 +16,7 @@ using iText.Layout.Layout;
 using iText.IO.Image;
 using iText.Kernel.Colors.Gradients;
 using Microsoft.JSInterop;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace PlantFocusEditor.Services
 {
@@ -64,7 +65,7 @@ namespace PlantFocusEditor.Services
             else if (child.className == "Text")
             {
                 byte[] fontBytes = await GetFont(child.attrs.fontFamily, child.attrs.fontStyle);
-                AddText(child, (float)child.attrs.x + x, stageHeight - ((float)child.attrs.y + y), fontBytes);
+                AddText(child, x, y, fontBytes, stageHeight);
             }
             else if (child.className == "Path")
             {
@@ -366,39 +367,63 @@ namespace PlantFocusEditor.Services
             return p;
         }
 
-        private void AddText(Child child, float x, float y, byte[] fontBytes)
+        private void AddText(Child child, float x, float y, byte[] fontBytes, float stageHeight)
         {
             FontProgram fontProgram = FontProgramFactory.CreateFont(fontBytes);
             PdfFont font = PdfFontFactory.CreateFont(fontProgram);
-            TextAlignment align = HandleAlignment(child.attrs.align);
             Paragraph paragraph = new Paragraph(child.attrs.text)
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize)
                 .SetWidth((float)child.attrs.width);
 
-            HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.fontStyle, child.attrs.opacity);
-            IRenderer renderer = paragraph.CreateRendererSubTree();
-            LayoutResult result = renderer.SetParent(_document.GetRenderer()).Layout(new LayoutContext(new LayoutArea(1, new Rectangle(1000, 1000))));
-            float textHeight = result.GetOccupiedArea().GetBBox().GetHeight();
-            float textWidth = ((ParagraphRenderer)renderer).GetMinMaxWidth().GetMaxWidth();
+            HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.opacity);
 
-            if (align == TextAlignment.RIGHT)
-            {
-                // x minus 10 to account for padding
-                paragraph.SetFixedPosition(x - 10, y - textHeight, (float)child.attrs.width);
-            }
-            else if (align == TextAlignment.LEFT)
-            {
-                // x plus 10 to account for padding
-                paragraph.SetFixedPosition(x + 10, y - textHeight, (float)child.attrs.width);
-            }
-            else
-            {
-                paragraph.SetFixedPosition(x, y - textHeight, (float)child.attrs.width);
-            }
+            float textHeight = GetTextHeight(paragraph, child, stageHeight);
+            Console.WriteLine(textHeight);
+            float left = (float)(child.attrs.x + x);
+            float bottom = (float)(stageHeight - (child.attrs.y + y + textHeight));
+            TextAlignment align = HandleAlignment(child.attrs.align);
+
+            SetTextPosition(child, paragraph, align, left, bottom);            
             paragraph.SetTextAlignment(align);
+
             SetTextColor(paragraph, child.attrs.fill);
+            
             _document.Add(paragraph);
+        }
+
+        private float GetTextHeight(Paragraph paragraph, Child child, float stageHeight)
+        {
+            IRenderer renderer = paragraph.CreateRendererSubTree();
+            LayoutResult result = renderer.SetParent(_document
+            .GetRenderer())
+                .Layout(new LayoutContext(new LayoutArea(1, new Rectangle((float)child.attrs.width, stageHeight))));
+            return result.GetOccupiedArea().GetBBox().GetHeight();
+        }
+
+        private static void SetTextPosition(Child child, Paragraph paragraph, TextAlignment align, float left, float bottom)
+        {
+            float padding = (float)child.attrs.padding;
+            if (padding > 0)
+            {
+                if (align == TextAlignment.RIGHT)
+                {
+                    // x minus 10 to account for padding
+                    paragraph.SetFixedPosition(left - padding, bottom - padding / 2, (float)child.attrs.width);
+                }
+                else if (align == TextAlignment.LEFT)
+                {
+                    // x plus 10 to account for padding
+                    paragraph.SetFixedPosition(left + padding, bottom - padding / 2, (float)child.attrs.width);
+                }
+                else
+                {
+                    paragraph.SetFixedPosition(left, bottom - padding / 2, (float)child.attrs.width);
+                }
+            } else
+            {
+                paragraph.SetFixedPosition(left, bottom, (float)child.attrs.width);
+            }
         }
 
         private static TextAlignment HandleAlignment(string align)
@@ -429,7 +454,7 @@ namespace PlantFocusEditor.Services
             }
         }
 
-        private static void HandleTextStyle(Paragraph paragraph, string? decoration, string? style, double? opacity)
+        private static void HandleTextStyle(Paragraph paragraph, string? decoration, double? opacity)
         {
             if (decoration != null)
             {
