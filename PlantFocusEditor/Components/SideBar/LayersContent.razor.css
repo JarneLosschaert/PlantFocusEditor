@@ -26,6 +26,7 @@
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .layers .layer .layer-info ::deep svg {
   height: 1rem;

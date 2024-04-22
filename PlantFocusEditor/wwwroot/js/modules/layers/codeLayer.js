@@ -16,6 +16,8 @@ function addBarcode(value) {
         const barcodeImg = new Konva.Image({
             x: 0,
             y: 0,
+            height: img.height,
+            width: img.width,
             image: img,
             src: img.src,
             code: value,

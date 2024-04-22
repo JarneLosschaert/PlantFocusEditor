@@ -73,8 +73,6 @@ function getGroupJson(json) {
         json = JSON.parse(jsonString);
     }
 
-    console.log(json);
-
     json.children.forEach(child => {
         child = Konva.Node.create(child);
 
@@ -119,7 +117,6 @@ function getGroupJson(json) {
                         }
                     });
                 });
-                console.log(child);
                 setPropertiesGroup(child);
             }
             addHoverAnimation(child);
@@ -152,12 +149,14 @@ function getGroupJson(json) {
             child.width(oldWidth * scale);
             child.height(oldHeight * scale);
         }
-    })
+    });
 
     const clipFunction = createClipFunc(commands);
     group.clipFunc(clipFunction);
     group.x(offsetX);
     group.y(offsetY);
+
+    console.log(group);
 
     return group;
 }
