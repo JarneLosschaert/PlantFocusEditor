@@ -48,13 +48,23 @@ namespace PlantFocusEditor.Services
             float y = (float)root.attrs.y;
             foreach (Child child in root.children)
             {
-                await AddNode(child, x, y, dimensions[1]);
+                await AddNode(child, x, y, dimensions[1], 1, 1);
             }
             return GetPdfBytes();
         }
 
-        private async Task AddNode(Child child, float x, float y, float stageHeight)
+        private async Task AddNode(Child child, float x, float y, float stageHeight, double scaleX = 1, double scaleY = 1)
         {
+            if (scaleX > 0)
+            {
+                child.attrs.width = child.attrs.width * scaleX;
+                child.attrs.x = child.attrs.x * scaleX;
+            }
+            if (scaleY > 0)
+            {
+                child.attrs.height = child.attrs.height * scaleY;
+                child.attrs.y = child.attrs.y * scaleY;
+            }
             if (child.attrs.name == "passepartout")
             {
                 string[] commands = PathUtils.ParsePathData(child.attrs.data);
@@ -64,8 +74,18 @@ namespace PlantFocusEditor.Services
             }
             else if (child.className == "Text")
             {
+                Text text = new Text(child.attrs.text);
+                if (scaleX > 0 || scaleY > 0)
+                {
+                    double scale = Math.Min(scaleX, scaleY);
+                    child.attrs.fontSize = (int)Math.Round(child.attrs.fontSize * scale);
+                }
+                if (scaleX > scaleY)
+                {
+                    text.SetHorizontalScaling((float)(scaleX / scaleY));
+                }
                 byte[] fontBytes = await GetFont(child.attrs.fontFamily, child.attrs.fontStyle);
-                AddText(child, x, y, fontBytes, stageHeight);
+                AddText(child, x, y, fontBytes, stageHeight, text);
             }
             else if (child.className == "Path")
             {
@@ -90,14 +110,22 @@ namespace PlantFocusEditor.Services
                 }
             }
             else if (child.className == "Line")
-            {
-                AddLine(child, x, y + 10, stageHeight);
+            {                
+                AddLine(child, x, y + 10, stageHeight, scaleX, scaleY);
             }
             else if (child.className == "Group")
             {
-                foreach (Child childNode in child.children)
+                if (child.attrs.scaleX > 0)
                 {
-                    await AddNode(childNode, (float)child.attrs.x + x, (float)child.attrs.y + y, stageHeight);
+                    scaleX = child.attrs.scaleX * scaleX;
+                }
+                if (child.attrs.scaleY > 0)
+                {
+                    scaleY = child.attrs.scaleY * scaleY;
+                }
+                foreach (Child childNode in child.children)
+                {                    
+                    await AddNode(childNode, (float)child.attrs.x + x, (float)child.attrs.y + y, stageHeight, scaleX, scaleY);
                 }
             }
         }
@@ -226,7 +254,7 @@ namespace PlantFocusEditor.Services
             
         }
 
-        private void AddLine(Child child, float x, float y, float stageHeight)
+        private void AddLine(Child child, float x, float y, float stageHeight, double scaleX, double scaleY)
         {
             Console.WriteLine(y);
             float width = (float)child.attrs.strokeWidth;
@@ -235,15 +263,15 @@ namespace PlantFocusEditor.Services
             {
                 stroke = HexToColor(child.attrs.stroke);
             }
-            DrawLine(child.attrs.points, width, x, y, stageHeight, stroke);
+            DrawLine(child.attrs.points, width, x, y, stageHeight, stroke, scaleX, scaleY);
         }
 
-        private void DrawLine(double[] points, float width, float x, float y, float stageHeight, Color strokeColor)
+        private void DrawLine(double[] points, float width, float x, float y, float stageHeight, Color strokeColor, double scaleX, double scaleY)
         {
             _canvas.SetLineWidth(width);
             _canvas.SetStrokeColor(strokeColor);
-            _canvas.MoveTo(points[0] + x, stageHeight - (points[1] + y));
-            _canvas.LineTo(points[2] + x, stageHeight - (points[3] + y));
+            _canvas.MoveTo(points[0] * scaleX + x, stageHeight - (points[1] * scaleY + y));
+            _canvas.LineTo(points[2] * scaleX + x, stageHeight - (points[3] * scaleY + y));
             _canvas.Stroke();
         }
 
@@ -367,11 +395,11 @@ namespace PlantFocusEditor.Services
             return p;
         }
 
-        private void AddText(Child child, float x, float y, byte[] fontBytes, float stageHeight)
+        private void AddText(Child child, float x, float y, byte[] fontBytes, float stageHeight, Text text)
         {
             FontProgram fontProgram = FontProgramFactory.CreateFont(fontBytes);
             PdfFont font = PdfFontFactory.CreateFont(fontProgram);
-            Paragraph paragraph = new Paragraph(child.attrs.text)
+            Paragraph paragraph = new Paragraph(text)
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize)
                 .SetWidth((float)child.attrs.width);
@@ -386,7 +414,7 @@ namespace PlantFocusEditor.Services
 
             SetTextPosition(child, paragraph, align, left, bottom);            
             paragraph.SetTextAlignment(align);
-
+            
             SetTextColor(paragraph, child.attrs.fill);
             
             _document.Add(paragraph);
@@ -408,12 +436,10 @@ namespace PlantFocusEditor.Services
             {
                 if (align == TextAlignment.RIGHT)
                 {
-                    // x minus 10 to account for padding
                     paragraph.SetFixedPosition(left - padding, bottom - padding / 2, (float)child.attrs.width);
                 }
                 else if (align == TextAlignment.LEFT)
                 {
-                    // x plus 10 to account for padding
                     paragraph.SetFixedPosition(left + padding, bottom - padding / 2, (float)child.attrs.width);
                 }
                 else
