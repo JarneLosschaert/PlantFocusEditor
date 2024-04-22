@@ -90,7 +90,7 @@ function getGroupJson(json) {
 
             commands = getScaledCommands(child.attrs.data, scale);
             const pathData = convertToSVGPath(commands);
-            child.attrs.data = pathData;
+            child.data(pathData);
         } else {
 
             if (child.attrs.name === "text") {
@@ -110,6 +110,16 @@ function getGroupJson(json) {
                 img.src = src;
                 child.image(img);
             } else if (child.attrs.name === "propertiesGroup") {
+                child.children.forEach(row => {
+                    row.children.forEach(rowChild => {
+                        if (rowChild.attrs.name === "propertyImage") {
+                            const img = new Image();
+                            img.src = rowChild.attrs.src;
+                            rowChild.image(img);
+                        }
+                    });
+                });
+                console.log(child);
                 setPropertiesGroup(child);
             }
             addHoverAnimation(child);
