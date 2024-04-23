@@ -29,6 +29,7 @@ namespace PlantFocusEditor.Services
         private readonly IJSRuntime _runtime;
         private MemoryStream _memoryStream;
         private PdfWriter _writer;
+        private PdfDocument _final;
         private PdfDocument _pdf;
         private Document _document;
         private PdfCanvas _canvas;
@@ -48,6 +49,7 @@ namespace PlantFocusEditor.Services
             byte[] secondPage = await AddPage(back, dimensions);
             using MemoryStream ms = new();
             using PdfDocument pdf = new(new PdfWriter(ms).SetSmartMode(true));
+
             // Create reader from bytes
             using (MemoryStream memoryStream = new(firstPage))
             {
@@ -303,7 +305,7 @@ namespace PlantFocusEditor.Services
             float left = (float)child.attrs.x + x;
             float bottom = stageHeight - (float)(child.attrs.y + height + y + 10);
 
-            image.SetWidth(width).SetHeight(height).SetAutoScale(false).ScaleToFit(width, height);
+            image.SetWidth(width).SetHeight(height);
 
             if (child.attrs.opacity != null)
             {
@@ -347,7 +349,14 @@ namespace PlantFocusEditor.Services
                 Console.WriteLine($"left: {left}, bottom {bottom}");
             }*/
             image.SetFixedPosition(left, bottom);
-            
+            if (child.className == "Path")
+            {
+                Console.WriteLine($"left: {left}, bottom {bottom}");
+            }
+            else
+            {
+                Console.WriteLine($"left: {left}, top {bottom + height}");
+            }
             if (child.className != "Path" && child.attrs.strokeWidth > 0)
             {
                 DeviceRgb color = HexToColor(child.attrs.stroke);                

@@ -62,6 +62,8 @@ function setSource(child) {
     if (child.attrs.name === "element") {
         const src = child.toDataURL({
             mimeType: "image/png",
+            width: child.attrs.width * child.attrs.scaleX,
+            height: child.attrs.height * child.attrs.scaleY,
             pixelRatio: 2
         });
         child.attrs.src = src;
