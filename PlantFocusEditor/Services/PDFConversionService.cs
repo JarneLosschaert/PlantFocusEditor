@@ -20,6 +20,7 @@ using Org.BouncyCastle.Asn1.Ocsp;
 using static System.Net.Mime.MediaTypeNames;
 using Image = iText.Layout.Element.Image;
 using Text = iText.Layout.Element.Text;
+using iText.Layout.Borders;
 
 namespace PlantFocusEditor.Services
 {
@@ -294,9 +295,9 @@ namespace PlantFocusEditor.Services
                 Console.WriteLine($"left: {left}, bottom {bottom}");
             }
             image.SetFixedPosition(left, bottom);
-            if (child.attrs.strokeWidth != 0)
+            if (child.className != "Path" && child.attrs.strokeWidth > 0)
             {
-                DeviceRgb color = HexToColor(child.attrs.stroke);
+                DeviceRgb color = HexToColor(child.attrs.stroke);                
                 if (child.attrs.rotation != 0)
                 {
                     AffineTransform transform = AffineTransform.GetRotateInstance(child.attrs.rotation * (Math.PI / 180));
