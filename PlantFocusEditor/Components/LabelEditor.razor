@@ -6,14 +6,16 @@
     <div class="label-editor">
         <SideBar SelectTab="SelectTab" />
         <SideBarContent @ref="_sideBarContent" />
-        <Editor EditorClicked="HandleEditorClicked" />
+        <Editor EditorClicked="HandleEditorClicked" Loading="_loading" />
         <StylingBar @ref="_stylingBar" />
     </div>
 </CascadingValue>
 
 @code {
-    public SideBarTabs _SelectedTab { get; set; } = SideBarTabs.Layers;
     private IJSObjectReference? _module;
+
+    public SideBarTabs _SelectedTab { get; set; } = SideBarTabs.Layers;
+
     private StylingBar.StylingBar? _stylingBar;
     private SideBarContent? _sideBarContent;
     private bool _loading = true;
@@ -59,8 +61,28 @@
                 await _module.InvokeVoidAsync("loadTemplate", state);
             }
         }
+
+        if (state is null)
+        {
+            List<Template> templates = await API.GetTemplatesAsync(null, null) ?? new List<Template>();
+            if (templates.Count() > 0)
+            {
+                Template template = templates[14];
+                if (_module is not null)
+                {
+                    await _module.InvokeVoidAsync("loadTemplate", template.JsonToRender);
+                }
+            }
+        } else
+        {
+            if (_module is not null)
+            {
+                await _module.InvokeVoidAsync("loadTemplate", state);
+            }
+        }
         _loading = false;
         _sideBarContent?.onEditorClicked();
+        StateHasChanged();
     }
 
     public void HandleEditorClicked()

@@ -34,6 +34,7 @@ function handleEventListeners() {
 }
 
 function loadTemplate(json) {
+    console.log(json);
     json = JSON.parse(json);
     const front = getGroupJson(json[0]);
     const back = getGroupJson(json[1]);
@@ -69,8 +70,6 @@ function getGroupJson(json) {
 
     json = JSON.parse(json);
 
-    console.log(json);
-
     json.children.forEach(child => {
         child = Konva.Node.create(child);
 
@@ -86,7 +85,7 @@ function getGroupJson(json) {
 
             commands = getScaledCommands(child.attrs.data, scale);
             const pathData = convertToSVGPath(commands);
-            child.attrs.data = pathData;
+            child.data(pathData);
         } else {
 
             if (child.attrs.name === "text") {
@@ -106,6 +105,15 @@ function getGroupJson(json) {
                 img.src = src;
                 child.image(img);
             } else if (child.attrs.name === "propertiesGroup") {
+                child.children.forEach(row => {
+                    row.children.forEach(rowChild => {
+                        if (rowChild.attrs.name === "propertyImage") {
+                            const img = new Image();
+                            img.src = rowChild.attrs.src;
+                            rowChild.image(img);
+                        }
+                    });
+                });
                 setPropertiesGroup(child);
             }
             addHoverAnimation(child);
@@ -138,26 +146,16 @@ function getGroupJson(json) {
             child.width(oldWidth * scale);
             child.height(oldHeight * scale);
         }
-    })
+    });
 
     const clipFunction = createClipFunc(commands);
     group.clipFunc(clipFunction);
     group.x(offsetX);
     group.y(offsetY);
 
+    console.log(group);
+
     return group;
-}
-
-function getFrontState() {
-    if (localStorage.getItem("front")) {
-        return JSON.parse(localStorage.getItem("front"));
-    }
-}
-
-function getBackState() {
-    if (localStorage.getItem("back")) {
-        return JSON.parse(localStorage.getItem("back"));
-    }
 }
 
 export { stage, layer, init, loadTemplate, getGroupJson, loadGroup };

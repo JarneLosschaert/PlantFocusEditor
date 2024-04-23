@@ -9,6 +9,11 @@
         padding: 0.75rem;
         transition: $transition;
 
+        @media (max-width: $lxl) {
+            flex-direction: column;
+            align-items: end;
+        }
+
         .property-container {
             width: 100%;
             display: flex;
@@ -22,22 +27,27 @@
                 img {
                     width: 100%;
                 }
+
+                @media (max-width: $lxl) {
+                    display: none;
+                }
             }
 
             .property-content-container {
-                max-width: 65%;
+                max-width: 60%;
                 display: flex;
                 flex: 1;
                 flex-direction: column;
                 gap: 0.25rem;
                 margin-right: 1rem;
 
+                @media (max-width: $lxl) {
+                    max-width: 100%;
+                }
+
                 ul {
                     display: flex;
-                    flex-wrap: wrap;
-                    gap: 0 0.5rem;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
+                    flex-direction: column;
 
                     li {
                         height: 1rem;
@@ -45,10 +55,15 @@
                         gap: 0.25rem;
                         font-size: 0.9rem;
                         color: $text-lighter;
-                        overflow: hidden;
 
                         .property-language {
                             text-transform: uppercase;
+                        }
+
+                        .property-text {
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
                         }
                     }
                 }
@@ -90,6 +105,10 @@
         transition: $transition;
         border-bottom: 1px solid $neutral-dark;
 
+        @media (max-width: $lxl) {
+            padding: 0 0.5rem 0.5rem 0.5rem;
+        }
+
         & > div {
             display: flex;
             align-items: center;
@@ -98,6 +117,10 @@
             img {
                 width: 10%;
                 border-radius: $border-radius-xs;
+
+                @media (max-width: $lxl) {
+                    display: none;
+                }
             }
 
             input {
@@ -106,6 +129,10 @@
                 border: 1px solid $neutral-dark;
                 border-radius: $border-radius-s;
                 padding: 0.25rem 0.5rem;
+
+                @media (max-width: $lxl) {
+                    width: 100%;
+                }
 
                 &:focus {
                     outline: none;

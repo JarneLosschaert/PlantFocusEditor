@@ -29,8 +29,19 @@
         gap: 0.5rem;
         height: 100%;
 
+        p {
+            padding: 0.25rem 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         img {
             height: 100%;
+
+            @media (max-width: $lxl) {
+                display: none;
+            }
         }
     }
 }

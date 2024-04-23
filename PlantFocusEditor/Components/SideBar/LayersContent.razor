@@ -6,8 +6,8 @@
 <div class="layers">
     @foreach (var layer in _layers)
     {
-        <div class="layer" @onclick="() => onLayerClick(layer)" @onmouseover="() => onLayerHover(layer)" @onmouseout="() => onLayerUnhover(layer)">
-            <div class="layer-info">
+        <div class="layer" @onmouseover="() => onLayerHover(layer)" @onmouseout="() => onLayerUnhover(layer)">
+            <div class="layer-info" @onclick="() => onLayerClick(layer)">
                 @if (layer.Type == "Image")
                 {
                     @((MarkupString)CustomIcons.Image())

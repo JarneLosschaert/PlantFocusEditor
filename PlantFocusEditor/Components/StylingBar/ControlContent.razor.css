@@ -47,6 +47,12 @@ button.selected ::deep svg {
   display: flex;
   justify-content: space-between;
 }
+@media (max-width: 1100px) {
+  .control-content > div .controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
 .control-content > div .position {
   position: relative;
 }

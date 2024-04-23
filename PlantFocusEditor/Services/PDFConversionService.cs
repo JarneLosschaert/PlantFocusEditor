@@ -282,19 +282,30 @@ namespace PlantFocusEditor.Services
             {
                 image.SetOpacity((float)child.attrs.opacity);
             }
-            if (child.attrs.rotation != 0)
+            double rotationAngle = child.attrs.rotation;
+            if (child.className == "Path" && rotationAngle != 0)
             {
                 Point corner = Rotate(child, image, width, height, left, bottom);
                 left = (float)corner.GetX();
                 bottom = (float)corner.GetY();
-                image.SetRotationAngle(DegreesToRadians(-child.attrs.rotation));
+                float rotatedWidth = (float)Math.Abs(width * Math.Cos(rotationAngle)) + (float)Math.Abs(height * Math.Sin(rotationAngle));
+                float rotatedHeight = (float)Math.Abs(height * Math.Sin(rotationAngle)) + (float)Math.Abs(height * Math.Cos(rotationAngle));
+                image.SetWidth(rotatedWidth).SetHeight(rotatedHeight);
+            }
+            /*else if (child.attrs.rotation != 0)
+            {
+                Point corner = Rotate(child, image, width, height, left, bottom);
+                left = (float)corner.GetX();
+                bottom = (float)corner.GetY();
+                //image.SetRotationAngle(DegreesToRadians(child.attrs.rotation));
 
             }
             else
             {
                 Console.WriteLine($"left: {left}, bottom {bottom}");
-            }
+            }*/
             image.SetFixedPosition(left, bottom);
+            
             if (child.className != "Path" && child.attrs.strokeWidth > 0)
             {
                 DeviceRgb color = HexToColor(child.attrs.stroke);                

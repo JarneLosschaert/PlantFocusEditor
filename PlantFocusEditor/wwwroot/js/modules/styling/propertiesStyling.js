@@ -1,4 +1,5 @@
 import { tr } from "../constants.js";
+import { layer } from "../state.js";
 
 function handleFontSelect(font) {
     const group = tr.nodes()[0];
@@ -76,6 +77,7 @@ function handleBorderWidthChange(width) {
         const value = parseFloat(width);
         node.strokeWidth(value);
     });
+    layer.batchDraw();
 }
 
 function getValues() {

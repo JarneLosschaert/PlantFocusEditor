@@ -3,29 +3,41 @@
 <article class="properties-content">
     <div>
         <h3>Properties on the label</h3>
-        <div class="properties">
-            @foreach (var plantProperty in _plantPropertiesLabel)
-            {
-                <div>
-                    <PlantPropertyEditor PlantProperty="plantProperty" OnPropertyDelete="OnPropertyDelete" AddProperties="AddProperties" />
-                </div>
-            }
-        </div>
+        @if (_plantPropertiesLabel.Count > 0)
+        {
+            <div class="properties">
+                @foreach (var plantProperty in _plantPropertiesLabel)
+                {
+                    <div>
+                        <PlantPropertyEditor PlantProperty="plantProperty" OnPropertyDelete="OnPropertyDelete" AddProperties="AddProperties" />
+                    </div>
+                }
+
+            </div>
+        }
+        else
+        {
+            <p>Add a property</p>
+        }
+
     </div>
     @if (_plantPropertiesLabel.Count < _maxproperties)
     {
-        <div>
-            <h3>Choose a known property</h3>
-            <div class="add-known-properties">
-                @foreach (var plantProperty in _plantPropertiesKnown)
-                {
-                    <AddPlantProperty PlantProperty="plantProperty" OnPropertyAdd="OnPropertyAdd" />
-                }
+        @if (_plantPropertiesKnown.Count > 0)
+        {
+            <div>
+                <h3>Add a known property</h3>
+                <div class="add-known-properties">
+                    @foreach (var plantProperty in _plantPropertiesKnown)
+                    {
+                        <AddPlantProperty PlantProperty="plantProperty" OnPropertyAdd="OnPropertyAdd" />
+                    }
+                </div>
             </div>
-        </div>
+        }
         <div>
             <h3>Add a new property</h3>
-            <NewPlantProperty />
+            <NewPlantProperty OnPropertyAdd="OnNewPropertyAdded" />
         </div>
     }
 </article>
@@ -137,6 +149,22 @@
     private void OnPropertyDelete(PlantProperty plantProperty)
     {
         _plantPropertiesLabel.Remove(plantProperty);
+        AddProperties();
+    }
+
+    public void OnNewPropertyAdded(string property)
+    {
+        _plantPropertiesLabel.Add(new PlantProperty
+        {
+            Name = property,
+            Translations = new List<Translation>
+        {
+            new Translation { Language = "nl", Text = "" },
+            new Translation { Language = "fr", Text = "" },
+            new Translation { Language = "en", Text = "" },
+            new Translation { Language = "de", Text = "" }
+        }
+        });
         AddProperties();
     }
 

@@ -24,6 +24,9 @@
 </section>
 
 @code {
+    [Parameter]
+    public Action EditorClicked { get; set; }
+
     private IJSObjectReference? _module;
     private bool _isFront = true;
     private bool _undoPossible = false;
@@ -46,6 +49,7 @@
             _undoPossible = values["undoPossible"].GetBoolean();
             _redoPossible = values["redoPossible"].GetBoolean();
             StateHasChanged();
+            EditorClicked();
         }
     }
 
@@ -56,6 +60,7 @@
             await _module.InvokeVoidAsync("switchSides");
             _isFront = !_isFront;
             await getUndoRedoStates();
+            EditorClicked();
         }
     }
 
