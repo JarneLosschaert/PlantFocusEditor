@@ -68,7 +68,11 @@ function getGroupJson(json) {
     let offsetY;
     let commands;
 
-    json = JSON.parse(json);
+    if (!json.children) {
+        const jsonGroup = Konva.Node.create(json.Group);
+        const jsonString = jsonGroup.toJSON();
+        json = JSON.parse(jsonString);
+    }
 
     json.children.forEach(child => {
         child = Konva.Node.create(child);

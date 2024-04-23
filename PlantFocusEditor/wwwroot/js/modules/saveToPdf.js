@@ -49,16 +49,23 @@ import { georgiaBoldItalic } from "../fonts/georgia-bold-italic.js";
 
 function getJsonToRender() {
     front.children.forEach(child => {
-        if (child.attrs.name === "element") {            
-            const src = child.toDataURL({
-                mimeType: "image/png",
-                pixelRatio: 2
-            });
-            child.attrs.src = src;
-        }
+        setSource(child);
+    });
+    back.children.forEach(child => {
+        setSource(child);
     });
     console.log(front);
-    return JSON.stringify(front);
+    return [JSON.stringify(front), JSON.stringify(back)];
+}
+
+function setSource(child) {
+    if (child.attrs.name === "element") {
+        const src = child.toDataURL({
+            mimeType: "image/png",
+            pixelRatio: 2
+        });
+        child.attrs.src = src;
+    }
 }
 
 window.getFont = async (fontName) => {

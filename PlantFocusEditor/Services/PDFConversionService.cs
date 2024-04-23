@@ -40,13 +40,40 @@ namespace PlantFocusEditor.Services
             _apiService = service;
         }
 
-        public async Task<byte[]> SaveToPdf(string jsonString, float[] dimensions)
+        public async Task<byte[]> SaveToPdf(string jsonStringFront, string jsonStringBack, float[] dimensions)
+        {            
+            RootObject front = ConvertFromJson(jsonStringFront);
+            RootObject back = ConvertFromJson(jsonStringBack);
+            byte[] firstPage = await AddPage(front, dimensions);
+            byte[] secondPage = await AddPage(back, dimensions);
+            using MemoryStream ms = new();
+            using PdfDocument pdf = new(new PdfWriter(ms).SetSmartMode(true));
+            // Create reader from bytes
+            using (MemoryStream memoryStream = new(firstPage))
+            {
+                // Create reader from bytes
+                using PdfReader reader = new(memoryStream);
+                PdfDocument srcDoc = new(reader);
+                srcDoc.CopyPagesTo(1, srcDoc.GetNumberOfPages(), pdf);
+            }
+            // Create reader from bytes
+            using (MemoryStream memoryStream = new(secondPage))
+            {
+                // Create reader from bytes
+                using PdfReader reader = new(memoryStream);
+                PdfDocument srcDoc = new(reader);
+                srcDoc.CopyPagesTo(1, srcDoc.GetNumberOfPages(), pdf);
+            }
+            pdf.Close();
+            return ms.ToArray();
+        }
+
+        private async Task<byte[]> AddPage(RootObject root, float[] dimensions)
         {
             _memoryStream = new MemoryStream();
             _writer = new PdfWriter(_memoryStream);
             _pdf = new PdfDocument(_writer);
             _document = new Document(_pdf);
-            RootObject root = ConvertFromJson(jsonString);
             _canvas = new PdfCanvas(_pdf.AddNewPage(new PageSize(dimensions[0], dimensions[1])));
             float x = (float)root.attrs.x;
             float y = (float)root.attrs.y;
@@ -272,12 +299,12 @@ namespace PlantFocusEditor.Services
             float[] widthHeight = GetNodeWidthHeight(child);
             float width, height;
             (width, height) = (widthHeight[0], widthHeight[1]);
-
+            Console.WriteLine($"width: {width}");
             float left = (float)child.attrs.x + x;
             float bottom = stageHeight - (float)(child.attrs.y + height + y + 10);
-            image
-                .SetWidth(width)
-                .SetHeight(height);
+
+            image.SetWidth(width).SetHeight(height).SetAutoScale(false).ScaleToFit(width, height);
+
             if (child.attrs.opacity != null)
             {
                 image.SetOpacity((float)child.attrs.opacity);
@@ -295,14 +322,17 @@ namespace PlantFocusEditor.Services
                 Point rotatedLeftTop = RotatePoint(center, originalLeftTop, rotationAngle);
                 Point rotatedRightBottom = RotatePoint(center, originalRightBottom, rotationAngle);
                 Point rotatedRightTop = RotatePoint(center, originalRightTop, rotationAngle);
+                
                 Rectangle bbox = CalculateBoundingBox(rotatedLeftBottom, rotatedLeftTop, rotatedRightBottom, rotatedRightTop);
-                left = (float)rotatedLeftBottom.GetX();
-                bottom = (float)rotatedLeftBottom.GetY();
-                // Set the new width and height for the rotated image
-                image.SetWidth(bbox.GetWidth()).SetHeight(bbox.GetHeight());
+                left = (float)bbox.GetX();
+                bottom = (float)bbox.GetY();
 
-                // Rotate the image
-                //image.SetRotationAngle((float)(rotationAngle * 180 / Math.PI));
+                double angle = DegreesToRadians(rotationAngle);
+                float scaleX = (float)(Math.Abs(Math.Cos(angle)) + Math.Abs(Math.Sin(angle)));
+                float scaleY = (float)(Math.Abs(Math.Cos(angle)) + Math.Abs(Math.Sin(angle)));
+
+
+                image.SetWidth(width * scaleX).SetHeight(height * scaleY);
             }
             /*else if (child.attrs.rotation != 0)
             {
