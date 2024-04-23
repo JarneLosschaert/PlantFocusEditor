@@ -8,7 +8,7 @@ namespace PlantFocusEditor.Services
         private HttpClient _client;
         private HttpClient _imagesClient;
 
-        public ApiConnectorService(IHttpClientFactory httpClientFactory) 
+        public ApiConnectorService(IHttpClientFactory httpClientFactory)
         {
             _client = httpClientFactory.CreateClient("Plantfocus Editor API");
             _imagesClient = httpClientFactory.CreateClient();
