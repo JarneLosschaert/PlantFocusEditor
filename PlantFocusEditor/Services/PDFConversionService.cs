@@ -285,12 +285,24 @@ namespace PlantFocusEditor.Services
             double rotationAngle = child.attrs.rotation;
             if (child.className == "Path" && rotationAngle != 0)
             {
-                Point corner = Rotate(child, image, width, height, left, bottom);
-                left = (float)corner.GetX();
-                bottom = (float)corner.GetY();
-                float rotatedWidth = (float)Math.Abs(width * Math.Cos(rotationAngle)) + (float)Math.Abs(height * Math.Sin(rotationAngle));
-                float rotatedHeight = (float)Math.Abs(height * Math.Sin(rotationAngle)) + (float)Math.Abs(height * Math.Cos(rotationAngle));
-                image.SetWidth(rotatedWidth).SetHeight(rotatedHeight);
+                Point center = GetCenterOfRotatedObjectFromLeftBottom(width, height, left, bottom, child.attrs.rotation);
+                Point originalLeftBottom = new(center.GetX() - width / 2, center.GetY() - height / 2);
+                Point originalLeftTop = new(originalLeftBottom.GetX(), originalLeftBottom.GetY() + height);
+                Point originalRightBottom = new(originalLeftBottom.GetX() + width, originalLeftBottom.GetY());
+                Point originalRightTop = new(originalLeftBottom.GetX() + width, originalLeftBottom.GetY() + height);
+
+                Point rotatedLeftBottom = RotatePoint(center, originalLeftBottom, rotationAngle);
+                Point rotatedLeftTop = RotatePoint(center, originalLeftTop, rotationAngle);
+                Point rotatedRightBottom = RotatePoint(center, originalRightBottom, rotationAngle);
+                Point rotatedRightTop = RotatePoint(center, originalRightTop, rotationAngle);
+                Rectangle bbox = CalculateBoundingBox(rotatedLeftBottom, rotatedLeftTop, rotatedRightBottom, rotatedRightTop);
+                left = (float)rotatedLeftBottom.GetX();
+                bottom = (float)rotatedLeftBottom.GetY();
+                // Set the new width and height for the rotated image
+                image.SetWidth(bbox.GetWidth()).SetHeight(bbox.GetHeight());
+
+                // Rotate the image
+                //image.SetRotationAngle((float)(rotationAngle * 180 / Math.PI));
             }
             /*else if (child.attrs.rotation != 0)
             {
@@ -325,16 +337,24 @@ namespace PlantFocusEditor.Services
             _document.Add(image);
         }
 
-        private Point Rotate(Child child, Image image, float width, float height, float left, float bottom)
+        private static Rectangle CalculateBoundingBox(Point leftBottom, Point leftUpper, Point rightBottom, Point rightUpper)
         {
-            Point center = GetCenterOfRotatedObjectFromLeftBottom(width, height, left, bottom, child.attrs.rotation);
-            Point corner = new(center.GetX() - width / 2, center.GetY() - height / 2);
-            Point actualBottomLeft = GetRotatedCornerCoords(center, corner, child.attrs.rotation);
-            left = (float)actualBottomLeft.GetX();
-            bottom = (float)actualBottomLeft.GetY();
-            Console.WriteLine($"left rot: {left}, bottom rot: {bottom}");
-            image.SetRotationAngle(-child.attrs.rotation * (Math.PI / 180));
-            return new Point(left, bottom);
+            double minX = Math.Min(leftBottom.GetX(), Math.Min(leftUpper.GetX(), Math.Min(rightBottom.GetX(), rightUpper.GetX())));
+            double minY = Math.Min(leftBottom.GetY(), Math.Min(leftUpper.GetY(), Math.Min(rightBottom.GetY(), rightUpper.GetY())));
+
+            double maxX = Math.Max(leftBottom.GetX(), Math.Max(leftUpper.GetX(), Math.Max(rightBottom.GetX(), rightUpper.GetX())));
+            double maxY = Math.Max(leftBottom.GetY(), Math.Max(leftUpper.GetY(), Math.Max(rightBottom.GetY(), rightUpper.GetY())));
+
+            double width = maxX - minX;
+            double height = maxY - minY;
+
+            return new Rectangle((float)minX, (float)minY, (float)width, (float)height);
+        }
+
+        private Point RotatePoint(Point center, Point point, double rotation)
+        {
+            Point rotatedPoint = GetRotatedCornerCoords(center, point, rotation);
+            return new Point(rotatedPoint.GetX(), rotatedPoint.GetY());
         }
 
         private async Task<ImageData?> GetImageDataByUrl(string url)
