@@ -60,12 +60,16 @@ function getJsonToRender() {
 
 function setSource(child) {
     if (child.attrs.name === "element") {
+        const box = child.getClientRect({ skipTransform: true, skipStroke: true, skipShadow: true, relativeTo: true });
+        console.log(`box: ${box.width}, ${box.height}`);
         const src = child.toDataURL({
             mimeType: "image/png",
-            width: child.attrs.width * child.attrs.scaleX,
-            height: child.attrs.height * child.attrs.scaleY,
+            width: box.width * child.attrs.scaleX,
+            height: box.height * child.attrs.scaleY,
             pixelRatio: 2
         });
+        child.attrs.width = box.width;
+        child.attrs.height = box.height;
         child.attrs.src = src;
     }
 }

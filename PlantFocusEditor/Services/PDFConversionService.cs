@@ -305,7 +305,7 @@ namespace PlantFocusEditor.Services
             float left = (float)child.attrs.x + x;
             float bottom = stageHeight - (float)(child.attrs.y + height + y + 10);
 
-            image.SetWidth(width).SetHeight(height);
+            image.ScaleToFit(width, height);
 
             if (child.attrs.opacity != null)
             {
