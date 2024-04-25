@@ -60,7 +60,7 @@ function getJsonToRender() {
 
 function setSource(child) {
     if (child.attrs.name === "element") {
-        const box = child.getClientRect({ skipTransform: true, skipStroke: true, skipShadow: true, relativeTo: true });
+        const box = child.getClientRect({ skipTransform: true, skipStroke: true, skipShadow: true });
         console.log(`box: ${box.width}, ${box.height}`);
         const src = child.toDataURL({
             mimeType: "image/png",

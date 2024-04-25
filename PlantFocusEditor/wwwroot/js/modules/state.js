@@ -34,7 +34,6 @@ function handleEventListeners() {
 }
 
 function loadTemplate(json) {
-    console.log(json);
     json = JSON.parse(json);
     const front = getGroupJson(json[0]);
     const back = getGroupJson(json[1]);
@@ -68,10 +67,10 @@ function getGroupJson(json) {
     let offsetY;
     let commands;
 
-    if (!json.children) {
-        const jsonGroup = Konva.Node.create(json.Group);
-        const jsonString = jsonGroup.toJSON();
-        json = JSON.parse(jsonString);
+    if (!json.Group) {
+        json = JSON.parse(json);
+    } else {
+        json = JSON.parse(json.Group);
     }
 
     json.children.forEach(child => {
