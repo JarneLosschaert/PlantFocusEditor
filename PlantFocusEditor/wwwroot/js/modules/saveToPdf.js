@@ -63,8 +63,6 @@ function setSource(child, parent) {
         const pos = child.getClientRect({ skipTransform: false, relativeTo: true });       
         const src = child.toDataURL({
             mimeType: "image/png",
-            width: child.attrs.width * child.attrs.scaleX,
-            height: child.attrs.height * child.attrs.scaleY,
             pixelRatio: 2
         });
         child.attrs.posX = pos.x - parent.attrs.x;

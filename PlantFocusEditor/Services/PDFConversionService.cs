@@ -321,7 +321,7 @@ namespace PlantFocusEditor.Services
                 image.SetOpacity((float)child.attrs.opacity);
             }
             double rotationAngle = child.attrs.rotation;
-            if (child.className == "Path" && rotationAngle != 0)
+            if (rotationAngle != 0)
             {
                 Point center = GetCenterOfRotatedObjectFromLeftBottom(width, height, left, bottom, child.attrs.rotation);
                 Point originalLeftBottom = new(center.GetX() - width / 2, center.GetY() - height / 2);
@@ -335,28 +335,25 @@ namespace PlantFocusEditor.Services
                 Point rotatedRightTop = RotatePoint(center, originalRightTop, rotationAngle);
                 
                 Rectangle bbox = CalculateBoundingBox(rotatedLeftBottom, rotatedLeftTop, rotatedRightBottom, rotatedRightTop);
-                left = (float)bbox.GetX();
-                bottom = (float)bbox.GetY();
 
-                double angle = DegreesToRadians(rotationAngle);
-                float scaleX = (float)(Math.Abs(Math.Cos(angle)) + Math.Abs(Math.Sin(angle)));
-                float scaleY = (float)(Math.Abs(Math.Cos(angle)) + Math.Abs(Math.Sin(angle)));
+                
 
+                if (child.className == "Path")
+                {                    
+                    float scaleX = (float)(bbox.GetWidth() / width);
+                    float scaleY = (float)(bbox.GetHeight() / height);
 
-                image.SetWidth(width * scaleX).SetHeight(height * scaleY);
-            }
-            /*else if (child.attrs.rotation != 0)
-            {
-                Point corner = Rotate(child, image, width, height, left, bottom);
-                left = (float)corner.GetX();
-                bottom = (float)corner.GetY();
-                //image.SetRotationAngle(DegreesToRadians(child.attrs.rotation));
-
-            }
-            else
-            {
-                Console.WriteLine($"left: {left}, bottom {bottom}");
-            }*/
+                    image.SetWidth(width * scaleX).SetHeight(height * scaleY);
+                }
+                else
+                {
+                    float diff = (float)(bbox.GetX() - rotatedLeftBottom.GetX());
+                    left = (float)rotatedLeftBottom.GetX() + diff;
+                    bottom = (float)rotatedLeftBottom.GetY();
+                    image.SetRotationAngle(DegreesToRadians(-rotationAngle));
+                }
+               
+            }            
             image.SetFixedPosition(left, bottom);
             if (child.className == "Path")
             {
