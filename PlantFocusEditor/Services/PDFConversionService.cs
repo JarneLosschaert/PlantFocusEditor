@@ -302,10 +302,19 @@ namespace PlantFocusEditor.Services
             float width, height;
             (width, height) = (widthHeight[0], widthHeight[1]);
             Console.WriteLine($"width: {width}");
-            float left = (float)child.attrs.x + x;
-            float bottom = stageHeight - (float)(child.attrs.y + height + y + 10);
-
-            image.ScaleToFit(width, height);
+            float left;
+            float bottom;
+            if (child.className == "Path")
+            {
+                left = (float)child.attrs.posX + x;
+                bottom = stageHeight - (float)(child.attrs.posY + height + y + 10);
+            }
+            else
+            {
+                left = (float)child.attrs.x + x;
+                bottom = stageHeight - (float)(child.attrs.y + height + y + 10);
+            }
+            image.SetWidth(width).SetHeight(height);
 
             if (child.attrs.opacity != null)
             {

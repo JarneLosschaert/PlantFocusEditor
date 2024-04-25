@@ -49,27 +49,26 @@ import { georgiaBoldItalic } from "../fonts/georgia-bold-italic.js";
 
 function getJsonToRender() {
     front.children.forEach(child => {
-        setSource(child);
+        setSource(child, front);
     });
     back.children.forEach(child => {
-        setSource(child);
+        setSource(child, front);
     });
     console.log(front);
     return [JSON.stringify(front), JSON.stringify(back)];
 }
 
-function setSource(child) {
+function setSource(child, parent) {
     if (child.attrs.name === "element") {
-        const box = child.getClientRect({ skipTransform: true, skipStroke: true, skipShadow: true });
-        console.log(`box: ${box.width}, ${box.height}`);
+        const pos = child.getClientRect({ skipTransform: false, relativeTo: true });       
         const src = child.toDataURL({
             mimeType: "image/png",
-            width: box.width * child.attrs.scaleX,
-            height: box.height * child.attrs.scaleY,
+            width: child.attrs.width * child.attrs.scaleX,
+            height: child.attrs.height * child.attrs.scaleY,
             pixelRatio: 2
         });
-        child.attrs.width = box.width;
-        child.attrs.height = box.height;
+        child.attrs.posX = pos.x - parent.attrs.x;
+        child.attrs.posY = pos.y - parent.attrs.y;
         child.attrs.src = src;
     }
 }

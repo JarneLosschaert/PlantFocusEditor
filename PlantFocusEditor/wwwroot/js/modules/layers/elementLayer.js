@@ -29,10 +29,11 @@ function addElement(svg) {
         fillLinearGradientColorStops: [0, "#45ac34", 0.5, "#45ac34", 1, "#c6d300"],
     });
 
-    const pathBoundingBox = element.getClientRect();
-    const pathWidth = pathBoundingBox.width;
-    element.scaleX(150 / pathWidth);
-    element.scaleY(150 / pathWidth);
+    const bbox = element.getClientRect({ skipTransform: true, skipShadow: true });
+    element.width(bbox.width);
+    element.height(bbox.height);
+    element.scaleX(150 / bbox.width);
+    element.scaleY(150 / bbox.height);
 
     currentGroup.add(element);
     addHoverAnimation(element);
