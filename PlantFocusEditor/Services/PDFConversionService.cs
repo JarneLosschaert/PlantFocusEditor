@@ -449,7 +449,9 @@ namespace PlantFocusEditor.Services
             Paragraph paragraph = new Paragraph(text)
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize)
-                .SetWidth((float)child.attrs.width);
+                .SetWidth((float)child.attrs.width)
+                .SetMargin(0)
+                .SetPadding(0);
             HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.opacity);
 
             float textHeight = GetTextHeight(paragraph, child, stageHeight);
