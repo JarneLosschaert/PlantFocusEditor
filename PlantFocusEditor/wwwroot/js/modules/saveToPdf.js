@@ -47,9 +47,7 @@ import { georgiaBoldItalic } from "../fonts/georgia-bold-italic.js";
     clone.destroy();
 }*/
 
-function getJsonToRender() {
-    setTextHeight(front);
-    setTextHeight(back);
+function getJsonToRender() {    
     front.children.forEach(child => {
         setSource(child, front);
     });

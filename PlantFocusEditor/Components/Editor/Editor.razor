@@ -30,7 +30,6 @@
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/saveToPdf.js");
-            Console.WriteLine(Directory.Exists("js"));
         }
     }
 
