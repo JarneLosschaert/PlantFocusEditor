@@ -349,15 +349,7 @@ namespace PlantFocusEditor.Services
                     image.SetRotationAngle(DegreesToRadians(-rotationAngle));
                 }
         }            
-            image.SetFixedPosition(left, bottom);
-            if (child.className == "Path")
-            {
-                Console.WriteLine($"left: {left}, bottom {bottom}");
-            }
-            else
-            {
-                Console.WriteLine($"left: {left}, top {bottom + height}");
-            }
+            image.SetFixedPosition(left, bottom);            
             if (child.className != "Path" && child.attrs.strokeWidth > 0)
             {
                 DeviceRgb color = HexToColor(child.attrs.stroke);                
@@ -457,21 +449,16 @@ namespace PlantFocusEditor.Services
             Paragraph paragraph = new Paragraph(text)
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize)
-                .SetWidth((float)child.attrs.width)
-                .SetMargin(0)
-                .SetPadding(0);
-            float ascent = font.GetAscent(child.attrs.text, child.attrs.fontSize * 0.75f);
-            float descent = font.GetDescent(child.attrs.text, child.attrs.fontSize * 0.75f);
+                .SetWidth((float)child.attrs.width);
             HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.opacity);
 
-            //float textHeight = ascent - descent;
             float textHeight = GetTextHeight(paragraph, child, stageHeight);
             Console.WriteLine(textHeight);
             float left = (float)(child.attrs.x + x);
             float bottom = (float)(stageHeight - (child.attrs.y + y + textHeight));
             TextAlignment align = HandleAlignment(child.attrs.align);
 
-            SetTextPosition(child, paragraph, align, left, bottom);            
+            SetTextPosition(child, paragraph, align, left, bottom);
             paragraph.SetTextAlignment(align);
             
             SetTextColor(paragraph, child.attrs.fill);

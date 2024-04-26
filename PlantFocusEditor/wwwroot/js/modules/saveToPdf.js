@@ -48,6 +48,8 @@ import { georgiaBoldItalic } from "../fonts/georgia-bold-italic.js";
 }*/
 
 function getJsonToRender() {
+    setTextHeight(front);
+    setTextHeight(back);
     front.children.forEach(child => {
         setSource(child, front);
     });
@@ -97,6 +99,21 @@ function getDimensions() {
         }
     });
     return [width, height];
+}
+
+function setTextHeight(group) {
+    group.children.forEach(node => {
+        if (node.getClassName() === "Text") {
+            const fontSize = node.attrs.fontSize * (node.scaleX() ?? 1);
+            const fontStyle = node.attrs.fontStyle;
+            const dimensions = getTextDimensions(node.attrs.text, fontStyle ?? '', fontSize, node.attrs.fontFamily ?? 'Arial');
+            const textHeight = dimensions.height;
+            node.attrs.textHeight = textHeight;
+            console.log(`text height: ${textHeight}`);
+        } else if (node.getClassName() === "Group") {
+            node.children.forEach(child => setTextHeight(child));
+        }
+    });    
 }
 
 window.downloadFile = (fileBytes, fileName, fileType) => {
@@ -418,11 +435,12 @@ function getTextDimensions(text, fontStyle, fontSizePx, font) {
 
     context.font = fontStyle + ' ' + fontSizePx + 'px ' + font;
     const metrics = context.measureText(text);
+    const ascent = metrics.actualBoundingBoxAscent;
     const descent = metrics.actualBoundingBoxDescent;
 
     const width = metrics.width;
     canvas = null;
-    return { width: width, descent: descent }
+    return { width: width, descent: descent, height: ascent + descent }
         ;
 }
 
