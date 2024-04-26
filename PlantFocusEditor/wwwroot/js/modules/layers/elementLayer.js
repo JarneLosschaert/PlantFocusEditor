@@ -29,12 +29,14 @@ function addElement(svg) {
         fillLinearGradientColorStops: [0, "#45ac34", 0.5, "#45ac34", 1, "#c6d300"],
     });
 
-    const bbox = element.getClientRect({ skipTransform: true, skipShadow: true });
-    element.width(bbox.width);
-    element.height(bbox.height);
+    const bbox = element.getClientRect({ skipTransform: false, skipShadow: true });
     element.scaleX(150 / bbox.width);
     element.scaleY(150 / bbox.height);
-
+    element.width(bbox.width);
+    element.height(bbox.height);
+    element.x(bbox.x);
+    element.y(bbox.y);
+    
     currentGroup.add(element);
     addHoverAnimation(element);
 }

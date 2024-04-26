@@ -81,7 +81,7 @@ namespace PlantFocusEditor.Services
             float y = (float)root.attrs.y;
             foreach (Child child in root.children)
             {
-                await AddNode(child, x, y, dimensions[1], 1, 1);
+                await AddNode(child, 0, 0, dimensions[1], 1, 1);
             }
             return GetPdfBytes();
         }
@@ -144,7 +144,7 @@ namespace PlantFocusEditor.Services
             }
             else if (child.className == "Line")
             {                
-                AddLine(child, x, y + 10, stageHeight, scaleX, scaleY);
+                AddLine(child, x, y, stageHeight, scaleX, scaleY);
             }
             else if (child.className == "Group")
             {
@@ -301,18 +301,19 @@ namespace PlantFocusEditor.Services
             float[] widthHeight = GetNodeWidthHeight(child);
             float width, height;
             (width, height) = (widthHeight[0], widthHeight[1]);
-            Console.WriteLine($"width: {width}");
+            Console.WriteLine($"height: {height}");
             float left;
             float bottom;
+            double rotationAngle = child.attrs.rotation;
             if (child.className == "Path")
             {
-                left = (float)child.attrs.posX + x;
-                bottom = stageHeight - (float)(child.attrs.posY + height + y + 10);
+                left = (float)child.attrs.posX;
+                bottom = stageHeight - (float)(child.attrs.posY + height + y);
             }
             else
             {
                 left = (float)child.attrs.x + x;
-                bottom = stageHeight - (float)(child.attrs.y + height + y + 10);
+                bottom = stageHeight - (float)(child.attrs.y + height + y);
             }
             image.SetWidth(width).SetHeight(height);
 
@@ -320,7 +321,7 @@ namespace PlantFocusEditor.Services
             {
                 image.SetOpacity((float)child.attrs.opacity);
             }
-            double rotationAngle = child.attrs.rotation;
+
             if (rotationAngle != 0)
             {
                 Point center = GetCenterOfRotatedObjectFromLeftBottom(width, height, left, bottom, child.attrs.rotation);
@@ -335,25 +336,19 @@ namespace PlantFocusEditor.Services
                 Point rotatedRightTop = RotatePoint(center, originalRightTop, rotationAngle);
                 
                 Rectangle bbox = CalculateBoundingBox(rotatedLeftBottom, rotatedLeftTop, rotatedRightBottom, rotatedRightTop);
-
-                
-
                 if (child.className == "Path")
-                {                    
-                    float scaleX = (float)(bbox.GetWidth() / width);
-                    float scaleY = (float)(bbox.GetHeight() / height);
-
-                    image.SetWidth(width * scaleX).SetHeight(height * scaleY);
+                {
+                    //left = (float)bbox.GetX();
+                    bottom = (float)originalLeftBottom.GetY();
+                    image.SetWidth(bbox.GetWidth()).SetHeight(bbox.GetHeight());
                 }
                 else
                 {
-                    float diff = (float)(bbox.GetX() - rotatedLeftBottom.GetX());
-                    left = (float)rotatedLeftBottom.GetX() + diff;
+                    left = (float)bbox.GetX();
                     bottom = (float)rotatedLeftBottom.GetY();
                     image.SetRotationAngle(DegreesToRadians(-rotationAngle));
                 }
-               
-            }            
+        }            
             image.SetFixedPosition(left, bottom);
             if (child.className == "Path")
             {
@@ -462,10 +457,14 @@ namespace PlantFocusEditor.Services
             Paragraph paragraph = new Paragraph(text)
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize)
-                .SetWidth((float)child.attrs.width);
-
+                .SetWidth((float)child.attrs.width)
+                .SetMargin(0)
+                .SetPadding(0);
+            float ascent = font.GetAscent(child.attrs.text, child.attrs.fontSize * 0.75f);
+            float descent = font.GetDescent(child.attrs.text, child.attrs.fontSize * 0.75f);
             HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.opacity);
 
+            //float textHeight = ascent - descent;
             float textHeight = GetTextHeight(paragraph, child, stageHeight);
             Console.WriteLine(textHeight);
             float left = (float)(child.attrs.x + x);
@@ -569,11 +568,11 @@ namespace PlantFocusEditor.Services
                 string command = commands[i];
                 char firstChar = command[0];
                 firstChar = char.ToUpper(firstChar);
-                float[] coords = null;
+                float[] coords;
 
                 if (char.ToUpper(firstChar) != 'Z')
                 {
-                    coords = TransformCoords(command, (float)child.attrs.x + x, (float)child.attrs.y + y + 10, stageHeight, child);
+                    coords = TransformCoords(command, (float)child.attrs.x + x, (float)child.attrs.y + y, stageHeight, child);
                     DrawPathFromCommands(command, coords, prevX, prevY, ref minX, ref maxX, ref minY, ref maxY);
                     if (firstChar == 'M' || firstChar == 'L')
                     {

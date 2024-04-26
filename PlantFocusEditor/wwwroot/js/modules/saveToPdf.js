@@ -1,5 +1,5 @@
 import { stage, layer } from "./state.js";
-import { getScaledCommands } from "./passePartout.js";
+import { getScaledCommands, findHeightPath, findWidthPath } from "./passePartout.js";
 import { front, back } from "./constants.js";
 import { calcLinearGradient, hexToRgb } from "./helpers.js";
 import { arialRegular } from '../fonts/arial-normal.js';
@@ -60,13 +60,20 @@ function getJsonToRender() {
 
 function setSource(child, parent) {
     if (child.attrs.name === "element") {
-        const pos = child.getClientRect({ skipTransform: false, relativeTo: true });       
+        const rotation = child.attrs.rotation;
+
+        const bbox = child.getClientRect({ skipTransform: false, relativeTo: true }); 
+        
+        child.attrs.posX = bbox.x - parent.attrs.x;
+        child.attrs.posY = bbox.y - parent.attrs.y;
+        child.rotation(0);
         const src = child.toDataURL({
-            mimeType: "image/png",
+            //mimeType: "image/png",
+            //width: pos.width,
+            //height: pos.height,
             pixelRatio: 2
         });
-        child.attrs.posX = pos.x - parent.attrs.x;
-        child.attrs.posY = pos.y - parent.attrs.y;
+        child.rotation(rotation);
         child.attrs.src = src;
     }
 }
@@ -79,7 +86,17 @@ window.getFont = async (fontName) => {
 }
 
 function getDimensions() {
-    return [stage.width(), stage.height()];
+    let width;
+    let height;
+    front.children.forEach(child => {
+        if (child.attrs.name == "passepartout") {
+            const originalHeight = findHeightPath(child.attrs.data);
+            const originalWidth = findWidthPath(child.attrs.data);
+            width = originalWidth;
+            height = originalHeight;
+        }
+    });
+    return [width, height];
 }
 
 window.downloadFile = (fileBytes, fileName, fileType) => {
