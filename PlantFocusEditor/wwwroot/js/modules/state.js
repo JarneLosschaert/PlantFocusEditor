@@ -19,6 +19,11 @@ const stage = new Konva.Stage({
 
 const layer = new Konva.Layer();
 
+const PLANT = {
+    Name: "Opal",
+    LatinName: "Pulmonaria",
+}
+
 function init() {
     initKonva();
     handleSelections();
@@ -93,7 +98,12 @@ function getGroupJson(json) {
 
             if (child.attrs.name === "text") {
                 handleTextEventListeners(child);
-
+                if (child.text().startsWith("$")) {
+                    const value = PLANT[child.text().slice(1)];
+                    if (value) {
+                        child.text(value);
+                    }
+                }
             } else if (child.attrs.name === "image") {
                 const img = new Image();
                 const src = child.attrs.src;
