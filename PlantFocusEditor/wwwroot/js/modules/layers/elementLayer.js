@@ -1,16 +1,19 @@
 import { currentGroup } from "../constants.js";
 import { addHoverAnimation } from "../animations.js";
-import { findWidthPath } from "../passePartout.js";
+import { findWidthPath, findHeightPath } from "../passePartout.js";
 
 function addElement(svg) {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(svg, "text/xml");
     const path = xmlDoc.getElementsByTagName("path")[0];
-    const originalWidth = findWidthPath(path.getAttribute("d"))
+    const originalWidth = findWidthPath(path.getAttribute("d"));
+    const originalHeight = findHeightPath(path.getAttribute("d"));
 
     const element = new Konva.Path({
         x: 50,
         y: 50,
+        width: originalWidth,
+        height: originalHeight,
         name: "element",
         data: path.getAttribute("d"),
         stroke: "#000000",
@@ -26,11 +29,14 @@ function addElement(svg) {
         fillLinearGradientColorStops: [0, "#45ac34", 0.5, "#45ac34", 1, "#c6d300"],
     });
 
-    const pathBoundingBox = element.getClientRect();
-    const pathWidth = pathBoundingBox.width;
-    element.scaleX(150 / pathWidth);
-    element.scaleY(150 / pathWidth);
-
+    const bbox = element.getClientRect({ skipTransform: false, skipShadow: true });
+    element.scaleX(150 / bbox.width);
+    element.scaleY(150 / bbox.height);
+    element.width(bbox.width);
+    element.height(bbox.height);
+    element.x(bbox.x);
+    element.y(bbox.y);
+    
     currentGroup.add(element);
     addHoverAnimation(element);
 }

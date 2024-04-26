@@ -1,7 +1,8 @@
 import { stage, layer } from "./state.js";
-import { getScaledCommands } from "./passePartout.js";
+import { getScaledCommands, findHeightPath, findWidthPath } from "./passePartout.js";
 import { front, back } from "./constants.js";
-import {arialRegular} from '../fonts/arial-normal.js';
+import { calcLinearGradient, hexToRgb } from "./helpers.js";
+import { arialRegular } from '../fonts/arial-normal.js';
 import { arialBold } from "../fonts/arial-bold.js";
 import { arialItalic } from "../fonts/arial-italic.js";
 import { arialBoldItalic } from "../fonts/arial-bold-italic.js";
@@ -45,6 +46,79 @@ import { georgiaBoldItalic } from "../fonts/georgia-bold-italic.js";
     doc.save('document.pdf');
     clone.destroy();
 }*/
+
+function getJsonToRender() {
+    front.children.forEach(child => {
+        setSource(child, front);
+    });
+    back.children.forEach(child => {
+        setSource(child, front);
+    });
+    console.log(front);
+    return [JSON.stringify(front), JSON.stringify(back)];
+}
+
+function setSource(child, parent) {
+    if (child.attrs.name === "element") {
+        const rotation = child.attrs.rotation;
+
+        const bbox = child.getClientRect({ skipTransform: false, relativeTo: true }); 
+        
+        child.attrs.posX = bbox.x - parent.attrs.x;
+        child.attrs.posY = bbox.y - parent.attrs.y;
+        child.rotation(0);
+        const src = child.toDataURL({
+            //mimeType: "image/png",
+            //width: pos.width,
+            //height: pos.height,
+            pixelRatio: 2
+        });
+        child.rotation(rotation);
+        child.attrs.src = src;
+    }
+}
+
+window.getFont = async (fontName) => {
+    const res = await fetch(`/fonts/${fontName}`);
+    const fontArrayBuffer = await res.arrayBuffer();
+    const fontBytes = new Uint8Array(fontArrayBuffer);
+    return fontBytes;
+}
+
+function getDimensions() {
+    let width;
+    let height;
+    front.children.forEach(child => {
+        if (child.attrs.name == "passepartout") {
+            const originalHeight = findHeightPath(child.attrs.data);
+            const originalWidth = findWidthPath(child.attrs.data);
+            width = originalWidth;
+            height = originalHeight;
+        }
+    });
+    return [width, height];
+}
+
+window.downloadFile = (fileBytes, fileName, fileType) => {
+    // Create a Blob from the byte array
+    const blob = new Blob([fileBytes], { type: fileType });
+    // Create a link element
+    const link = document.createElement('a');
+    // Set the href attribute to the Blob object
+    link.href = URL.createObjectURL(blob);
+    // Set the download attribute to the file name
+    link.download = fileName;
+    // Append the link to the document body
+    document.body.appendChild(link);
+    // Click the link to initiate the download
+    link.click();
+    // Remove the link from the document body
+    document.body.removeChild(link);
+}
+
+function getFontsDirectory() {
+    return "fonts";
+}
 
 async function saveToPdfFromJson() {
     console.log("save to pdf from json");
@@ -101,7 +175,13 @@ function convertLayerToPdf(doc, group) {
                 arr[i] = { op: segment.op, c: newCoords };
             });
             doc.path(lines);
-            doc.clip(lines);
+            if (child.fillLinearGradientColorStops()) {
+                fillPathWithGradient(doc, child, lines);
+            }
+            console.log(lines);
+            if (child.attrs.name === "passepartout") {
+                doc.clip(lines);
+            }
             doc.setDrawColor('#000000');
             doc.stroke();
         }
@@ -133,7 +213,7 @@ function convertLayerToPdf(doc, group) {
             }
             if (child.attrs.opacity) {
                 doc.saveGraphicsState();
-                doc.setGState(new doc.GState({opacity: child.attrs.opacity}));
+                doc.setGState(new doc.GState({ opacity: child.attrs.opacity }));
                 doc.addImage(...attrs);
                 doc.restoreGraphicsState();
             } else {
@@ -150,27 +230,23 @@ function convertLayerToPdf(doc, group) {
             const text = splitText(child);
             doc.setFontSize(fontSizePoints);
             doc.setLineWidth(2);
-            const stepY = y + fontSizePoints + padding;
-            const stepLineY = y + fontSize + padding;
+            doc.setFont(fontFamily ?? 'Arial', fontStyle ?? 'normal');
+            const stepY = fontSizePoints + padding;
             text.forEach((txt, i) => {
-                let txtWidth;
-                if (fontStyle && fontFamily) {
-                    doc.setFont(fontFamily, fontStyle);
-                    txtWidth = getTextDimensions(txt, fontStyle, fontSize, fontFamily);
-                } else if (fontFamily) {
-                    doc.setFont(fontFamily, 'normal');
-                    txtWidth = getTextDimensions(txt, '', fontSize, fontFamily);
-                } else if (fontStyle) {
-                    doc.setFont('Arial', fontStyle);
-                    txtWidth = getTextDimensions(txt, fontStyle, fontSize, 'Arial');
-                } else {
-                    doc.setFont('Arial', 'normal');
-                    txtWidth = getTextDimensions(txt, '', fontSize, 'Arial');
+                const txtWidth = getTextDimensions(txt, fontStyle ?? '', fontSize, fontFamily ?? 'Arial').width;
+                const currentStep = i + 1;
+
+                let maxDescent = 0;
+                for (let j = 0; j < txt.length; j++) {
+                    const char = txt[j];
+                    const descent = getTextDimensions(char, fontStyle ?? '', fontSize, fontFamily ?? 'Arial').descent;
+                    maxDescent = Math.min(maxDescent, descent);
                 }
-                
+
+                const textY = y + (currentStep * stepY);
+                const textLineY = textY + padding / 2 + maxDescent;
+
                 let textX;
-                const textY = stepY + (i * stepY);
-                const textLineY = stepLineY + (i * stepLineY);
                 if (align === "center") {
                     textX = x + (width / 2) - (txtWidth / 2);
                 } else if (align === "right") {
@@ -200,19 +276,31 @@ function convertLayerToPdf(doc, group) {
             doc.restoreGraphicsState();
         } else if (child.className === 'Rect') {
             const width = child.attrs.width * (child.scaleX() ?? 1);
-            const height = child.attrs.height * (child.scaleX() ?? 1);
+            const height = child.attrs.height * (child.scaleY() ?? 1);
             if (shadowOpacity !== 0) {
                 blurShadow(doc, child);
             }
-            doc.setLineWidth(strokeWidth);
-            doc.setDrawColor(stroke);
-            setFillColor(doc, child);
-            if (strokeWidth === 0) {
-                doc.rect(x, y, width, height, 'F');
+            
+            console.log(child.fillLinearGradientStartPoint());
+            if (child.fillLinearGradientStartPoint() && child.fillLinearGradientEndPoint() && child.fillLinearGradientColorStops() && !child.fill()) {
+                setGradientFillLinesRect(doc, child, groupX, groupY, width, height);
+                if (strokeWidth !== 0) {
+                    doc.setDrawColor(stroke);
+                    doc.setLineWidth(strokeWidth);
+                    doc.rect(x, y, width, height, 'S');
+                }                
             } else {
-                doc.rect(x, y, width, height, 'FD');
-            }            
-            doc.restoreGraphicsState();
+                setFillColor(doc, child);
+                if (strokeWidth !== 0) {
+                    doc.setDrawColor(stroke);
+                    doc.setLineWidth(strokeWidth);
+                    doc.rect(x, y, width, height, 'FD');
+                } else {
+                    doc.rect(x, y, width, height, 'S');
+                }
+            }
+            //doc.restoreGraphicsState();
+            console.log("rect end");
         } else if (child.getClassName() === 'Shape') {
             const x1 = child.attrs.x1;
             const x2 = child.attrs.x2;
@@ -244,6 +332,46 @@ function convertLayerToPdf(doc, group) {
     }
 }
 
+function fillPathWithGradient(doc, child, lines) {
+    const colorOne = hexToRgb(child.fillLinearGradientColorStops()[1]);
+    const colorTwo = hexToRgb(child.fillLinearGradientColorStops()[3]);
+    const points = [];
+    for (let i = 0; i < lines.length - 1; i++) {
+        const startPoint = lines[i].c;
+        const endPoint = lines[i + 1].c;
+        const command = lines[i].op;
+
+    }
+}
+
+function setGradientFillLinesRect(doc, child, x, y, width, height) {
+    const gradient = calcLinearGradient(child);
+    const numLines = gradient.length; 
+    const stepX = (width / numLines) * 2;
+    const stepY = (height / numLines) * 2;
+    doc.setLineWidth(Math.sqrt(stepX * stepX + stepY * stepY));
+    for (let i = 0; i < numLines; i++) {
+        const { color, shape } = gradient[i];
+
+        // Calculate the end coordinates of the line based on the gradient position
+        if (i < numLines / 2) {
+            const lineX1 = x + child.x() + stepX * i;
+            const lineY1 = y + child.y();
+            const lineX2 = x + child.x();
+            const lineY2 = lineY1 + stepY * i;
+            doc.setDrawColor(color[0], color[1], color[2]);
+            doc.line(lineX1, lineY1, lineX2, lineY2);
+        } else {
+            const lineX1 = x + child.x() + width;
+            const lineY1 = y + child.y() + stepY * i - height;
+            const lineX2 = x + child.x() + stepX * i - width;
+            const lineY2 = y + child.y() + height;
+            doc.setDrawColor(color[0], color[1], color[2]);
+            doc.line(lineX1, lineY1, lineX2, lineY2);
+        }
+    }
+}
+
 function addText(doc, child, x, y, textLineY, txt, txtWidth, shadowOpacity) {
     if (shadowOpacity !== 0) {
         blurShadow(doc, child, x, y);
@@ -269,7 +397,7 @@ function splitText(text, txtWidth) {
 
     for (const word of words) {
         const tempLine = currentLine ? currentLine + ' ' + word : word;
-        const tempWidth = getTextDimensions(tempLine, fontStyle, text.fontSize() * (text.scaleX() ?? 1), font ?? 'Arial');
+        const tempWidth = getTextDimensions(tempLine, fontStyle, text.fontSize(), font ?? 'Arial').width + text.attrs.padding * 2;
         if (tempWidth <= text.width()) {
             currentLine = tempLine;
         } else {
@@ -281,7 +409,6 @@ function splitText(text, txtWidth) {
     if (currentLine) {
         lines.push(currentLine);
     }
-    console.log(lines);
     return lines;
 }
 
@@ -290,11 +417,13 @@ function getTextDimensions(text, fontStyle, fontSizePx, font) {
     const context = canvas.getContext("2d");
 
     context.font = fontStyle + ' ' + fontSizePx + 'px ' + font;
-    const textMetrics = context.measureText(text);
+    const metrics = context.measureText(text);
+    const descent = metrics.actualBoundingBoxDescent;
 
-    const width = textMetrics.width;
+    const width = metrics.width;
     canvas = null;
-    return width;
+    return { width: width, descent: descent }
+        ;
 }
 
 function blurShadow(doc, shape, textX, textY) {
@@ -305,7 +434,7 @@ function blurShadow(doc, shape, textX, textY) {
         const opacity = (shape.shadowOpacity() / shape.shadowBlur()) + (i / shape.shadowBlur()); // Increase opacity for each step
         const offsetX = stepX * (shape.shadowBlur() - i); // Starts at the outer shadow layer, move inward
         const offsetY = stepY * (shape.shadowBlur() - i);
-        
+
         const x = shape.x() + front.x() + offsetX;
         const y = shape.y() + front.y() + offsetY;
         doc.setFillColor(0, 0, 0, opacity);
@@ -431,7 +560,7 @@ function setFillColor(doc, node) {
     doc.saveGraphicsState();
     const isText = node.className === "Text";
     if (node.attrs.opacity) {
-        doc.setGState(new doc.GState({opacity: node.attrs.opacity}));
+        doc.setGState(new doc.GState({ opacity: node.attrs.opacity }));
         isText ? doc.setTextColor(node.attrs.fill) : doc.setFillColor(node.attrs.fill);
     } else {
         isText ? doc.setTextColor(node.attrs.fill) : doc.setFillColor(node.attrs.fill);
@@ -454,4 +583,4 @@ function calcCoordinates(node) {
     return [X, Y];
 }
 
-export { saveToPdfFromJson }
+export { saveToPdfFromJson, getJsonToRender, getDimensions, getFontsDirectory }

@@ -1,9 +1,12 @@
-﻿@inject IJSRuntime JS;
+﻿@using System.Text
+@inject IJSRuntime JS;
+@inject PDFConversionService PDFConversionService
 
 <section class="editor">
     <EditorBar EditorClicked="EditorClicked" @ref="_editorBar" />
     <div id="konva-container" @onclick="onEditorClicked" @ontouchend="onEditorClicked"></div>
     <button @onclick="Save">Save to pdf</button>
+    <button @onclick="SaveToPdf">Save to pdf iText</button>
     @if (Loading)
     {
         <div class="loader">
@@ -27,6 +30,7 @@
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/saveToPdf.js");
+            Console.WriteLine(Directory.Exists("js"));
         }
     }
 
@@ -35,6 +39,20 @@
         if (_module != null)
         {
             _module.InvokeVoidAsync("saveToPdfFromJson");
+        }
+    }
+
+    public async Task SaveToPdf()
+    {
+        if (_module != null)
+        {
+            string[] jsonToRender = await _module.InvokeAsync<string[]>("getJsonToRender");
+            float[] dimensions = await _module.InvokeAsync<float[]>("getDimensions");
+            byte[] pdfBytes = await PDFConversionService.SaveToPdf(jsonToRender[0], jsonToRender[1], dimensions);
+            string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssffff");
+            string fileName = $"{timeStamp}.pdf";
+            string fileType = "application/pdf";
+            await JS.InvokeVoidAsync("downloadFile", pdfBytes, fileName, fileType);
         }
     }
 

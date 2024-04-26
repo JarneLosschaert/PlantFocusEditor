@@ -9,7 +9,7 @@ function createTextLayer(type) {
         fontSize: 16,
         draggable: true,
         width: 250,
-        height: "auto",
+        height: 50,
         padding: 10,
         align: "center",
         shadowColor: 'black',
@@ -39,7 +39,7 @@ function handleTextEventListeners(text) {
 }
 
 function onTransfromText() {
-    const minWidth = this.fontSize() * 2;
+    const minWidth = this.fontSize();
     const minHeight = this.fontSize() * 1.5;
     this.setAttrs({
         width: Math.max(this.width() * this.scaleX(), minWidth),

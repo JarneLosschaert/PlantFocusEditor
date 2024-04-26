@@ -13,6 +13,7 @@ builder.Services.AddHttpClient("Plantfocus Editor API",
 builder.Services.AddScoped<ApiConnectorService>();
 builder.Services.AddScoped<TemplatesService>();
 builder.Services.AddScoped<ImagesService>();
+builder.Services.AddScoped<PDFConversionService>();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 await builder.Build().RunAsync();
