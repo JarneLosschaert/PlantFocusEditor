@@ -317,22 +317,22 @@ namespace PlantFocusEditor.Services
                     if (child.attrs.scaleX > 0)
                     {
                         float stroke = (float)(child.attrs.strokeWidth * child.attrs.scaleX);
-                        width += stroke;
+                        width += stroke * 2;
                     }
                     else
                     {
-                        width += (float)child.attrs.strokeWidth;
+                        width += (float)child.attrs.strokeWidth * 2;
                     }
                     if (child.attrs.scaleY > 0)
                     {
                         float stroke = (float)(child.attrs.strokeWidth * child.attrs.scaleY);
-                        bottom -= stroke;
-                        height += stroke;
+                        bottom -= stroke * 2;
+                        height += stroke * 2;
                     }
                     else
                     {
-                        bottom -= (float)child.attrs.strokeWidth;
-                        height += (float)child.attrs.strokeWidth;
+                        bottom -= (float)child.attrs.strokeWidth * 2;
+                        height += (float)child.attrs.strokeWidth * 2;
                     }
                 }
             }
