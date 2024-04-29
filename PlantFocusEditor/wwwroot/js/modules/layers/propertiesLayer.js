@@ -47,6 +47,7 @@ function addProperties(json) {
         const rowGroup = new Konva.Group({
             y: index * rowHeight + borderThickness,
             name: "rowGroup",
+            property: property.Name,
         });
 
         const background = new Konva.Rect({
@@ -69,6 +70,7 @@ function addProperties(json) {
                 image: img,
                 width: imageSize,
                 height: imageSize,
+                crossOrigin: "anonymous",
             });
             rowGroup.add(image);
         };
@@ -87,11 +89,12 @@ function addProperties(json) {
             const middle = spaceText * index + (spaceText / 2) - (fontSize / 2) + (margin / 2);
             const textNode = new Konva.Text({
                 name: "propertyText",
+                language: translation.Language,
                 text: translation.Text,
                 x: margin + imageSize + margin + borderThickness,
                 y: middle,
                 width: rowWidth - margin - imageSize - margin - borderThickness,
-                height: spaceText,
+                height: fontSize,
                 fontFamily: font,
                 fontStyle: style,
                 textDecoration: decoration,
@@ -131,4 +134,25 @@ function addProperties(json) {
     tr.nodes([]);
 }
 
-export { addProperties };
+function getProperties() {
+    const properties = [];
+    propertiesGroup.children.forEach(rowGroup => {
+        const property = {
+            Name: rowGroup.attrs.property,
+            Icon: rowGroup.findOne(".propertyImage").image,
+            Translations: [],
+        };
+        rowGroup.children.forEach(child => {
+            if (child.getClassName() === "Text") {
+                property.Translations.push({
+                    Language: child.attrs.language,
+                    Text: child.text(),
+                });
+            }
+        });
+        properties.push(property);
+    });
+    return JSON.stringify(properties);
+}
+
+export { addProperties, getProperties };

@@ -50,40 +50,6 @@
 
     protected override void OnInitialized()
     {
-        _plantPropertiesLabel.Add(new PlantProperty
-            {
-                Name = "Color",
-                Translations = new List<Translation>
-        {
-            new Translation { Language = "nl", Text = "Kleur" },
-            new Translation { Language = "fr", Text = "Couleur" },
-            new Translation { Language = "en", Text = "Color" },
-            new Translation { Language = "de", Text = "Farbe" }
-        }
-            });
-        _plantPropertiesLabel.Add(new PlantProperty
-            {
-                Name = "Height",
-                Translations = new List<Translation>
-        {
-            new Translation { Language = "nl", Text = "Hoogte" },
-            new Translation { Language = "fr", Text = "Hauteur" },
-            new Translation { Language = "en", Text = "Height" },
-            new Translation { Language = "de", Text = "Höhe" }
-        }
-            });
-        _plantPropertiesLabel.Add(new PlantProperty
-            {
-                Name = "Width",
-                Translations = new List<Translation>
-                {
-            new Translation { Language = "nl", Text = "Breedte" },
-            new Translation { Language = "fr", Text = "Largeur" },
-            new Translation { Language = "en", Text = "Width" },
-            new Translation { Language = "de", Text = "Breite" }
-                }
-            });
-
         _plantPropertiesKnown.Add(new PlantProperty
             {
                 Name = "Weight",
@@ -136,6 +102,8 @@
         if (firstRender)
         {
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/layers/propertiesLayer.js");
+            var json = await _module.InvokeAsync<string>("getProperties");
+            _plantPropertiesLabel = JsonSerializer.Deserialize<List<PlantProperty>>(json);
             StateHasChanged();
         }
     }
