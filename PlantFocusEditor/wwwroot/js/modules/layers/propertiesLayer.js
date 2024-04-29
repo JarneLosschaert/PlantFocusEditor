@@ -91,7 +91,7 @@ function addProperties(json) {
                 x: margin + imageSize + margin + borderThickness,
                 y: middle,
                 width: rowWidth - margin - imageSize - margin - borderThickness,
-                height: fontSize,
+                height: spaceText,
                 fontFamily: font,
                 fontStyle: style,
                 textDecoration: decoration,

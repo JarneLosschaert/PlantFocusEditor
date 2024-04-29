@@ -22,6 +22,7 @@ const layer = new Konva.Layer();
 const PLANT = {
     Name: "Opal",
     LatinName: "Pulmonaria",
+    image: "https://plantfocus.blob.core.windows.net/plants/ed821db8-3e9e-4d50-b261-95daea03e1e6.jpg"
 }
 
 function init() {
