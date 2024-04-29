@@ -449,15 +449,24 @@ namespace PlantFocusEditor.Services
             Paragraph paragraph = new Paragraph(text)
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize)
-                .SetWidth((float)child.attrs.width)
+                .SetWidth((float)child.attrs.width)                
                 .SetMargin(0)
                 .SetPadding(0);
             HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.opacity);
 
-            float textHeight = GetTextHeight(paragraph, child, stageHeight);
-            Console.WriteLine(textHeight);
             float left = (float)(child.attrs.x + x);
-            float bottom = (float)(stageHeight - (child.attrs.y + y + textHeight));
+            float bottom;
+            if (child.attrs.height > 0)
+            {
+                paragraph.SetHeight((float)child.attrs.height);
+                bottom = (float)(stageHeight - (child.attrs.y + y + child.attrs.height));
+            } else
+            {
+                float textHeight = GetTextHeight(paragraph, child, stageHeight);
+                Console.WriteLine(textHeight);
+                bottom = (float)(stageHeight - (child.attrs.y + y + textHeight));
+            }
+
             TextAlignment align = HandleAlignment(child.attrs.align);
 
             SetTextPosition(child, paragraph, align, left, bottom);
@@ -484,15 +493,15 @@ namespace PlantFocusEditor.Services
             {
                 if (align == TextAlignment.RIGHT)
                 {
-                    paragraph.SetFixedPosition(left - padding, bottom - padding / 2, (float)child.attrs.width);
+                    paragraph.SetFixedPosition(left - padding, bottom, (float)child.attrs.width);
                 }
                 else if (align == TextAlignment.LEFT)
                 {
-                    paragraph.SetFixedPosition(left + padding, bottom - padding / 2, (float)child.attrs.width);
+                    paragraph.SetFixedPosition(left + padding, bottom, (float)child.attrs.width);
                 }
                 else
                 {
-                    paragraph.SetFixedPosition(left, bottom - padding / 2, (float)child.attrs.width);
+                    paragraph.SetFixedPosition(left, bottom, (float)child.attrs.width);
                 }
             } else
             {

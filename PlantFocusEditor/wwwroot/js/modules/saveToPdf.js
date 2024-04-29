@@ -68,9 +68,9 @@ function setSource(child, parent) {
         child.attrs.posY = bbox.y - parent.attrs.y;
         child.rotation(0);
         const src = child.toDataURL({
-            //mimeType: "image/png",
-            //width: pos.width,
-            //height: pos.height,
+            mimeType: "image/png",
+            width: child.attrs.width * child.attrs.scaleX,
+            height: child.attrs.height * child.attrs.scaleY,
             pixelRatio: 2
         });
         child.rotation(rotation);
