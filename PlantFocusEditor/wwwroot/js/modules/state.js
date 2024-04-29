@@ -20,9 +20,9 @@ const stage = new Konva.Stage({
 const layer = new Konva.Layer();
 
 const PLANT = {
-    Name: "Opal",
-    LatinName: "Pulmonaria",
-    image: "https://plantfocus.blob.core.windows.net/plants/ed821db8-3e9e-4d50-b261-95daea03e1e6.jpg"
+    Name: "Fragaria ananassa",
+    LatinName: "Charlotte",
+    image: "https://plantfocus.blob.core.windows.net/plants/5ed049f3-f5d0-4c5d-8581-0c9dae879d88.jpg"
 }
 
 function init() {
@@ -96,7 +96,6 @@ function getGroupJson(json) {
             const pathData = convertToSVGPath(commands);
             child.data(pathData);
         } else {
-
             if (child.attrs.name === "text") {
                 handleTextEventListeners(child);
                 if (child.text().startsWith("$")) {
@@ -107,9 +106,33 @@ function getGroupJson(json) {
                 }
             } else if (child.attrs.name === "image") {
                 const img = new Image();
-                const src = PLANT.image;
+                const src = child.attrs.src;
                 img.src = src;
                 child.image(img);
+            } else if (child.attrs.name === "defaultImage") {
+                const img = new Image();
+                img.src = PLANT.image;
+                const kimg = new Konva.Image({
+                    x: child.x(),
+                    y: child.y(),
+                    name: "image",
+                    image: img,
+                    src: img.src,
+                    height: child.height(),
+                    width: child.width(),
+                    scaleX: child.scaleX(),
+                    scaleY: child.scaleY(),
+                    draggable: true,
+                    stroke: "#000000",
+                    strokeWidth: 0,
+                    shadowBlur: 10,
+                    shadowOffset: { x: 5, y: 5 },
+                    shadowOpacity: 0,
+                });
+                const crop = getCrop(img, child.width(), child.height());
+                kimg.setAttrs(crop);
+                group.add(kimg);
+                addHoverAnimation(kimg);
             } else if (child.attrs.name === "element") {
                 // not sure if this is needed
                 // child.sceneFunc(sceneFunc);
@@ -132,7 +155,9 @@ function getGroupJson(json) {
             }
             addHoverAnimation(child);
         }
-        group.add(child);
+        if (child.attrs.name !== "defaultImage") {
+            group.add(child);
+        }
     });
 
     group.children.forEach(child => {
@@ -170,6 +195,33 @@ function getGroupJson(json) {
     console.log(group);
 
     return group;
+}
+
+function getCrop(image, width, height) {
+    const aspectRatio = width / height;
+
+    let newWidth;
+    let newHeight;
+
+    const imageRatio = image.width / image.height;
+
+    if (aspectRatio >= imageRatio) {
+        newWidth = image.width;
+        newHeight = image.width / aspectRatio;
+    } else {
+        newWidth = image.height * aspectRatio;
+        newHeight = image.height;
+    }
+
+    const x = (image.width - newWidth) / 2;
+    const y = (image.height - newHeight) / 2;
+
+    return {
+        cropX: x,
+        cropY: y,
+        cropWidth: newWidth,
+        cropHeight: newHeight,
+    };
 }
 
 export { stage, layer, init, loadTemplate, getGroupJson, loadGroup };
