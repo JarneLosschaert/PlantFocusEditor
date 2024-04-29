@@ -107,7 +107,7 @@ function getGroupJson(json) {
                 }
             } else if (child.attrs.name === "image") {
                 const img = new Image();
-                const src = child.attrs.src;
+                const src = PLANT.image;
                 img.src = src;
                 child.image(img);
             } else if (child.attrs.name === "element") {
