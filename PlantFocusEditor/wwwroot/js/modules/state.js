@@ -112,7 +112,6 @@ function getGroupJson(json) {
             } else if (child.attrs.name === "defaultImage") {
                 const img = new Image();
                 img.src = PLANT.image;
-                console.log(child);
                 const kimg = new Konva.Image({
                     x: child.x(),
                     y: child.y(),
@@ -125,10 +124,10 @@ function getGroupJson(json) {
                     scaleY: child.scaleY(),
                     draggable: true,
                     stroke: "#000000",
-                    strokeWidth: 0,
-                    shadowBlur: 10,
-                    shadowOffset: { x: 5, y: 5 },
-                    shadowOpacity: 0,
+                    strokeWidth: child.strokeWidth(),
+                    shadowBlur: child.shadowBlur(),
+                    shadowOffset: child.shadowOffset(),
+                    shadowOpacity: child.shadowOpacity(),
                 });
                 img.onload = function () {
                     const width = child.width() * child.scaleX();
