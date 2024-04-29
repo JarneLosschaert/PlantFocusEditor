@@ -21,6 +21,7 @@ using static System.Net.Mime.MediaTypeNames;
 using Image = iText.Layout.Element.Image;
 using Text = iText.Layout.Element.Text;
 using iText.Layout.Borders;
+using iText.Commons.Datastructures;
 
 namespace PlantFocusEditor.Services
 {
@@ -340,7 +341,7 @@ namespace PlantFocusEditor.Services
                 left = (float)child.attrs.x + x;
                 bottom = stageHeight - (float)(child.attrs.y + height + y);
             }
-            image.SetWidth(width).SetHeight(height);
+            image.SetWidth(width).SetHeight(height).SetObjectFit(ObjectFit.COVER);
 
             if (child.attrs.opacity != null)
             {
@@ -392,7 +393,7 @@ namespace PlantFocusEditor.Services
             }
 
             _document.Add(image);
-        }
+        }        
 
         private static Rectangle CalculateBoundingBox(Point leftBottom, Point leftUpper, Point rightBottom, Point rightUpper)
         {

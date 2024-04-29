@@ -112,14 +112,15 @@ function getGroupJson(json) {
             } else if (child.attrs.name === "defaultImage") {
                 const img = new Image();
                 img.src = PLANT.image;
+                console.log(child);
                 const kimg = new Konva.Image({
                     x: child.x(),
                     y: child.y(),
                     name: "image",
                     image: img,
                     src: img.src,
-                    height: child.height(),
                     width: child.width(),
+                    height: child.height(),
                     scaleX: child.scaleX(),
                     scaleY: child.scaleY(),
                     draggable: true,
@@ -129,8 +130,12 @@ function getGroupJson(json) {
                     shadowOffset: { x: 5, y: 5 },
                     shadowOpacity: 0,
                 });
-                const crop = getCrop(img, child.width(), child.height());
-                kimg.setAttrs(crop);
+                img.onload = function () {
+                    const width = child.width() * child.scaleX();
+                    const height = child.height() * child.scaleY();
+                    const crop = getCrop(img, width, height);
+                    kimg.setAttrs(crop);
+                }
                 group.add(kimg);
                 addHoverAnimation(kimg);
             } else if (child.attrs.name === "element") {
@@ -165,7 +170,7 @@ function getGroupJson(json) {
             if (child.attrs.name === "text") {
                 const newFontSize = Math.round(child.fontSize() * scale);
                 child.fontSize(newFontSize);
-            } else {
+            } else if (child.attrs.name !== "image") {
                 const oldScaleX = child.scaleX();
                 const oldScaleY = child.scaleY();
                 child.scaleX(oldScaleX * scale);
@@ -181,7 +186,7 @@ function getGroupJson(json) {
             child.x(oldX * scale);
             child.y(oldY * scale);
             child.offsetX(oldOffsetX * scale);
-            child.offsetY(oldOffsetY * scale); $
+            child.offsetY(oldOffsetY * scale);
             child.width(oldWidth * scale);
             child.height(oldHeight * scale);
         }
@@ -199,11 +204,9 @@ function getGroupJson(json) {
 
 function getCrop(image, width, height) {
     const aspectRatio = width / height;
-
+    const imageRatio = image.width / image.height;
     let newWidth;
     let newHeight;
-
-    const imageRatio = image.width / image.height;
 
     if (aspectRatio >= imageRatio) {
         newWidth = image.width;
