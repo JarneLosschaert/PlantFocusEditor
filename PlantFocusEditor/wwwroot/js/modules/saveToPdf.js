@@ -62,15 +62,16 @@ function setSource(child, parent) {
     if (child.attrs.name === "element") {
         const rotation = child.attrs.rotation;
 
-        const bbox = child.getClientRect({ skipTransform: false, relativeTo: true }); 
+        const bbox = child.getClientRect({ skipTransform: false, skipStroke: false, relativeTo: true }); 
         
         child.attrs.posX = bbox.x - parent.attrs.x;
         child.attrs.posY = bbox.y - parent.attrs.y;
+
         child.rotation(0);
         const src = child.toDataURL({
             mimeType: "image/png",
-            width: child.attrs.width * child.attrs.scaleX,
-            height: child.attrs.height * child.attrs.scaleY,
+            //width: bbox.width + child.attrs.strokeWidth * 2,
+            //height: bbox.height + child.attrs.strokeWidth * 2,
             pixelRatio: 2
         });
         child.rotation(rotation);

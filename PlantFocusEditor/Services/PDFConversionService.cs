@@ -87,7 +87,7 @@ namespace PlantFocusEditor.Services
         }
 
         private async Task AddNode(Child child, float x, float y, float stageHeight, double scaleX = 1, double scaleY = 1)
-        {
+        {            
             if (scaleX > 0)
             {
                 child.attrs.width = child.attrs.width * scaleX;
@@ -107,16 +107,18 @@ namespace PlantFocusEditor.Services
             }
             else if (child.className == "Text")
             {
-                Text text = new Text(child.attrs.text);
+                Text text = new Text(child.attrs.text);                
                 if (scaleX > 0 || scaleY > 0)
                 {
                     double scale = Math.Min(scaleX, scaleY);
+                    Console.WriteLine($"fontSize before scale: {child.attrs.fontSize}");
                     child.attrs.fontSize = (int)Math.Round(child.attrs.fontSize * scale);
+                    Console.WriteLine($"fontSize after scale: {child.attrs.fontSize}");
                 }
                 if (scaleX > scaleY)
                 {
                     text.SetHorizontalScaling((float)(scaleX / scaleY));
-                }
+                }                
                 byte[] fontBytes = await GetFont(child.attrs.fontFamily, child.attrs.fontStyle);
                 AddText(child, x, y, fontBytes, stageHeight, text);
             }
@@ -260,7 +262,6 @@ namespace PlantFocusEditor.Services
 
         private void AddLine(Child child, float x, float y, float stageHeight, double scaleX, double scaleY)
         {
-            Console.WriteLine(y);
             float width = (float)child.attrs.strokeWidth;
             Color stroke = ColorConstants.BLACK;
             if (child.attrs.stroke.Contains('#'))
@@ -298,17 +299,41 @@ namespace PlantFocusEditor.Services
             }
             Image image = new(imgData);
 
-            float[] widthHeight = GetNodeWidthHeight(child);
-            float width, height;
-            (width, height) = (widthHeight[0], widthHeight[1]);
+            float[] dimensions = GetNodeWidthHeight(child);
+            float width = dimensions[0];
+            float height = dimensions[1];
             Console.WriteLine($"height: {height}");
             float left;
             float bottom;
             double rotationAngle = child.attrs.rotation;
             if (child.className == "Path")
             {
-                left = (float)child.attrs.posX;
-                bottom = stageHeight - (float)(child.attrs.posY + height + y);
+                left = (float)child.attrs.posX + x;
+                bottom = stageHeight - (float)(child.attrs.posY + height + y);                
+                image.SetWidth(width).SetHeight(height);
+                if (child.attrs.strokeWidth > 0)
+                {
+                    if (child.attrs.scaleX > 0)
+                    {
+                        float stroke = (float)(child.attrs.strokeWidth * child.attrs.scaleX);
+                        width += stroke;
+                    }
+                    else
+                    {
+                        width += (float)child.attrs.strokeWidth;
+                    }
+                    if (child.attrs.scaleY > 0)
+                    {
+                        float stroke = (float)(child.attrs.strokeWidth * child.attrs.scaleY);
+                        bottom -= stroke;
+                        height += stroke;
+                    }
+                    else
+                    {
+                        bottom -= (float)child.attrs.strokeWidth;
+                        height += (float)child.attrs.strokeWidth;
+                    }
+                }
             }
             else
             {
@@ -458,12 +483,14 @@ namespace PlantFocusEditor.Services
             float bottom;
             if (child.attrs.height > 0)
             {
+                Console.WriteLine($"calculating with height: {child.attrs.height}");
                 paragraph.SetHeight((float)child.attrs.height);
                 bottom = (float)(stageHeight - (child.attrs.y + y + child.attrs.height));
+                Console.WriteLine(child.attrs.y + y);
             } else
             {
                 float textHeight = GetTextHeight(paragraph, child, stageHeight);
-                Console.WriteLine(textHeight);
+                Console.WriteLine($"Calculating with textHeight: {textHeight}");
                 bottom = (float)(stageHeight - (child.attrs.y + y + textHeight));
             }
 

@@ -92,7 +92,7 @@ function saveState(e) {
         historyBack[historyBackIndex] = back.toJSON();
         historyBack.length = historyBackIndex + 1;
     }
-    saveStateLS();
+    //saveStateLS();
 }
 
 function saveStateLS() {

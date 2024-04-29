@@ -46,7 +46,6 @@
             List<Template> templates = await API.GetTemplatesAsync(null, null) ?? new List<Template>();
             if (templates.Count() > 0)
             {
-
                 Template template = templates[3];
                 Console.WriteLine(template.JsonToRender);
                 Console.WriteLine(template.Name);
