@@ -340,8 +340,9 @@ namespace PlantFocusEditor.Services
             {
                 left = (float)child.attrs.x + x;
                 bottom = stageHeight - (float)(child.attrs.y + height + y);
+                image.SetObjectFit(ObjectFit.COVER);
             }
-            image.SetWidth(width).SetHeight(height).SetObjectFit(ObjectFit.COVER);
+            image.SetWidth(width).SetHeight(height);
 
             if (child.attrs.opacity != null)
             {
@@ -374,7 +375,7 @@ namespace PlantFocusEditor.Services
                     bottom = (float)rotatedLeftBottom.GetY();
                     image.SetRotationAngle(DegreesToRadians(-rotationAngle));
                 }
-        }            
+            }            
             image.SetFixedPosition(left, bottom);            
             if (child.className != "Path" && child.attrs.strokeWidth > 0)
             {

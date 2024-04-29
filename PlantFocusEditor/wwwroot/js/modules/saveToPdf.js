@@ -70,8 +70,8 @@ function setSource(child, parent) {
         child.rotation(0);
         const src = child.toDataURL({
             mimeType: "image/png",
-            //width: bbox.width + child.attrs.strokeWidth * 2,
-            //height: bbox.height + child.attrs.strokeWidth * 2,
+            width: child.attrs.width * child.attrs.scaleX,
+            height: child.attrs.height * child.attrs.scaleY,
             pixelRatio: 2
         });
         child.rotation(rotation);
