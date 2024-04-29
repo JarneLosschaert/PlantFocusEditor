@@ -22,6 +22,7 @@ using Image = iText.Layout.Element.Image;
 using Text = iText.Layout.Element.Text;
 using iText.Layout.Borders;
 using iText.Commons.Datastructures;
+using static iText.Kernel.Pdf.Canvas.PdfCanvasConstants;
 
 namespace PlantFocusEditor.Services
 {
@@ -108,7 +109,7 @@ namespace PlantFocusEditor.Services
             }
             else if (child.className == "Text")
             {
-                Text text = new Text(child.attrs.text);                
+                Text text = new Text(child.attrs.text);  
                 if (scaleX > 0 || scaleY > 0)
                 {
                     double scale = Math.Min(scaleX, scaleY);
@@ -119,8 +120,8 @@ namespace PlantFocusEditor.Services
                 if (scaleX > scaleY)
                 {
                     text.SetHorizontalScaling((float)(scaleX / scaleY));
-                }                
-                byte[] fontBytes = await GetFont(child.attrs.fontFamily, child.attrs.fontStyle);
+                }
+                byte[] fontBytes = await GetFont(child.attrs.fontFamily, child.attrs.fontStyle);               
                 AddText(child, x, y, fontBytes, stageHeight, text);
             }
             else if (child.className == "Path")
@@ -476,9 +477,10 @@ namespace PlantFocusEditor.Services
             Paragraph paragraph = new Paragraph(text)
                 .SetFont(font)
                 .SetFontSize(child.attrs.fontSize)
-                .SetWidth((float)child.attrs.width)                
+                .SetWidth((float)child.attrs.width)
                 .SetMargin(0)
-                .SetPadding(0);
+                .SetPadding(0)
+                .SetVerticalAlignment(VerticalAlignment.TOP);
             HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.opacity);
 
             float left = (float)(child.attrs.x + x);
