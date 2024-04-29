@@ -104,6 +104,22 @@
             _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/modules/layers/propertiesLayer.js");
             var json = await _module.InvokeAsync<string>("getProperties");
             _plantPropertiesLabel = JsonSerializer.Deserialize<List<PlantProperty>>(json);
+            int propertiesCount = _plantPropertiesLabel.Count(el => el.Name.Contains("Property"));
+            if (propertiesCount > 0)
+            {
+                _plantPropertiesLabel = new List<PlantProperty>();
+                for (int i = 0; i < propertiesCount; i++)
+                {
+                    if (_plantPropertiesKnown.Count > i)
+                    {
+                        PlantProperty plantProperty = _plantPropertiesKnown[i];
+                        if (plantProperty != null)
+                        {
+                            _plantPropertiesLabel.Add(plantProperty);
+                        }
+                    }
+                }
+            }
             StateHasChanged();
         }
     }
@@ -123,16 +139,16 @@
     public void OnNewPropertyAdded(string property)
     {
         _plantPropertiesLabel.Add(new PlantProperty
-        {
-            Name = property,
-            Translations = new List<Translation>
+            {
+                Name = property,
+                Translations = new List<Translation>
         {
             new Translation { Language = "nl", Text = "" },
             new Translation { Language = "fr", Text = "" },
             new Translation { Language = "en", Text = "" },
             new Translation { Language = "de", Text = "" }
         }
-        });
+            });
         AddProperties();
     }
 
