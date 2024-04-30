@@ -1,21 +1,21 @@
-﻿using iText.Kernel.Pdf;
-using iText.Layout;
-using System.Text.Json;
-using Library.Classes;
-using System.Text.RegularExpressions;
-using iText.Kernel.Pdf.Canvas;
-using iText.Kernel.Geom;
-using iText.Layout.Element;
-using iText.Layout.Properties;
-using PlantFocusEditor.Helpers;
-using iText.Kernel.Colors;
-using iText.Layout.Renderer;
-using iText.Kernel.Font;
-using iText.IO.Font;
-using iText.Layout.Layout;
+﻿using iText.IO.Font;
 using iText.IO.Image;
+using iText.Kernel.Colors;
 using iText.Kernel.Colors.Gradients;
+using iText.Kernel.Font;
+using iText.Kernel.Geom;
+using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Layout;
+using iText.Layout.Properties;
+using iText.Layout.Renderer;
+using Library.Classes;
 using Microsoft.JSInterop;
+using PlantFocusEditor.Helpers;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using Image = iText.Layout.Element.Image;
 using Text = iText.Layout.Element.Text;
 
@@ -26,11 +26,10 @@ namespace PlantFocusEditor.Services
         private readonly IJSRuntime _runtime;
         private MemoryStream _memoryStream;
         private PdfWriter _writer;
-        private PdfDocument _final;
         private PdfDocument _pdf;
         private Document _document;
         private PdfCanvas _canvas;
-        private ApiConnectorService _apiService;
+        private readonly ApiConnectorService _apiService;
 
         public PDFConversionService(IJSRuntime runtime, ApiConnectorService service)
         {
@@ -42,8 +41,8 @@ namespace PlantFocusEditor.Services
         {
             RootObject front = UnitConverter.ConvertJsonPixelsToMillimeters(ConvertFromJson(jsonStringFront), dimensions, dimensionsMillimeters);
             RootObject back = UnitConverter.ConvertJsonPixelsToMillimeters(ConvertFromJson(jsonStringBack), dimensions, dimensionsMillimeters);
-            double width = dimensionsMillimeters[0];
-            double height = dimensionsMillimeters[1];
+            double width = UnitConverter.ConvertMillimetersToPoints(dimensionsMillimeters[0]);
+            double height = UnitConverter.ConvertMillimetersToPoints(dimensionsMillimeters[1]);
             byte[] firstPage = await AddPage(front, width, height);
             byte[] secondPage = await AddPage(back, width, height);
             using MemoryStream ms = new();
@@ -71,10 +70,7 @@ namespace PlantFocusEditor.Services
             _writer = new PdfWriter(_memoryStream);
             _pdf = new PdfDocument(_writer);
             _document = new Document(_pdf);
-            _canvas = new PdfCanvas(_pdf.AddNewPage(new PageSize((float)width, (float)height)));
-            
-            float x = (float)root.attrs.x;
-            float y = (float)root.attrs.y;
+            _canvas = new PdfCanvas(_pdf.AddNewPage(new PageSize((float)width, (float)height)));            
             foreach (Child child in root.children)
             {
                 await AddNode(child, 0, 0, (float)height, 1, 1);
@@ -82,23 +78,13 @@ namespace PlantFocusEditor.Services
             return GetPdfBytes();
         }
 
-        private async Task AddNode(Child child, float x, float y, float stageHeight, double scaleX = 1, double scaleY = 1)
+        private async Task AddNode(Child child, float x, float y, float pageHeight, double scaleX = 1, double scaleY = 1)
         {            
-            /*if (scaleX > 0)
-            {
-                child.attrs.width = child.attrs.width * scaleX;
-                child.attrs.x = child.attrs.x * scaleX;
-            }
-            if (scaleY > 0)
-            {
-                child.attrs.height = child.attrs.height * scaleY;
-                child.attrs.y = child.attrs.y * scaleY;
-            }*/
             if (child.attrs.name == "passepartout")
             {
                 string[] commands = PathUtils.ParsePathData(child.attrs.data);
-                AddPath(commands, child, x, y, stageHeight);
-                //_canvas.Clip();
+                AddPath(commands, child, x, y, pageHeight);
+                _canvas.Clip();
                 _canvas.Stroke();
             }
             else if (child.className == "Text")
@@ -116,33 +102,26 @@ namespace PlantFocusEditor.Services
                     text.SetHorizontalScaling((float)(scaleX / scaleY));
                 }
                 byte[] fontBytes = await GetFont(child.attrs.fontFamily, child.attrs.fontStyle);               
-                AddText(child, x, y, fontBytes, stageHeight, text);
+                AddText(child, x, y, fontBytes, pageHeight, text);
             }
             else if (child.className == "Path")
-            {
-                /*string[] commands = PathUtils.ParsePathData(child.attrs.data);
-                Rectangle bbox = AddPath(commands, child, x, y, dimensions[1]);
-                if (child.attrs.fillLinearGradientColorStops.Count() >= 2)
-                {
-                    SetCanvasLinearGradient(child, bbox);
-                }
-                _canvas.FillStroke();*/
-                await AddImage(child, x, y, stageHeight);
+            {                
+                await AddImage(child, x, y, pageHeight);
             }
             else if (child.className == "Image")
             {
-                await AddImage(child, x, y, stageHeight);
+                await AddImage(child, x, y, pageHeight);
             }
             else if (child.className == "Rect")
             {
                 if (child.attrs.strokeWidth > 0)
                 {
-                    AddRectangle(child, x, y, stageHeight);
+                    AddRectangle(child, x, y, pageHeight);
                 }
             }
             else if (child.className == "Line")
             {                
-                AddLine(child, x, y, stageHeight, scaleX, scaleY);
+                AddLine(child, x, y, pageHeight, scaleX, scaleY);
             }
             else if (child.className == "Group")
             {
@@ -156,7 +135,7 @@ namespace PlantFocusEditor.Services
                 }
                 foreach (Child childNode in child.children)
                 {                    
-                    await AddNode(childNode, (float)child.attrs.x + x, (float)child.attrs.y + y, stageHeight, scaleX, scaleY);
+                    await AddNode(childNode, (float)child.attrs.x + x, (float)child.attrs.y + y, pageHeight, scaleX, scaleY);
                 }
             }
         }
@@ -236,13 +215,13 @@ namespace PlantFocusEditor.Services
             return _memoryStream.ToArray();
         }
 
-        private void AddRectangle(Child child, float x, float y, float stageHeight)
+        private void AddRectangle(Child child, float x, float y, float pageHeight)
         {
             float[] widthHeight = GetNodeWidthHeight(child);
             float width, height;
             (width, height) = (widthHeight[0], widthHeight[1]);
             float left = (float)child.attrs.x + x;
-            float bottom = stageHeight - ((float)child.attrs.y + y + height);
+            float bottom = pageHeight - ((float)child.attrs.y + y + height);
             Rectangle rect = new(left, bottom, width, height);
             if (child.attrs.fill.Contains("#"))
             {
@@ -252,8 +231,7 @@ namespace PlantFocusEditor.Services
             _canvas.SetLineWidth((float)child.attrs.strokeWidth);
             _canvas.Rectangle(rect);
             _canvas.Stroke();
-            _canvas.SetLineWidth(1);
-            
+            _canvas.SetLineWidth(1);            
         }
 
         private void AddLine(Child child, float x, float y, float stageHeight, double scaleX, double scaleY)
@@ -264,19 +242,19 @@ namespace PlantFocusEditor.Services
             {
                 stroke = HexToColor(child.attrs.stroke);
             }
-            DrawLine(child.attrs.points, width, x, y, stageHeight, stroke, scaleX, scaleY);
+            DrawLine(child.attrs.points, x, y, width, stroke);
         }
 
-        private void DrawLine(double[] points, float width, float x, float y, float stageHeight, Color strokeColor, double scaleX, double scaleY)
+        private void DrawLine(double[] points, float x, float y, float width, Color strokeColor)
         {
             _canvas.SetLineWidth(width);
             _canvas.SetStrokeColor(strokeColor);
-            _canvas.MoveTo(points[0] * scaleX + x, stageHeight - (points[1] * scaleY + y));
-            _canvas.LineTo(points[2] * scaleX + x, stageHeight - (points[3] * scaleY + y));
+            _canvas.MoveTo(points[0] + x, points[1] - y);
+            _canvas.LineTo(points[2] + x, points[3] - y);
             _canvas.Stroke();
         }
 
-        private async Task AddImage(Child child, float x, float y, float stageHeight)
+        private async Task AddImage(Child child, float x, float y, float pageHeight)
         {
             ImageData imgData;
             if (child.attrs.src.Contains("http"))
@@ -304,7 +282,7 @@ namespace PlantFocusEditor.Services
             if (child.className == "Path")
             {
                 left = (float)child.attrs.posX + x;
-                bottom = stageHeight - (float)(child.attrs.posY + height + y);                
+                bottom = pageHeight - (float)(child.attrs.posY + height + y);                
                 image.SetWidth(width).SetHeight(height);
                 if (child.attrs.strokeWidth > 0)
                 {
@@ -333,7 +311,7 @@ namespace PlantFocusEditor.Services
             else
             {
                 left = (float)child.attrs.x + x;
-                bottom = stageHeight - (float)(child.attrs.y + height + y);
+                bottom = pageHeight - (float)(child.attrs.y + height + y);
                 if (rotationAngle == 0)
                 {
                     image.SetObjectFit(ObjectFit.COVER);
@@ -429,14 +407,14 @@ namespace PlantFocusEditor.Services
             float width = (float)child.attrs.width;
             float height = (float)child.attrs.height;
 
-            if (child.attrs.scaleX != 0)
+            /*if (child.attrs.scaleX != 0)
             {
                 width *= (float)child.attrs.scaleX;
             }
             if (child.attrs.scaleY != 0)
             {
                 height *= (float)child.attrs.scaleY;
-            }
+            }*/
             return [width, height];
         }
 
@@ -466,7 +444,7 @@ namespace PlantFocusEditor.Services
             return p;
         }
 
-        private void AddText(Child child, float x, float y, byte[] fontBytes, float stageHeight, Text text)
+        private void AddText(Child child, float x, float y, byte[] fontBytes, float pageHeight, Text text)
         {
             FontProgram fontProgram = FontProgramFactory.CreateFont(fontBytes);
             PdfFont font = PdfFontFactory.CreateFont(fontProgram);
@@ -477,6 +455,7 @@ namespace PlantFocusEditor.Services
                 .SetMargin(0)
                 .SetPadding(0)
                 .SetVerticalAlignment(VerticalAlignment.TOP);
+            //paragraph.SetProperty(Property.TOP, pageHeight - (child.attrs.y + y));
             HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.opacity);
 
             float left = (float)(child.attrs.x + x);
@@ -485,13 +464,13 @@ namespace PlantFocusEditor.Services
             {
                 Console.WriteLine($"calculating with height: {child.attrs.height}");
                 paragraph.SetHeight((float)child.attrs.height);
-                bottom = (float)(stageHeight - (child.attrs.y + y + child.attrs.height));
+                bottom = (float)(pageHeight - (child.attrs.y + y + child.attrs.height));
                 Console.WriteLine(child.attrs.y + y);
             } else
             {
-                float textHeight = GetTextHeight(paragraph, child, stageHeight);
+                float textHeight = GetTextHeight(paragraph, pageHeight);
                 Console.WriteLine($"Calculating with textHeight: {textHeight}");
-                bottom = (float)(stageHeight - (child.attrs.y + y + textHeight));
+                bottom = (float)(pageHeight - (child.attrs.y + y + textHeight));
             }
 
             TextAlignment align = HandleAlignment(child.attrs.align);
@@ -504,12 +483,12 @@ namespace PlantFocusEditor.Services
             _document.Add(paragraph);
         }
 
-        private float GetTextHeight(Paragraph paragraph, Child child, float stageHeight)
+        private float GetTextHeight(Paragraph paragraph, float stageHeight)
         {
             IRenderer renderer = paragraph.CreateRendererSubTree();
             LayoutResult result = renderer.SetParent(_document
             .GetRenderer())
-                .Layout(new LayoutContext(new LayoutArea(1, new Rectangle((float)child.attrs.width, stageHeight))));
+                .Layout(new LayoutContext(new LayoutArea(1, new Rectangle(1000, stageHeight))));
             return result.GetOccupiedArea().GetBBox().GetHeight();
         }
 
@@ -521,18 +500,22 @@ namespace PlantFocusEditor.Services
                 if (align == TextAlignment.RIGHT)
                 {
                     paragraph.SetFixedPosition(left - padding, bottom, (float)child.attrs.width);
+                    //paragraph.SetProperty(Property.LEFT, left - padding);
                 }
                 else if (align == TextAlignment.LEFT)
                 {
                     paragraph.SetFixedPosition(left + padding, bottom, (float)child.attrs.width);
+                    //paragraph.SetProperty(Property.LEFT, left + padding);
                 }
                 else
                 {
-                    paragraph.SetFixedPosition(left, bottom, (float)child.attrs.width);
+                    //paragraph.SetFixedPosition(left, bottom, (float)child.attrs.width);
+                    paragraph.SetProperty(Property.LEFT, left);
                 }
             } else
             {
                 paragraph.SetFixedPosition(left, bottom, (float)child.attrs.width);
+                //paragraph.SetProperty(Property.LEFT, left);
             }
         }
 
@@ -581,7 +564,7 @@ namespace PlantFocusEditor.Services
 
         private Rectangle AddPath(string[] commands, Child child, float x, float y, float stageHeight)
         {
-            _canvas.SetLineWidth(0.5f);
+            _canvas.SetLineWidth(0.01f);
             float prevX = 0.0F;
             float prevY = 0.0F;
             float minX = float.MaxValue;

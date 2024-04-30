@@ -1,4 +1,5 @@
-﻿using iText.Layout.Renderer;
+﻿using iText.Layout;
+using iText.Layout.Renderer;
 using Library.Classes;
 
 namespace PlantFocusEditor.Helpers
@@ -11,9 +12,11 @@ namespace PlantFocusEditor.Helpers
             float heightPixels = pixels[1];
             float widthMillimeters = millimeters[0];
             float heightMillimeters = millimeters[1];
+            float widthPoints = (float)ConvertMillimetersToPoints(widthMillimeters);
+            float heightPoints = (float)ConvertMillimetersToPoints(heightMillimeters);
             foreach (Child node in json.children)
             {
-                ConvertPixelsToUserUnits(node, widthPixels, heightPixels, widthMillimeters, heightMillimeters);
+                ConvertPixelsToUserUnits(node, widthPixels, heightPixels, widthMillimeters, heightMillimeters, widthPoints, heightPoints);
             }
             return json;
         }
@@ -23,46 +26,93 @@ namespace PlantFocusEditor.Helpers
             return millimeters * (72 / 25.4);
         }
 
-        private static void ConvertPixelsToUserUnits(Child node, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters)
+        private static void ConvertPixelsToUserUnits(Child node, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters, float widthPoints, float heightPoints)
         {
             ScaleNode(node, node.attrs.scaleX, node.attrs.scaleY);
             ConvertAbsoluteToRelative(node, widthPixels, heightPixels);
             ConvertRelativeToMillimeter(node, widthMillimeters, heightMillimeters);
-            //ConvertToUserUnits(node);
+            ConvertToUserUnits(node);
             if (node.className == "Group")
             {
                 foreach (Child childNode in node.children)
                 {
-                    if (node.attrs.scaleX > 0 )
+                    if (node.attrs.scaleX > 0)
                     {
                         childNode.attrs.scaleX *= node.attrs.scaleX;
                     }
-                    if (node.attrs.scaleY > 0 )
+                    if (node.attrs.scaleY > 0)
                     {
                         childNode.attrs.scaleY *= node.attrs.scaleY;
                     }
-                    ConvertPixelsToUserUnits(childNode, widthPixels, heightPixels, widthMillimeters, heightMillimeters);
+                    ConvertPixelsToUserUnits(childNode, widthPixels, heightPixels, widthMillimeters, heightMillimeters, widthPoints, heightPoints);
                 }
             }
             if (node.attrs.name == "passepartout")
             {
-                string[] commands = PathUtils.ParsePathData(node.attrs.data);
-                string data = "";
-                foreach (string command in commands)
-                {
-                    if (command != "" && !command.StartsWith('Z'))
-                    {
-                        string newCommand = TransformCoords(command, (float)node.attrs.x, (float)node.attrs.y, widthPixels, heightPixels, widthMillimeters, heightMillimeters, node);
-                        data += newCommand;
-                    }
-                }
-                node.attrs.data = data;
+                HandlePath(node, widthPixels, heightPixels, widthMillimeters, heightMillimeters, heightPoints);
             }
+            else if (node.className == "Line")
+            {
+                HandleLine(node, widthPixels, heightPixels, widthMillimeters, heightMillimeters);
+            }
+            else if (node.className == "Text")
+            {
+                ScaleFont(node, widthPixels, heightPixels, widthPoints, heightPoints);
+            }
+        }
+
+        private static double CalculateScale(float widthPixels, float heightPixels, float widthPoints, float heightPoints)
+        {
+            double horScale = widthPoints / widthPixels;
+            double verScale = heightPoints / heightPixels;
+            return Math.Min(horScale, verScale);
+        }
+
+        private static void HandlePath(Child node, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters, float heightPoints)
+        {
+            string[] commands = PathUtils.ParsePathData(node.attrs.data);
+            string data = "";
+            foreach (string command in commands)
+            {
+                if (command != "" && !command.StartsWith('Z'))
+                {
+                    string newCommand = TransformCoords(command, (float)node.attrs.x, (float)node.attrs.y, widthPixels, heightPixels, widthMillimeters, heightMillimeters, heightPoints, node);
+                    data += newCommand;
+                }
+            }
+            node.attrs.data = data;
+        }
+
+        private static void HandleLine(Child node, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters)
+        {
+            double[] points = node.attrs.points;
+            if (node.attrs.scaleX > 0)
+            {
+                points[0] = ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(points[0] * node.attrs.scaleX, widthPixels), widthMillimeters)); 
+                points[2] = ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(points[2] * node.attrs.scaleX, widthPixels), widthMillimeters));               
+            }
+            else
+            {
+                points[0] = ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(points[0], widthPixels), widthMillimeters));
+                points[2] = ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(points[2], widthPixels), widthMillimeters));
+            }
+            if (node.attrs.scaleY > 0)
+            {
+                points[1] = ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(points[1] * node.attrs.scaleY, heightPixels), heightMillimeters));
+                points[3] = ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(points[3] * node.attrs.scaleY, heightPixels), heightMillimeters));
+            }
+            else
+            {
+                points[1] = ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(points[1], heightPixels), heightMillimeters));
+                points[3] = ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(points[3], heightPixels), heightMillimeters));
+            }
+            node.attrs.points = points;
         }
 
         private static void ScaleNode(Child node, double scaleX, double scaleY)
         {
-            if (scaleX > 0) {
+            if (scaleX > 0)
+            {
                 node.attrs.width *= scaleX;
             }
             if (scaleY > 0)
@@ -71,50 +121,74 @@ namespace PlantFocusEditor.Helpers
             }
         }
 
+        private static double ConvertToRelative(double value, double maximum)
+        {
+            return value / maximum;
+        }
+
+        private static double ConvertRelativeToMillimeter(double value, double maximum)
+        {
+            return value * maximum;
+        }
+
+        public static double ConvertMillimetersToPoints(double value)
+        {
+            return value * (75 / 25.4);
+        }
+
         private static void ConvertAbsoluteToRelative(Child node, float width, float height)
         {
             if (node.attrs.name == "element")
             {
-                node.attrs.posX = node.attrs.posX / width;
-                node.attrs.posY = node.attrs.posY / height;
-            }            
-            node.attrs.x = (node.attrs.x / width);
-            node.attrs.y = (node.attrs.y / height);
-            node.attrs.width = (node.attrs.width / width);
-            node.attrs.height = (node.attrs.height / height);
+                node.attrs.posX = ConvertToRelative(node.attrs.posX, width);
+                node.attrs.posY = ConvertToRelative(node.attrs.posY, height);
+            }
+            node.attrs.padding = ConvertToRelative(node.attrs.padding, width);
+            node.attrs.strokeWidth = ConvertToRelative(node.attrs.strokeWidth, width);
+            node.attrs.x = ConvertToRelative(node.attrs.x, width);
+            node.attrs.y = ConvertToRelative(node.attrs.y, height);
+            node.attrs.width = ConvertToRelative(node.attrs.width, width);
+            node.attrs.height = ConvertToRelative(node.attrs.height, height);
         }
 
         private static void ConvertRelativeToMillimeter(Child node, float width, float height)
         {
             if (node.attrs.name == "element")
             {
-                node.attrs.posX *= width;
-                node.attrs.posY *= height;
+                node.attrs.posX = ConvertRelativeToMillimeter(node.attrs.posX, width);
+                node.attrs.posY = ConvertRelativeToMillimeter(node.attrs.posY, height);
             }            
-            node.attrs.x = node.attrs.x * width;
-            node.attrs.y = node.attrs.y * height;
-            node.attrs.width = node.attrs.width * width;
-            node.attrs.height = node.attrs.height * height;
+            node.attrs.padding = ConvertRelativeToMillimeter(node.attrs.padding, width);
+            node.attrs.strokeWidth = ConvertRelativeToMillimeter(node.attrs.strokeWidth, width);
+            node.attrs.x = ConvertRelativeToMillimeter(node.attrs.x, width);
+            node.attrs.y = ConvertRelativeToMillimeter(node.attrs.y, height);
+            node.attrs.width = ConvertRelativeToMillimeter(node.attrs.width, width);
+            node.attrs.height = ConvertRelativeToMillimeter(node.attrs.height, height);
         }
 
         private static void ConvertToUserUnits(Child node)
         {
             if (node.attrs.name == "element")
             {
-                node.attrs.posX = node.attrs.posX / 25.4 * 72;
-                node.attrs.posY = node.attrs.posY / 25.4 * 72;
+                node.attrs.posX = ConvertMillimetersToPoints(node.attrs.posX);
+                node.attrs.posY = ConvertMillimetersToPoints(node.attrs.posY);
             }
-            if (node.className == "Text")
-            {
-                node.attrs.fontSize = (int)Math.Round(node.attrs.fontSize * 25.4 / 72);
-            }
-            node.attrs.x = node.attrs.x / 25.4 * 72;
-            node.attrs.y = node.attrs.y / 25.4 * 72;
-            node.attrs.width = node.attrs.width / 25.4 * 72;
-            node.attrs.height = node.attrs.height / 25.4 * 72;
+            node.attrs.padding = ConvertMillimetersToPoints(node.attrs.padding);
+            node.attrs.strokeWidth = ConvertMillimetersToPoints(node.attrs.strokeWidth);
+            node.attrs.x = ConvertMillimetersToPoints(node.attrs.x);
+            node.attrs.y = ConvertMillimetersToPoints(node.attrs.y);
+            node.attrs.width = ConvertMillimetersToPoints(node.attrs.width);
+            node.attrs.height = ConvertMillimetersToPoints(node.attrs.height);
         }
 
-        private static string TransformCoords(string command, float x, float y, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters, Child child)
+        private static void ScaleFont(Child node, float widthPixels, float heightPixels, float widthPoints, float heightPoints)
+        {
+            double scale = CalculateScale(widthPixels, heightPixels, widthPoints, heightPoints);
+            Console.WriteLine($"Scale: {scale}");
+            node.attrs.fontSize = (int)Math.Round(node.attrs.fontSize * scale);
+        }
+
+        private static string TransformCoords(string command, float x, float y, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters, float heightPoints, Child child)
         {
             Console.WriteLine(command);
             string stringCoords = command.Substring(1, command.Length - 1);
@@ -134,7 +208,7 @@ namespace PlantFocusEditor.Helpers
             }
             if (coords.Length > 1)
             {
-                string points = TransformCoords(coords, child, x, y, widthPixels, heightPixels, widthMillimeters, heightMillimeters);
+                string points = TransformCoords(coords, child, x, y, widthPixels, heightPixels, widthMillimeters, heightMillimeters, heightPoints);
                 return string.Join("", command[0], points);
             }
             if (command.StartsWith('H') || command.StartsWith('h'))
@@ -168,7 +242,7 @@ namespace PlantFocusEditor.Helpers
             return string.Join("", command[0], newCoords);
         }
 
-        private static string TransformCoords(float[] coords, Child child, float x, float y, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters)
+        private static string TransformCoords(float[] coords, Child child, float x, float y, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters, float heightPoints)
         {
             for (int i = 0; i < coords.Length; i++)
             {
@@ -176,26 +250,22 @@ namespace PlantFocusEditor.Helpers
                 {
                     if (child.attrs.scaleX == 0.0)
                     {
-                        coords[i] = coords[i] / widthPixels;
-                        coords[i] = coords[i] * widthMillimeters + x;
+                        coords[i] = (float)ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(coords[i], widthPixels), widthMillimeters)) + x;
                     }
                     else
                     {
-                        coords[i] = (float)(coords[i] * child.attrs.scaleX / widthPixels);
-                        coords[i] = coords[i] * widthMillimeters + x;
+                        coords[i] = (float)ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(coords[i] * child.attrs.scaleX, widthPixels), widthMillimeters)) + x;
                     }
                 }
                 else
                 {
                     if (child.attrs.scaleY == 0.0)
                     {
-                        coords[i] = coords[i] / heightPixels;
-                        coords[i] = heightMillimeters - coords[i] * heightMillimeters;
+                        coords[i] = heightPoints - (float)ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(coords[i], heightPixels), heightMillimeters));
                     }
                     else
                     {
-                        coords[i] = (float)(coords[i] * child.attrs.scaleY / heightPixels);
-                        coords[i] = heightMillimeters - coords[i] * heightMillimeters;
+                        coords[i] = heightPoints - (float)ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(coords[i] * child.attrs.scaleY, heightPixels), heightMillimeters));
                     }
                 }
             }
