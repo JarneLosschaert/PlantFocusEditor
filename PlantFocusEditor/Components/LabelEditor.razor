@@ -6,7 +6,7 @@
     <div class="label-editor">
         <SideBar SelectTab="SelectTab" />
         <SideBarContent @ref="_sideBarContent" />
-        <Editor EditorClicked="HandleEditorClicked" Loading="_loading" />
+        <Editor EditorClicked="HandleEditorClicked" Loading="_loading" Template="Template" />
         <StylingBar @ref="_stylingBar" />
     </div>
 </CascadingValue>
@@ -15,6 +15,7 @@
     private IJSObjectReference? _module;
 
     public SideBarTabs _SelectedTab { get; set; } = SideBarTabs.Layers;
+    public Template Template { get; set; }
 
     private StylingBar.StylingBar? _stylingBar;
     private SideBarContent? _sideBarContent;
@@ -47,6 +48,7 @@
             if (templates.Count() > 0)
             {
                 Template template = templates[1];
+                Template = template;
                 Console.WriteLine(template.JsonToRender);
                 Console.WriteLine(template.Name);
                 if (_module is not null)

@@ -38,54 +38,53 @@ namespace PlantFocusEditor.Services
             _apiService = service;
         }
 
-        public async Task<byte[]> SaveToPdf(string jsonStringFront, string jsonStringBack, float[] dimensions)
-        {            
-            RootObject front = ConvertFromJson(jsonStringFront);
-            RootObject back = ConvertFromJson(jsonStringBack);
-            byte[] firstPage = await AddPage(front, dimensions);
-            byte[] secondPage = await AddPage(back, dimensions);
+        public async Task<byte[]> SaveToPdf(string jsonStringFront, string jsonStringBack, float[] dimensions, float[] dimensionsMillimeters)
+        {
+            RootObject front = UnitConverter.ConvertJsonPixelsToMillimeters(ConvertFromJson(jsonStringFront), dimensions, dimensionsMillimeters);
+            RootObject back = UnitConverter.ConvertJsonPixelsToMillimeters(ConvertFromJson(jsonStringBack), dimensions, dimensionsMillimeters);
+            double width = dimensionsMillimeters[0];
+            double height = dimensionsMillimeters[1];
+            byte[] firstPage = await AddPage(front, width, height);
+            byte[] secondPage = await AddPage(back, width, height);
             using MemoryStream ms = new();
             using PdfDocument pdf = new(new PdfWriter(ms).SetSmartMode(true));
 
-            // Create reader from bytes
             using (MemoryStream memoryStream = new(firstPage))
             {
-                // Create reader from bytes
                 using PdfReader reader = new(memoryStream);
                 PdfDocument srcDoc = new(reader);
                 srcDoc.CopyPagesTo(1, srcDoc.GetNumberOfPages(), pdf);
             }
-            // Create reader from bytes
             using (MemoryStream memoryStream = new(secondPage))
             {
-                // Create reader from bytes
                 using PdfReader reader = new(memoryStream);
                 PdfDocument srcDoc = new(reader);
                 srcDoc.CopyPagesTo(1, srcDoc.GetNumberOfPages(), pdf);
             }
             pdf.Close();
             return ms.ToArray();
-        }
+        }        
 
-        private async Task<byte[]> AddPage(RootObject root, float[] dimensions)
+        private async Task<byte[]> AddPage(RootObject root, double width, double height)
         {
             _memoryStream = new MemoryStream();
             _writer = new PdfWriter(_memoryStream);
             _pdf = new PdfDocument(_writer);
             _document = new Document(_pdf);
-            _canvas = new PdfCanvas(_pdf.AddNewPage(new PageSize(dimensions[0], dimensions[1])));
+            _canvas = new PdfCanvas(_pdf.AddNewPage(new PageSize((float)width, (float)height)));
+            
             float x = (float)root.attrs.x;
             float y = (float)root.attrs.y;
             foreach (Child child in root.children)
             {
-                await AddNode(child, 0, 0, dimensions[1], 1, 1);
+                await AddNode(child, 0, 0, (float)height, 1, 1);
             }
             return GetPdfBytes();
         }
 
         private async Task AddNode(Child child, float x, float y, float stageHeight, double scaleX = 1, double scaleY = 1)
         {            
-            if (scaleX > 0)
+            /*if (scaleX > 0)
             {
                 child.attrs.width = child.attrs.width * scaleX;
                 child.attrs.x = child.attrs.x * scaleX;
@@ -94,12 +93,12 @@ namespace PlantFocusEditor.Services
             {
                 child.attrs.height = child.attrs.height * scaleY;
                 child.attrs.y = child.attrs.y * scaleY;
-            }
+            }*/
             if (child.attrs.name == "passepartout")
             {
                 string[] commands = PathUtils.ParsePathData(child.attrs.data);
                 AddPath(commands, child, x, y, stageHeight);
-                _canvas.Clip();
+                //_canvas.Clip();
                 _canvas.Stroke();
             }
             else if (child.className == "Text")
@@ -598,7 +597,7 @@ namespace PlantFocusEditor.Services
 
                 if (char.ToUpper(firstChar) != 'Z')
                 {
-                    coords = TransformCoords(command, (float)child.attrs.x + x, (float)child.attrs.y + y, stageHeight, child);
+                    coords = GetCoordsFromCommand(command);
                     DrawPathFromCommands(command, coords, prevX, prevY, ref minX, ref maxX, ref minY, ref maxY);
                     if (firstChar == 'M' || firstChar == 'L')
                     {
@@ -637,6 +636,103 @@ namespace PlantFocusEditor.Services
             float height = maxY - minY;
             _canvas.ClosePath();
             return new Rectangle(minX, minY, width, height).SetBbox(minX, minY, maxX, maxY);
+        }
+
+        private static float[] GetCoordsFromCommand(string command)
+        {
+            string stringCoords = command.Substring(1, command.Length - 1);
+            float[] coords = null;
+            if (stringCoords.Contains(','))
+            {
+                coords = Array.ConvertAll(stringCoords.Split(','), float.Parse);
+            }
+            else if (stringCoords.Contains(' '))
+            {
+                coords = Array.ConvertAll(stringCoords.Split(' '), float.Parse);
+            }
+            else
+            {
+                coords = [float.Parse(stringCoords)];
+            }
+            return coords;
+        }
+
+        private static float[] TransformCoords(string command, float x, float y, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters, Child child)
+        {
+            string stringCoords = command.Substring(1, command.Length - 1);
+            float[] coords = null;
+            if (stringCoords.Contains(','))
+            {
+                coords = Array.ConvertAll(stringCoords.Split(','), float.Parse);
+            }
+            else if (stringCoords.Contains(' '))
+            {
+                coords = Array.ConvertAll(stringCoords.Split(' '), float.Parse);
+            }
+            else
+            {
+                coords = [float.Parse(stringCoords)];
+            }
+            if (coords.Length > 1)
+            {
+                return TransformCoords(coords, child, x, y, widthPixels, heightPixels, widthMillimeters, heightMillimeters);
+            }
+            if (command.StartsWith('H') || command.StartsWith('h'))
+            {
+                if (child.attrs.scaleX == 0.0)
+                {
+                    coords[0] = (coords[0] / widthPixels) * widthMillimeters + x;
+                    coords[0] = (coords[0] / widthPixels) * widthMillimeters;
+                }
+                else
+                {
+                    coords[0] = ((coords[0] * (float)child.attrs.scaleX) / widthPixels) * widthMillimeters + x;
+                }
+                return coords;
+            }
+            if (command.StartsWith('V') || command.StartsWith('v'))
+            {
+                if (child.attrs.scaleY == 0.0)
+                {
+                    coords[0] = heightMillimeters - ((coords[0] / heightPixels) * heightMillimeters + y);
+                }
+                else
+                {
+                    coords[0] = heightMillimeters - (((coords[0] * (float)child.attrs.scaleY) / heightPixels) * heightMillimeters + y);
+                }
+            }
+            return coords;
+        }
+
+        private static float[] TransformCoords(float[] coords, Child child, float x, float y, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters)
+        {
+            for (int i = 0; i < coords.Length; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    if (child.attrs.scaleX == 0.0)
+                    {
+                        coords[i] = (coords[i] / widthPixels) * widthMillimeters + x;
+                    }
+                    else
+                    {
+                        coords[i] = (coords[i] * (float)child.attrs.scaleX) / widthPixels * widthMillimeters + x;
+                    }
+
+                }
+                else
+                {
+                    if (child.attrs.scaleY == 0.0)
+                    {
+                        coords[i] = heightMillimeters - (coords[i] / heightPixels * heightMillimeters + y);
+                    }
+                    else
+                    {
+                        coords[i] = heightMillimeters - ((coords[i] * (float)child.attrs.scaleY) / heightPixels * heightMillimeters + y);
+                    }
+                }
+            }
+            return coords;
         }
 
         private float[] TransformCoords(string command, float x, float y, float stageHeight, Child child)
