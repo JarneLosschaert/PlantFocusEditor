@@ -16,13 +16,8 @@ using iText.Layout.Layout;
 using iText.IO.Image;
 using iText.Kernel.Colors.Gradients;
 using Microsoft.JSInterop;
-using Org.BouncyCastle.Asn1.Ocsp;
-using static System.Net.Mime.MediaTypeNames;
 using Image = iText.Layout.Element.Image;
 using Text = iText.Layout.Element.Text;
-using iText.Layout.Borders;
-using iText.Commons.Datastructures;
-using static iText.Kernel.Pdf.Canvas.PdfCanvasConstants;
 
 namespace PlantFocusEditor.Services
 {
@@ -304,7 +299,6 @@ namespace PlantFocusEditor.Services
             float[] dimensions = GetNodeWidthHeight(child);
             float width = dimensions[0];
             float height = dimensions[1];
-            Console.WriteLine($"height: {height}");
             float left;
             float bottom;
             double rotationAngle = child.attrs.rotation;
@@ -341,7 +335,10 @@ namespace PlantFocusEditor.Services
             {
                 left = (float)child.attrs.x + x;
                 bottom = stageHeight - (float)(child.attrs.y + height + y);
-                image.SetObjectFit(ObjectFit.COVER);
+                if (rotationAngle == 0)
+                {
+                    image.SetObjectFit(ObjectFit.COVER);
+                }
             }
             image.SetWidth(width).SetHeight(height);
 
