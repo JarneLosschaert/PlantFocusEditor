@@ -129,7 +129,7 @@ namespace PlantFocusEditor.Helpers
 
         public static double ConvertMillimetersToPoints(double value)
         {
-            return value * (75 / 25.4);
+            return value * (72 / 25.4);
         }
 
         private static void ConvertAbsoluteToRelative(Child node, float width, float height)
