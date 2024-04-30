@@ -93,9 +93,7 @@ namespace PlantFocusEditor.Services
                 if (scaleX > 0 || scaleY > 0)
                 {
                     double scale = Math.Min(scaleX, scaleY);
-                    Console.WriteLine($"fontSize before scale: {child.attrs.fontSize}");
                     child.attrs.fontSize = (int)Math.Round(child.attrs.fontSize * scale);
-                    Console.WriteLine($"fontSize after scale: {child.attrs.fontSize}");
                 }
                 if (scaleX > scaleY)
                 {
@@ -455,21 +453,19 @@ namespace PlantFocusEditor.Services
                 .SetMargin(0)
                 .SetPadding(0)
                 .SetVerticalAlignment(VerticalAlignment.TOP);
-            //paragraph.SetProperty(Property.TOP, pageHeight - (child.attrs.y + y));
+            paragraph.SetProperty(Property.OVERFLOW_X, OverflowPropertyValue.VISIBLE);
+            paragraph.SetProperty(Property.OVERFLOW_Y, OverflowPropertyValue.VISIBLE);
             HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.opacity);
 
             float left = (float)(child.attrs.x + x);
             float bottom;
             if (child.attrs.height > 0)
             {
-                Console.WriteLine($"calculating with height: {child.attrs.height}");
                 paragraph.SetHeight((float)child.attrs.height);
                 bottom = (float)(pageHeight - (child.attrs.y + y + child.attrs.height));
-                Console.WriteLine(child.attrs.y + y);
             } else
             {
                 float textHeight = GetTextHeight(paragraph, pageHeight);
-                Console.WriteLine($"Calculating with textHeight: {textHeight}");
                 bottom = (float)(pageHeight - (child.attrs.y + y + textHeight));
             }
 
@@ -509,8 +505,8 @@ namespace PlantFocusEditor.Services
                 }
                 else
                 {
-                    //paragraph.SetFixedPosition(left, bottom, (float)child.attrs.width);
-                    paragraph.SetProperty(Property.LEFT, left);
+                    paragraph.SetFixedPosition(left, bottom, (float)child.attrs.width);
+                    //paragraph.SetProperty(Property.LEFT, left);
                 }
             } else
             {

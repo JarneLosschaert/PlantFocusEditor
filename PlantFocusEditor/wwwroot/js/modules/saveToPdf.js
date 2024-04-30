@@ -54,7 +54,7 @@ function getJsonToRender() {
     back.children.forEach(child => {
         setSource(child, front);
     });
-    console.log(front);
+    console.log(back);
     return [JSON.stringify(front), JSON.stringify(back)];
 }
 

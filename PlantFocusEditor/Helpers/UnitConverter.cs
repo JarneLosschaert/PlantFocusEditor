@@ -180,15 +180,12 @@ namespace PlantFocusEditor.Helpers
         private static void ScaleFont(Child node, float widthPixels, float heightPixels, float widthMillimeter, float heightMillimeter)
         {
             double scale = CalculateScale(widthPixels, heightPixels, widthMillimeter, heightMillimeter);
-            Console.WriteLine($"Scale: {scale}");
             node.attrs.fontSize = (int)Math.Round(node.attrs.fontSize * scale);
         }
 
         private static string TransformCoords(string command, float x, float y, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters, Child child)
         {
-            Console.WriteLine(command);
             string stringCoords = command.Substring(1, command.Length - 1);
-            Console.WriteLine(stringCoords);
             float[] coords = null;
             if (stringCoords.Contains(','))
             {
