@@ -78,6 +78,7 @@ namespace PlantFocusEditor.Services
             {
                 await AddNode(child, 0, 0, (float)height, 1, 1);
             }
+            _fontManager.Clear();
             return GetPdfBytes();
         }
 

@@ -48,7 +48,8 @@
         {
             string[] jsonToRender = await _module.InvokeAsync<string[]>("getJsonToRender");
             float[] dimensions = await _module.InvokeAsync<float[]>("getDimensions");
-            float[] dimensionsTemplate = [50, 120];
+            float[] dimensionsTemplate = [(float)Template.WidthMillimeters, (float)Template.HeightMillimeters];
+            //float[] dimensionsTemplate = [50, 120];
             byte[] pdfBytes = await PDFConversionService.SaveToPdf(jsonToRender[0], jsonToRender[1], dimensions, dimensionsTemplate);
             string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssffff");
             string fileName = $"{timeStamp}.pdf";

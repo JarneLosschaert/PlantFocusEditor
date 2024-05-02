@@ -1,4 +1,5 @@
-﻿using Library.Classes;
+﻿using iText.Kernel.Geom;
+using Library.Classes;
 
 namespace PlantFocusEditor.Helpers
 {
@@ -58,6 +59,7 @@ namespace PlantFocusEditor.Helpers
         private static void HandlePath(Child node, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters)
         {
             string[] commands = PathUtils.ParsePathData(node.attrs.data);
+            double height = PathUtils.FindHeightPassePartout(node.attrs.data);
             string data = "";
             foreach (string command in commands)
             {
@@ -66,7 +68,7 @@ namespace PlantFocusEditor.Helpers
                     string newCommand = TransformCoords(command, (float)node.attrs.x, (float)node.attrs.y, widthPixels, heightPixels, widthMillimeters, heightMillimeters, node);
                     data += newCommand;
                 }
-            }
+            }            
             node.attrs.data = data;
         }
 
@@ -183,11 +185,11 @@ namespace PlantFocusEditor.Helpers
             {
                 if (child.attrs.scaleY == 0.0)
                 {
-                    coords[0] = (float)ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(coords[0], heightPixels), heightMillimeters));
+                    coords[0] = (float)ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(coords[0], heightPixels), heightMillimeters)) + y;
                 }
                 else
                 {
-                    coords[0] = (float)ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(coords[0] * child.attrs.scaleY, heightPixels), heightMillimeters));
+                    coords[0] = (float)ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(coords[0] * child.attrs.scaleY, heightPixels), heightMillimeters)) + y;
                 }
             }
             string newCoords = string.Join(',', coords);
@@ -213,11 +215,11 @@ namespace PlantFocusEditor.Helpers
                 {
                     if (child.attrs.scaleY == 0.0)
                     {
-                        coords[i] = (float)ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(coords[i], heightPixels), heightMillimeters));
+                        coords[i] = (float)ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(coords[i], heightPixels), heightMillimeters)) + y;
                     }
                     else
                     {
-                        coords[i] = (float)ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(coords[i] * child.attrs.scaleY, heightPixels), heightMillimeters));
+                        coords[i] = (float)ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(coords[i] * child.attrs.scaleY, heightPixels), heightMillimeters)) + y;
                     }
                 }
             }

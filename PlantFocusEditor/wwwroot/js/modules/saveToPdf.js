@@ -97,6 +97,7 @@ function getDimensions() {
             height = originalHeight;
         }
     });
+    console.log(width, height);
     return [width, height];
 }
 
