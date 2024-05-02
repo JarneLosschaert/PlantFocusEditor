@@ -1,4 +1,7 @@
-﻿namespace Library.Classes
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
+
+namespace Library.Classes
 {
     public class Attrs
     {
@@ -17,6 +20,7 @@
         public string? fill { get; set; }
         public string? text { get; set; }
         public int fontSize { get; set; }
+        public double fontSizeDouble { get; set; }
         public string? fontFamily { get; set; }
         public string? fontStyle { get; set; }
         public bool draggable { get; set; }

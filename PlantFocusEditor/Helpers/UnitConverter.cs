@@ -61,7 +61,7 @@ namespace PlantFocusEditor.Helpers
         {
             double horScale = ConvertMillimetersToPoints(widthMillimeter) / widthPixels;
             double verScale = ConvertMillimetersToPoints(heightMillimeter) / heightPixels;
-            return Math.Min(horScale, verScale);
+            return Math.Max(horScale, verScale);
         }
 
         private static void HandlePath(Child node, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters)
@@ -180,7 +180,7 @@ namespace PlantFocusEditor.Helpers
         private static void ScaleFont(Child node, float widthPixels, float heightPixels, float widthMillimeter, float heightMillimeter)
         {
             double scale = CalculateScale(widthPixels, heightPixels, widthMillimeter, heightMillimeter);
-            node.attrs.fontSize = (int)Math.Round(node.attrs.fontSize * scale);
+            node.attrs.fontSizeDouble = node.attrs.fontSize * scale;
         }
 
         private static string TransformCoords(string command, float x, float y, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters, Child child)
