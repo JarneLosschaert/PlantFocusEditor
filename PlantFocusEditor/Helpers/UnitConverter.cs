@@ -9,7 +9,7 @@ namespace PlantFocusEditor.Helpers
             float widthPixels = pixels[0];
             float heightPixels = pixels[1];
             float widthMillimeters = millimeters[0];
-            float heightMillimeters = millimeters[1];            
+            float heightMillimeters = millimeters[1];
             foreach (Child node in json.children)
             {
                 ConvertPixelsToUserUnits(node, widthPixels, heightPixels, widthMillimeters, heightMillimeters);
@@ -24,22 +24,13 @@ namespace PlantFocusEditor.Helpers
 
         private static void ConvertPixelsToUserUnits(Child node, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters)
         {
-            ScaleNode(node, node.attrs.scaleX, node.attrs.scaleY);
             ConvertAbsoluteToRelative(node, widthPixels, heightPixels);
             ConvertRelativeToMillimeter(node, widthMillimeters, heightMillimeters);
             ConvertToUserUnits(node);
             if (node.className == "Group")
             {
                 foreach (Child childNode in node.children)
-                {
-                    if (node.attrs.scaleX > 0)
-                    {
-                        childNode.attrs.scaleX *= node.attrs.scaleX;
-                    }
-                    if (node.attrs.scaleY > 0)
-                    {
-                        childNode.attrs.scaleY *= node.attrs.scaleY;
-                    }
+                {                    
                     ConvertPixelsToUserUnits(childNode, widthPixels, heightPixels, widthMillimeters, heightMillimeters);
                 }
             }
@@ -82,40 +73,12 @@ namespace PlantFocusEditor.Helpers
         private static void HandleLine(Child node, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters)
         {
             double[] points = node.attrs.points;
-            if (node.attrs.scaleX > 0)
-            {
-                points[0] = ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(points[0] * node.attrs.scaleX, widthPixels), widthMillimeters)); 
-                points[2] = ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(points[2] * node.attrs.scaleX, widthPixels), widthMillimeters));               
-            }
-            else
-            {
-                points[0] = ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(points[0], widthPixels), widthMillimeters));
-                points[2] = ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(points[2], widthPixels), widthMillimeters));
-            }
-            if (node.attrs.scaleY > 0)
-            {
-                points[1] = ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(points[1] * node.attrs.scaleY, heightPixels), heightMillimeters));
-                points[3] = ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(points[3] * node.attrs.scaleY, heightPixels), heightMillimeters));
-            }
-            else
-            {
-                points[1] = ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(points[1], heightPixels), heightMillimeters));
-                points[3] = ConvertMillimetersToPoints(heightMillimeters - ConvertRelativeToMillimeter(ConvertToRelative(points[3], heightPixels), heightMillimeters));
-            }
+            points[0] = ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(points[0], widthPixels), widthMillimeters));
+            points[2] = ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(points[2], widthPixels), widthMillimeters));
+            points[1] = ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(points[1], heightPixels), heightMillimeters));
+            points[3] = ConvertMillimetersToPoints(ConvertRelativeToMillimeter(ConvertToRelative(points[3], heightPixels), heightMillimeters));
             node.attrs.points = points;
-        }
-
-        private static void ScaleNode(Child node, double scaleX, double scaleY)
-        {
-            if (scaleX > 0)
-            {
-                node.attrs.width *= scaleX;
-            }
-            if (scaleY > 0)
-            {
-                node.attrs.height *= scaleY;
-            }
-        }
+        }        
 
         private static double ConvertToRelative(double value, double maximum)
         {
@@ -153,7 +116,7 @@ namespace PlantFocusEditor.Helpers
             {
                 node.attrs.posX = ConvertRelativeToMillimeter(node.attrs.posX, width);
                 node.attrs.posY = ConvertRelativeToMillimeter(node.attrs.posY, height);
-            }            
+            }
             node.attrs.padding = ConvertRelativeToMillimeter(node.attrs.padding, width);
             node.attrs.strokeWidth = ConvertRelativeToMillimeter(node.attrs.strokeWidth, width);
             node.attrs.x = ConvertRelativeToMillimeter(node.attrs.x, width);

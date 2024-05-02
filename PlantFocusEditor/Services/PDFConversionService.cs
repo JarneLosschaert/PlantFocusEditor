@@ -63,6 +63,7 @@ namespace PlantFocusEditor.Services
                 srcDoc.CopyPagesTo(1, srcDoc.GetNumberOfPages(), pdf);
             }
             pdf.Close();
+            _fontManager.Clear();
             return ms.ToArray();
         }
 
@@ -82,6 +83,16 @@ namespace PlantFocusEditor.Services
 
         private async Task AddNode(Child child, float x, float y, float pageHeight, double scaleX = 1, double scaleY = 1)
         {
+            if (scaleX > 0)
+            {
+                child.attrs.width = child.attrs.width * scaleX;
+                child.attrs.x = child.attrs.x * scaleX;
+            }
+            if (scaleY > 0)
+            {
+                child.attrs.height = child.attrs.height * scaleY;
+                child.attrs.y = child.attrs.y * scaleY;
+            }
             if (child.attrs.name == "passepartout")
             {
                 string[] commands = PathUtils.ParsePathData(child.attrs.data);
@@ -208,7 +219,7 @@ namespace PlantFocusEditor.Services
             _canvas.SetLineWidth(1);
         }
 
-        private void AddLine(Child child, float x, float y, float stageHeight, double scaleX, double scaleY)
+        private void AddLine(Child child, float x, float y, float pageHeight, double scaleX, double scaleY)
         {
             float width = (float)child.attrs.strokeWidth;
             Color stroke = ColorConstants.BLACK;
@@ -216,15 +227,15 @@ namespace PlantFocusEditor.Services
             {
                 stroke = HexToColor(child.attrs.stroke);
             }
-            DrawLine(child.attrs.points, x, y, width, stroke);
+            DrawLine(child.attrs.points, x, y, pageHeight, (float)scaleX, (float)scaleY, width, stroke);
         }
 
-        private void DrawLine(double[] points, float x, float y, float width, Color strokeColor)
+        private void DrawLine(double[] points, float x, float y, float pageHeight, float scaleX, float scaleY, float width, Color strokeColor)
         {
             _canvas.SetLineWidth(width);
             _canvas.SetStrokeColor(strokeColor);
-            _canvas.MoveTo(points[0] + x, points[1] - y);
-            _canvas.LineTo(points[2] + x, points[3] - y);
+            _canvas.MoveTo(points[0] * scaleX + x, pageHeight - (points[1] * scaleY + y));
+            _canvas.LineTo(points[2] * scaleX + x, pageHeight - (points[3] * scaleY + y));
             _canvas.Stroke();
         }
 
@@ -382,14 +393,14 @@ namespace PlantFocusEditor.Services
             float width = (float)child.attrs.width;
             float height = (float)child.attrs.height;
 
-            /*if (child.attrs.scaleX != 0)
+            if (child.attrs.scaleX != 0)
             {
                 width *= (float)child.attrs.scaleX;
             }
             if (child.attrs.scaleY != 0)
             {
                 height *= (float)child.attrs.scaleY;
-            }*/
+            }
             return [width, height];
         }
 

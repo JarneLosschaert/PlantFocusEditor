@@ -73,5 +73,10 @@ namespace PlantFocusEditor.Helpers
             }
             return null;
         }
+
+        public void Clear()
+        {
+            _fonts.Clear();
+        }
     }
 }
