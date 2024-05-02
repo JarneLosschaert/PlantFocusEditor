@@ -47,14 +47,14 @@ import { georgiaBoldItalic } from "../fonts/georgia-bold-italic.js";
     clone.destroy();
 }*/
 
-function getJsonToRender() {
+function getJsonToRender() {    
     front.children.forEach(child => {
         setSource(child, front);
     });
     back.children.forEach(child => {
         setSource(child, front);
     });
-    console.log(front);
+    console.log(back);
     return [JSON.stringify(front), JSON.stringify(back)];
 }
 
@@ -62,15 +62,16 @@ function setSource(child, parent) {
     if (child.attrs.name === "element") {
         const rotation = child.attrs.rotation;
 
-        const bbox = child.getClientRect({ skipTransform: false, relativeTo: true }); 
+        const bbox = child.getClientRect({ skipTransform: false, skipStroke: false, relativeTo: true }); 
         
         child.attrs.posX = bbox.x - parent.attrs.x;
         child.attrs.posY = bbox.y - parent.attrs.y;
+
         child.rotation(0);
         const src = child.toDataURL({
-            //mimeType: "image/png",
-            //width: pos.width,
-            //height: pos.height,
+            mimeType: "image/png",
+            width: child.attrs.width * child.attrs.scaleX + child.attrs.strokeWidth * 2 * child.attrs.scaleX,
+            height: child.attrs.height * child.attrs.scaleY + child.attrs.strokeWidth * 2 * child.attrs.scaleY,
             pixelRatio: 2
         });
         child.rotation(rotation);
@@ -96,7 +97,23 @@ function getDimensions() {
             height = originalHeight;
         }
     });
+    console.log(width, height);
     return [width, height];
+}
+
+function setTextHeight(group) {
+    group.children.forEach(node => {
+        if (node.getClassName() === "Text") {
+            const fontSize = node.attrs.fontSize * (node.scaleX() ?? 1);
+            const fontStyle = node.attrs.fontStyle;
+            const dimensions = getTextDimensions(node.attrs.text, fontStyle ?? '', fontSize, node.attrs.fontFamily ?? 'Arial');
+            const textHeight = dimensions.height;
+            node.attrs.textHeight = textHeight;
+            console.log(`text height: ${textHeight}`);
+        } else if (node.getClassName() === "Group") {
+            node.children.forEach(child => setTextHeight(child));
+        }
+    });    
 }
 
 window.downloadFile = (fileBytes, fileName, fileType) => {
@@ -418,11 +435,12 @@ function getTextDimensions(text, fontStyle, fontSizePx, font) {
 
     context.font = fontStyle + ' ' + fontSizePx + 'px ' + font;
     const metrics = context.measureText(text);
+    const ascent = metrics.actualBoundingBoxAscent;
     const descent = metrics.actualBoundingBoxDescent;
 
     const width = metrics.width;
     canvas = null;
-    return { width: width, descent: descent }
+    return { width: width, descent: descent, height: ascent + descent }
         ;
 }
 

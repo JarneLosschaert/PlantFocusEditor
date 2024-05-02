@@ -10,7 +10,7 @@ function createTextLayer(type) {
         draggable: true,
         width: 250,
         height: 50,
-        padding: 10,
+        padding: 0,
         align: "center",
         shadowColor: 'black',
         shadowBlur: 10,

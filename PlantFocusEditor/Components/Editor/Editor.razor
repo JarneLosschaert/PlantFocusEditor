@@ -5,8 +5,7 @@
 <section class="editor">
     <EditorBar EditorClicked="EditorClicked" @ref="_editorBar" />
     <div id="konva-container" @onclick="onEditorClicked" @ontouchend="onEditorClicked"></div>
-    <button @onclick="Save">Save to pdf</button>
-    <button @onclick="SaveToPdf">Save to pdf iText</button>
+    <button @onclick="SaveToPdf">Save to pdf</button>
     @if (Loading)
     {
         <div class="loader">
@@ -18,9 +17,10 @@
 @code {
     [Parameter]
     public Action EditorClicked { get; set; }
-
     [Parameter]
     public bool Loading { get; set; }
+    [Parameter]
+    public Template Template { get; set; }
 
     private IJSObjectReference? _module;
     private EditorBar? _editorBar;
@@ -47,7 +47,9 @@
         {
             string[] jsonToRender = await _module.InvokeAsync<string[]>("getJsonToRender");
             float[] dimensions = await _module.InvokeAsync<float[]>("getDimensions");
-            byte[] pdfBytes = await PDFConversionService.SaveToPdf(jsonToRender[0], jsonToRender[1], dimensions);
+            float[] dimensionsTemplate = [(float)Template.WidthMillimeters, (float)Template.HeightMillimeters];
+            //float[] dimensionsTemplate = [50, 120];
+            byte[] pdfBytes = await PDFConversionService.SaveToPdf(jsonToRender[0], jsonToRender[1], dimensions, dimensionsTemplate);
             string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssffff");
             string fileName = $"{timeStamp}.pdf";
             string fileType = "application/pdf";

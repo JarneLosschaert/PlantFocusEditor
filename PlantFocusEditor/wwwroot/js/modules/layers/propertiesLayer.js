@@ -94,7 +94,7 @@ function addProperties(json) {
                 x: margin + imageSize + margin + borderThickness,
                 y: middle,
                 width: rowWidth - margin - imageSize - margin - borderThickness,
-                height: fontSize,
+                height: (rowHeight - margin) / property.Translations.length,
                 fontFamily: font,
                 fontStyle: style,
                 textDecoration: decoration,

@@ -18,6 +18,9 @@ function handleFontSizeChange(fontSize) {
         if (node.getClassName() === "Text") {
             const value = parseFloat(fontSize);
             node.fontSize(value);
+            const bbox = node.getClientRect({ skipTransform: false });
+            console.log(`bbox height: ${bbox.height}`);
+            node.height(bbox.height);
         }
     });
 }
