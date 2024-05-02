@@ -5,8 +5,7 @@
 <section class="editor">
     <EditorBar EditorClicked="EditorClicked" @ref="_editorBar" />
     <div id="konva-container" @onclick="onEditorClicked" @ontouchend="onEditorClicked"></div>
-    <button @onclick="Save">Save to pdf</button>
-    <button @onclick="SaveToPdf">Save to pdf iText</button>
+    <button @onclick="SaveToPdf">Save to pdf</button>
     @if (Loading)
     {
         <div class="loader">
