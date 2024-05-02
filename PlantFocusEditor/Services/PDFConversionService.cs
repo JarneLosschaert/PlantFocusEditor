@@ -30,11 +30,13 @@ namespace PlantFocusEditor.Services
         private Document _document;
         private PdfCanvas _canvas;
         private readonly ApiConnectorService _apiService;
+        private readonly FontManager _fontManager;
 
         public PDFConversionService(IJSRuntime runtime, ApiConnectorService service)
         {
             _runtime = runtime;
             _apiService = service;
+            _fontManager = new(_runtime);
         }
 
         public async Task<byte[]> SaveToPdf(string jsonStringFront, string jsonStringBack, float[] dimensions, float[] dimensionsMillimeters)
@@ -62,7 +64,7 @@ namespace PlantFocusEditor.Services
             }
             pdf.Close();
             return ms.ToArray();
-        }        
+        }
 
         private async Task<byte[]> AddPage(RootObject root, double width, double height)
         {
@@ -70,7 +72,7 @@ namespace PlantFocusEditor.Services
             _writer = new PdfWriter(_memoryStream);
             _pdf = new PdfDocument(_writer);
             _document = new Document(_pdf);
-            _canvas = new PdfCanvas(_pdf.AddNewPage(new PageSize((float)width, (float)height)));            
+            _canvas = new PdfCanvas(_pdf.AddNewPage(new PageSize((float)width, (float)height)));
             foreach (Child child in root.children)
             {
                 await AddNode(child, 0, 0, (float)height, 1, 1);
@@ -79,7 +81,7 @@ namespace PlantFocusEditor.Services
         }
 
         private async Task AddNode(Child child, float x, float y, float pageHeight, double scaleX = 1, double scaleY = 1)
-        {            
+        {
             if (child.attrs.name == "passepartout")
             {
                 string[] commands = PathUtils.ParsePathData(child.attrs.data);
@@ -89,7 +91,7 @@ namespace PlantFocusEditor.Services
             }
             else if (child.className == "Text")
             {
-                Text text = new Text(child.attrs.text);  
+                Text text = new Text(child.attrs.text);
                 if (scaleX > 0 || scaleY > 0)
                 {
                     double scale = Math.Min(scaleX, scaleY);
@@ -106,11 +108,21 @@ namespace PlantFocusEditor.Services
                 {
                     text.SetHorizontalScaling((float)(scaleX / scaleY));
                 }
-                byte[] fontBytes = await GetFont(child.attrs.fontFamily, child.attrs.fontStyle);               
-                AddText(child, x, y, fontBytes, pageHeight, text);
+                string fontName = FontManager.GetFont(child.attrs.fontFamily, child.attrs.fontStyle);
+                PdfFont? font = _fontManager.GetPdfFont(fontName);
+                if (font != null)
+                {
+                    AddText(child, x, y, font, pageHeight, text);
+                }
+                else
+                {
+                    byte[] fontBytes = await _fontManager.GetFontBytes(fontName);
+                    font = _fontManager.SaveFont(fontName, fontBytes);
+                    AddText(child, x, y, font, pageHeight, text);
+                }                
             }
             else if (child.className == "Path")
-            {                
+            {
                 await AddImage(child, x, y, pageHeight);
             }
             else if (child.className == "Image")
@@ -125,7 +137,7 @@ namespace PlantFocusEditor.Services
                 }
             }
             else if (child.className == "Line")
-            {                
+            {
                 AddLine(child, x, y, pageHeight, scaleX, scaleY);
             }
             else if (child.className == "Group")
@@ -139,54 +151,11 @@ namespace PlantFocusEditor.Services
                     scaleY = child.attrs.scaleY * scaleY;
                 }
                 foreach (Child childNode in child.children)
-                {                    
+                {
                     await AddNode(childNode, (float)child.attrs.x + x, (float)child.attrs.y + y, pageHeight, scaleX, scaleY);
                 }
             }
-        }
-
-        private async Task<byte[]> GetFont(string? fontFamily, string? fontStyle)
-        {
-            string font;
-            if (fontFamily != null)
-            {
-                if (fontStyle != null)
-                {
-                    bool isBold = fontStyle.Contains("bold");
-                    bool isItalic = fontStyle.Contains("italic");
-                    font = GetFontFileName(fontFamily, isBold, isItalic);
-                }
-                else
-                {
-                    font = GetFontFileName(fontFamily, false, false);
-                }
-            }
-            else if (fontStyle != null)
-            {
-                bool isBold = fontStyle.Contains("bold");
-                bool isItalic = fontStyle.Contains("italic");
-                font = GetFontFileName("Arial", isBold, isItalic);
-            }
-            else
-            {
-                font = GetFontFileName("Arial", false, false);
-            }
-            return await _runtime.InvokeAsync<byte[]>("getFont", font);
-        }
-
-        private static string GetFontFileName(string fontName, bool isBold, bool isItalic)
-        {
-            fontName = fontName.Replace(" ", "");
-            if (isBold)
-            {
-                fontName = $"{fontName}Bold";
-            }
-            if (isItalic)
-            {
-                fontName = $"{fontName}Italic";
-            }
-            return $"{fontName}.ttf";
-        }      
+        }                
 
         private void SetCanvasLinearGradient(Child child, Rectangle bbox)
         {
@@ -236,7 +205,7 @@ namespace PlantFocusEditor.Services
             _canvas.SetLineWidth((float)child.attrs.strokeWidth);
             _canvas.Rectangle(rect);
             _canvas.Stroke();
-            _canvas.SetLineWidth(1);            
+            _canvas.SetLineWidth(1);
         }
 
         private void AddLine(Child child, float x, float y, float stageHeight, double scaleX, double scaleY)
@@ -265,7 +234,8 @@ namespace PlantFocusEditor.Services
             if (child.attrs.src.Contains("http"))
             {
                 imgData = await GetImageDataByUrl(child.attrs.src);
-            } else
+            }
+            else
             {
                 string base64 = child.attrs.src.Substring(child.attrs.src.IndexOf(",") + 1);
                 byte[] data = Convert.FromBase64String(base64);
@@ -287,7 +257,7 @@ namespace PlantFocusEditor.Services
             if (child.className == "Path")
             {
                 left = (float)child.attrs.posX + x;
-                bottom = pageHeight - (float)(child.attrs.posY + height + y);                
+                bottom = pageHeight - (float)(child.attrs.posY + height + y);
                 image.SetWidth(width).SetHeight(height);
                 if (child.attrs.strokeWidth > 0)
                 {
@@ -341,7 +311,7 @@ namespace PlantFocusEditor.Services
                 Point rotatedLeftTop = RotatePoint(center, originalLeftTop, rotationAngle);
                 Point rotatedRightBottom = RotatePoint(center, originalRightBottom, rotationAngle);
                 Point rotatedRightTop = RotatePoint(center, originalRightTop, rotationAngle);
-                
+
                 Rectangle bbox = CalculateBoundingBox(rotatedLeftBottom, rotatedLeftTop, rotatedRightBottom, rotatedRightTop);
                 if (child.className == "Path")
                 {
@@ -355,11 +325,11 @@ namespace PlantFocusEditor.Services
                     bottom = (float)rotatedLeftBottom.GetY();
                     image.SetRotationAngle(DegreesToRadians(-rotationAngle));
                 }
-            }            
-            image.SetFixedPosition(left, bottom);            
+            }
+            image.SetFixedPosition(left, bottom);
             if (child.className != "Path" && child.attrs.strokeWidth > 0)
             {
-                DeviceRgb color = HexToColor(child.attrs.stroke);                
+                DeviceRgb color = HexToColor(child.attrs.stroke);
                 if (child.attrs.rotation != 0)
                 {
                     AffineTransform transform = AffineTransform.GetRotateInstance(child.attrs.rotation * (Math.PI / 180));
@@ -374,7 +344,7 @@ namespace PlantFocusEditor.Services
             }
 
             _document.Add(image);
-        }        
+        }
 
         private static Rectangle CalculateBoundingBox(Point leftBottom, Point leftUpper, Point rightBottom, Point rightUpper)
         {
@@ -449,10 +419,8 @@ namespace PlantFocusEditor.Services
             return p;
         }
 
-        private void AddText(Child child, float x, float y, byte[] fontBytes, float pageHeight, Text text)
+        private void AddText(Child child, float x, float y, PdfFont font, float pageHeight, Text text)
         {
-            FontProgram fontProgram = FontProgramFactory.CreateFont(fontBytes);
-            PdfFont font = PdfFontFactory.CreateFont(fontProgram);
             Console.WriteLine(child.attrs.fontSizeDouble);
             Paragraph paragraph = new Paragraph(text)
                 .SetFont(font)
@@ -460,19 +428,19 @@ namespace PlantFocusEditor.Services
                 .SetWidth((float)child.attrs.width)
                 .SetMargin(0)
                 .SetPadding(0)
-                .SetVerticalAlignment(VerticalAlignment.TOP)
-                .SetMultipliedLeading(1.5f);
+                .SetVerticalAlignment(VerticalAlignment.TOP);
             paragraph.SetProperty(Property.OVERFLOW_X, OverflowPropertyValue.VISIBLE);
             paragraph.SetProperty(Property.OVERFLOW_Y, OverflowPropertyValue.VISIBLE);
             HandleTextStyle(paragraph, child.attrs.textDecoration, child.attrs.opacity);
 
             float left = (float)(child.attrs.x + x);
-            float bottom;            
+            float bottom;
             if (child.attrs.height > 0)
             {
                 paragraph.SetHeight((float)child.attrs.height);
                 bottom = (float)(pageHeight - (child.attrs.y + y + child.attrs.height));
-            } else
+            }
+            else
             {
                 float textHeight = GetTextHeight(paragraph, pageHeight);
                 bottom = (float)(pageHeight - (child.attrs.y + y + textHeight));
@@ -482,9 +450,9 @@ namespace PlantFocusEditor.Services
 
             SetTextPosition(child, paragraph, align, left, bottom);
             paragraph.SetTextAlignment(align);
-            
+
             SetTextColor(paragraph, child.attrs.fill);
-            
+
             _document.Add(paragraph);
         }
 
@@ -514,7 +482,8 @@ namespace PlantFocusEditor.Services
                 {
                     paragraph.SetFixedPosition(left, bottom, (float)child.attrs.width);
                 }
-            } else
+            }
+            else
             {
                 paragraph.SetFixedPosition(left, bottom, (float)child.attrs.width);
             }
