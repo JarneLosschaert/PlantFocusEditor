@@ -131,7 +131,7 @@ namespace PlantFocusEditor.Services
                     byte[] fontBytes = await _fontManager.GetFontBytes(fontName);
                     font = _fontManager.SaveFont(fontName, fontBytes);
                     AddText(child, x, y, font, pageHeight, text);
-                }                
+                }
             }
             else if (child.className == "Path")
             {
@@ -143,10 +143,7 @@ namespace PlantFocusEditor.Services
             }
             else if (child.className == "Rect")
             {
-                if (child.attrs.strokeWidth > 0)
-                {
-                    AddRectangle(child, x, y, pageHeight);
-                }
+                AddRectangle(child, x, y, pageHeight);
             }
             else if (child.className == "Line")
             {
@@ -167,7 +164,7 @@ namespace PlantFocusEditor.Services
                     await AddNode(childNode, (float)child.attrs.x + x, (float)child.attrs.y + y, pageHeight, scaleX, scaleY);
                 }
             }
-        }                
+        }
 
         private void SetCanvasLinearGradient(Child child, Rectangle bbox)
         {
@@ -203,25 +200,48 @@ namespace PlantFocusEditor.Services
 
         private void AddRectangle(Child child, float x, float y, float pageHeight)
         {
+            _canvas.SaveState();
             float[] widthHeight = GetNodeWidthHeight(child);
-            float width, height;
-            (width, height) = (widthHeight[0], widthHeight[1]);
+            float width = widthHeight[0];
+            float height = widthHeight[1];
             float left = (float)child.attrs.x + x;
             float bottom = pageHeight - ((float)child.attrs.y + y + height);
             Rectangle rect = new(left, bottom, width, height);
+            
+            _canvas.Rectangle(rect);
             if (child.attrs.fill.Contains("#"))
             {
+
                 Color rgb = HexToColor(child.attrs.fill);
+                TransparentColor color;
+                if (child.attrs.fill.Length > 7)
+                {
+                    string opacity = $"{child.attrs.fill[child.attrs.fill.Length - 2]}{child.attrs.fill[child.attrs.fill.Length - 1]}";
+                    color = new(rgb, float.Parse(opacity));
+                }
+                else
+                {
+                    color = new TransparentColor(rgb, (float)child.attrs.opacity);
+                }
                 _canvas.SetFillColor(rgb);
+                color.ApplyFillTransparency(_canvas);
+                color.ApplyStrokeTransparency(_canvas);
             }
-            _canvas.SetLineWidth((float)child.attrs.strokeWidth);
-            _canvas.Rectangle(rect);
-            _canvas.Stroke();
-            _canvas.SetLineWidth(1);
+            if (child.attrs.strokeWidth == 0)
+            {
+                _canvas.Fill();
+            }
+            else
+            {
+                _canvas.SetLineWidth((float)child.attrs.strokeWidth);
+                _canvas.Stroke();
+            }
+            _canvas.RestoreState();
         }
 
         private void AddLine(Child child, float x, float y, float pageHeight, double scaleX, double scaleY)
         {
+            _canvas.SaveState();
             float width = (float)child.attrs.strokeWidth;
             Color stroke = ColorConstants.BLACK;
             if (child.attrs.stroke.Contains('#'))
@@ -229,6 +249,7 @@ namespace PlantFocusEditor.Services
                 stroke = HexToColor(child.attrs.stroke);
             }
             DrawLine(child.attrs.points, x, y, pageHeight, (float)scaleX, (float)scaleY, width, stroke);
+            _canvas.RestoreState();
         }
 
         private void DrawLine(double[] points, float x, float y, float pageHeight, float scaleX, float scaleY, float width, Color strokeColor)
@@ -544,8 +565,63 @@ namespace PlantFocusEditor.Services
             }
         }
 
-        private Rectangle AddPath(string[] commands, Child child, float x, float y, float stageHeight)
+        private void AddPath(string[] commands, Child child, float x, float y, float pageHeight)
         {
+            _canvas.SaveState();
+            _canvas.SetLineWidth(0.01f);
+            float prevX = 0.0F;
+            float prevY = 0.0F;            
+            for (int i = 0; i < commands.Length; i++)
+            {
+                string command = commands[i];
+                char firstChar = command[0];
+                firstChar = char.ToUpper(firstChar);
+                float[] coords;
+
+                if (char.ToUpper(firstChar) != 'Z')
+                {
+                    coords = GetCoordsFromCommand(command);
+                    DrawPathFromCommands(command, coords, prevX, prevY);
+                    if (firstChar == 'M' || firstChar == 'L')
+                    {
+                        prevX = coords[0];
+                        prevY = coords[1];
+                    }
+                    else if (firstChar == 'C')
+                    {
+                        prevX = coords[4];
+                        prevY = coords[5];
+                    }
+                    else if (firstChar == 'S')
+                    {
+                        if (coords.Length == 4)
+                        {
+                            prevX = coords[2];
+                            prevY = coords[3];
+                        }
+                        else
+                        {
+                            prevX = coords[4];
+                            prevY = coords[5];
+                        }
+                    }
+                    else if (firstChar == 'H')
+                    {
+                        prevX = coords[0];
+                    }
+                    else if (firstChar == 'V')
+                    {
+                        prevY = coords[0];
+                    }
+                }
+            }
+            _canvas.ClosePath();
+            _canvas.SaveState();
+        }
+
+        private Rectangle AddPathWithBbox(string[] commands, Child child, float x, float y, float stageHeight)
+        {
+            _canvas.SaveState();
             _canvas.SetLineWidth(0.01f);
             float prevX = 0.0F;
             float prevY = 0.0F;
@@ -563,7 +639,7 @@ namespace PlantFocusEditor.Services
                 if (char.ToUpper(firstChar) != 'Z')
                 {
                     coords = GetCoordsFromCommand(command);
-                    DrawPathFromCommands(command, coords, prevX, prevY, ref minX, ref maxX, ref minY, ref maxY);
+                    DrawPathFromCommandsWithBbox(command, coords, prevX, prevY, ref minX, ref maxX, ref minY, ref maxY);
                     if (firstChar == 'M' || firstChar == 'L')
                     {
                         prevX = coords[0];
@@ -600,6 +676,7 @@ namespace PlantFocusEditor.Services
             float width = maxX - minX;
             float height = maxY - minY;
             _canvas.ClosePath();
+            _canvas.SaveState();
             return new Rectangle(minX, minY, width, height).SetBbox(minX, minY, maxX, maxY);
         }
 
@@ -621,162 +698,7 @@ namespace PlantFocusEditor.Services
             }
             return coords;
         }
-
-        private static float[] TransformCoords(string command, float x, float y, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters, Child child)
-        {
-            string stringCoords = command.Substring(1, command.Length - 1);
-            float[] coords = null;
-            if (stringCoords.Contains(','))
-            {
-                coords = Array.ConvertAll(stringCoords.Split(','), float.Parse);
-            }
-            else if (stringCoords.Contains(' '))
-            {
-                coords = Array.ConvertAll(stringCoords.Split(' '), float.Parse);
-            }
-            else
-            {
-                coords = [float.Parse(stringCoords)];
-            }
-            if (coords.Length > 1)
-            {
-                return TransformCoords(coords, child, x, y, widthPixels, heightPixels, widthMillimeters, heightMillimeters);
-            }
-            if (command.StartsWith('H') || command.StartsWith('h'))
-            {
-                if (child.attrs.scaleX == 0.0)
-                {
-                    coords[0] = (coords[0] / widthPixels) * widthMillimeters + x;
-                    coords[0] = (coords[0] / widthPixels) * widthMillimeters;
-                }
-                else
-                {
-                    coords[0] = ((coords[0] * (float)child.attrs.scaleX) / widthPixels) * widthMillimeters + x;
-                }
-                return coords;
-            }
-            if (command.StartsWith('V') || command.StartsWith('v'))
-            {
-                if (child.attrs.scaleY == 0.0)
-                {
-                    coords[0] = heightMillimeters - ((coords[0] / heightPixels) * heightMillimeters + y);
-                }
-                else
-                {
-                    coords[0] = heightMillimeters - (((coords[0] * (float)child.attrs.scaleY) / heightPixels) * heightMillimeters + y);
-                }
-            }
-            return coords;
-        }
-
-        private static float[] TransformCoords(float[] coords, Child child, float x, float y, float widthPixels, float heightPixels, float widthMillimeters, float heightMillimeters)
-        {
-            for (int i = 0; i < coords.Length; i++)
-            {
-                if (i % 2 == 0)
-                {
-                    if (child.attrs.scaleX == 0.0)
-                    {
-                        coords[i] = (coords[i] / widthPixels) * widthMillimeters + x;
-                    }
-                    else
-                    {
-                        coords[i] = (coords[i] * (float)child.attrs.scaleX) / widthPixels * widthMillimeters + x;
-                    }
-
-                }
-                else
-                {
-                    if (child.attrs.scaleY == 0.0)
-                    {
-                        coords[i] = heightMillimeters - (coords[i] / heightPixels * heightMillimeters + y);
-                    }
-                    else
-                    {
-                        coords[i] = heightMillimeters - ((coords[i] * (float)child.attrs.scaleY) / heightPixels * heightMillimeters + y);
-                    }
-                }
-            }
-            return coords;
-        }
-
-        private float[] TransformCoords(string command, float x, float y, float stageHeight, Child child)
-        {
-            string stringCoords = command.Substring(1, command.Length - 1);
-            float[] coords = null;
-            if (stringCoords.Contains(','))
-            {
-                coords = Array.ConvertAll(stringCoords.Split(','), float.Parse);
-            }
-            else if (stringCoords.Contains(' '))
-            {
-                coords = Array.ConvertAll(stringCoords.Split(' '), float.Parse);
-            }
-            else
-            {
-                coords = [float.Parse(stringCoords)];
-            }
-            if (coords.Length > 1)
-            {
-                return TransformCoords(coords, child, x, y, stageHeight);
-            }
-            if (command.StartsWith('H') || command.StartsWith('h'))
-            {
-                if (child.attrs.scaleX == 0.0)
-                {
-                    coords[0] = coords[0] + x;
-                }
-                else
-                {
-                    coords[0] = coords[0] * (float)child.attrs.scaleX + x;
-                }
-                return coords;
-            }
-            if (command.StartsWith('V') || command.StartsWith('v'))
-            {
-                if (child.attrs.scaleY == 0.0)
-                {
-                    coords[0] = stageHeight - (coords[0] + y);
-                }
-                else
-                {
-                    coords[0] = stageHeight - (coords[0] * (float)child.attrs.scaleY + y);
-                }
-            }
-            return coords;
-        }
-
-        private float[] TransformCoords(float[] coords, Child child, float x, float y, float stageHeight)
-        {
-            for (int i = 0; i < coords.Length; i++)
-            {
-                if (i % 2 == 0)
-                {
-                    if (child.attrs.scaleX == 0.0)
-                    {
-                        coords[i] = coords[i] + x;
-                    }
-                    else
-                    {
-                        coords[i] = coords[i] * (float)child.attrs.scaleX + x;
-                    }
-
-                }
-                else
-                {
-                    if (child.attrs.scaleY == 0.0)
-                    {
-                        coords[i] = stageHeight - (coords[i] + y);
-                    }
-                    else
-                    {
-                        coords[i] = stageHeight - (coords[i] * (float)child.attrs.scaleY + y);
-                    }
-                }
-            }
-            return coords;
-        }
-
+        
         static void UpdateBoundingBox(float x, float y, ref float minX, ref float maxX, ref float minY, ref float maxY)
         {
             minX = Math.Min(minX, x);
@@ -785,7 +707,47 @@ namespace PlantFocusEditor.Services
             maxY = Math.Max(maxY, y);
         }
 
-        private void DrawPathFromCommands(string command, float[] coords, float prevX, float prevY, ref float minX, ref float maxX, ref float minY, ref float maxY)
+        private void DrawPathFromCommands(string command, float[] coords, float prevX, float prevY)
+        {
+            char firstChar = char.ToUpper(command[0]);
+            if (firstChar == 'M')
+            {
+                _canvas.MoveTo(coords[0], coords[1]);
+            }
+            else if (firstChar == 'L')
+            {
+                _canvas.LineTo(coords[0], coords[1]);
+            }
+            else if (firstChar == 'C' || firstChar == 'S')
+            {
+                if (coords.Length == 6)
+                {
+                    _canvas.CurveTo(coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);                   
+                }
+                else
+                {
+                    for (int i = 0; i < coords.Length - 3; i += 4)
+                    {
+                        _canvas.CurveTo(coords[i], coords[i + 1], coords[i + 2], coords[i + 3]);
+                    }
+                }
+
+            }
+            else if (firstChar == 'H')
+            {
+                _canvas.LineTo(coords[0], prevY);
+            }
+            else if (firstChar == 'V')
+            {
+                _canvas.LineTo(prevX, coords[0]);
+            }
+            else if (firstChar == 'Z')
+            {
+                _canvas.ClosePath();
+            }
+        }
+
+        private void DrawPathFromCommandsWithBbox(string command, float[] coords, float prevX, float prevY, ref float minX, ref float maxX, ref float minY, ref float maxY)
         {
 
             char firstChar = char.ToUpper(command[0]);
